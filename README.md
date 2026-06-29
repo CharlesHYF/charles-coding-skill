@@ -1,48 +1,103 @@
 # charles-coding-skill
 
-Charles 专用全栈编码规范，适用于 Claude Code（Superpowers Skill 体系）。
+Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
 
 覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：Tab 缩进、中文注释、文件头规范、命名约定、格式化工具链、测试要求、Git 分支与提交规范。
 
+---
+
 ## 安装
 
-### 方式一：全局安装（推荐）
-
-将 skill 克隆到 Claude Code 的全局 skills 目录，对所有项目生效：
+### Claude Code
 
 ```bash
+# 全局（推荐，对所有项目生效）
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.claude/skills/charles-coding
-```
 
-### 方式二：项目级安装
-
-仅对当前项目生效，适合团队共享：
-
-```bash
-# 在项目根目录执行
+# 项目级
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .claude/skills/charles-coding
 ```
 
-或以 Git Submodule 方式引入，方便跟随上游更新：
+### Codex CLI
 
 ```bash
-git submodule add git@github.com:CharlesHYF/charles-coding-skill.git .claude/skills/charles-coding
+# 全局
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.agents/skills/charles-coding
+
+# 项目级
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .agents/skills/charles-coding
 ```
 
-### 安装后使用
-
-在 Claude Code 中直接调用：
-
-```
-/charles-coding
-```
-
-或在对话中描述任务，skill 会根据 `~/.claude/CLAUDE.md` 的配置自动触发。
-
-### 更新
+### OpenCode
 
 ```bash
-cd ~/.claude/skills/charles-coding && git pull origin main
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .opencode/skills/charles-coding
+```
+
+### Cursor
+
+```bash
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/skills/charles-coding
+```
+
+### Gemini CLI
+
+```bash
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .gemini/skills/charles-coding
+```
+
+### GitHub Copilot
+
+```bash
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .github/skills/charles-coding
+```
+
+### Trae
+
+```bash
+# 国际版
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae/skills/charles-coding
+
+# 国内版
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae-cn/skills/charles-coding
+```
+
+### Rovo Dev
+
+```bash
+# 全局
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.rovodev/skills/charles-coding
+
+# 项目级
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .rovodev/skills/charles-coding
+```
+
+### Qoder
+
+```bash
+# 全局
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.qoder/skills/charles-coding
+
+# 项目级
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .qoder/skills/charles-coding
+```
+
+### Pi
+
+```bash
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .pi/skills/charles-coding
+```
+
+### Hermes Agent / OpenClaw
+
+无需手动安装目录，将 [SKILL.md](SKILL.md) 内容作为 system prompt 或上下文注入即可。
+
+---
+
+## 更新
+
+```bash
+cd <上述安装目录> && git pull origin main
 ```
 
 ---
