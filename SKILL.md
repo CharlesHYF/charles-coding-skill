@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.2.1
+version: 2.3.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -27,7 +27,7 @@ author: Charles <w1400214654@outlook.com>
 | [Vue](reference/vue.md)                     | Vue 3 + Vite + TS          | Prettier + ESLint              | Vitest + Playwright       |
 | [React](reference/react.md)                 | Next.js (App Router) + TS  | Prettier + ESLint（或 Biome）  | Vitest + RTL + Playwright |
 | [Python](reference/python.md)               | FastAPI + uv               | Ruff + mypy                    | pytest（覆盖率 ≥80%）     |
-| [SQL](reference/sql.md)                     | PostgreSQL / MySQL / SQLite | 关键字大写 + 2 空格           | —                         |
+| [SQL](reference/sql.md)                     | PostgreSQL / MySQL / SQLite | 关键字大写 + 2 空格 + 阿里巴巴规约 | —                         |
 
 > **缩进**默认 **Tab**；例外：**Python / Kotlin 4 空格**、**SQL / YAML / JSON 2 空格**。**行尾**统一 **LF**。以上由脚手架里的 `.editorconfig` + `.gitattributes` 强制，不靠自觉。
 
