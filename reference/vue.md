@@ -42,7 +42,7 @@
 
 ## 类型（types）
 - **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
-- 命名约定：请求 `XxxReq`、响应 `XxxRespVO`。示例：登录接口的 `LoginReq` / `LoginRespVO` 放在 `src/types/auth.d.ts`（数据传输命名总规约见 [SKILL.md](../SKILL.md)）
+- 命名约定：请求 `XxxReqVO`、响应 `XxxRespVO`。示例：登录接口的 `LoginReqVO` / `LoginRespVO` 放在 `src/types/auth.d.ts`（数据传输命名总规约见 [SKILL.md](../SKILL.md)）
 
 ## 开发体验（dev）
 - **启动自动打开浏览器**：dev 脚本加 `--open`，即 `package.json` 中 `"dev": "vite --open"`（或在 `vite.config` 设 `server: { open: true }`）

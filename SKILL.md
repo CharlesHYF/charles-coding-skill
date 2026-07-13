@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.7.1
+version: 2.8.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -48,9 +48,10 @@ author: Charles <w1400214654@outlook.com>
 - 段落正文开头**缩进一个 Tab**（两个字符宽）
 
 ### 数据传输命名规范
-- **前后端交互**：请求参数用 `XxxReq`，响应返回给前端用 `XxxRespVO`。示例：`LoginReq` / `LoginRespVO`
-- **内部传输**（服务/模块之间、Service 层内部）：用 `XxxDTO`
-- 三者边界：`Req` = 入参（前端 → 后端）、`RespVO` = 出参（后端 → 前端展示）、`DTO` = 内部流转，不直接暴露给前端
+- **前后端交互**：请求参数用 `XxxReqVO`，响应返回给前端用 `XxxRespVO`。示例：`LoginReqVO` / `LoginRespVO`
+  - 细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`
+- **内部/跨服务传输**（RPC、服务/模块之间）：用 `XxxReqDTO` / `XxxRespDTO`（统称 `XxxDTO`）
+- 三者边界：`ReqVO` = 入参（前端 → 后端）、`RespVO` = 出参（后端 → 前端展示）、`DTO` = 内部流转，不直接暴露给前端
 - 后端（Java / Go / Python）与前端（Vue / React 的 `types/`）均遵循此命名
 
 ### 注释规范
