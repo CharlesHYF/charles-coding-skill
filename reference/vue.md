@@ -44,6 +44,20 @@
 - **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
 - 命名约定：请求 `XxxReq`、响应 `XxxResp`。示例：登录接口的 `LoginReq` / `LoginResp` 放在 `src/types/auth.d.ts`
 
+## 开发体验（dev）
+- **启动自动打开浏览器**：dev 脚本加 `--open`，即 `package.json` 中 `"dev": "vite --open"`（或在 `vite.config` 设 `server: { open: true }`）
+- **codeInspectorPlugin**：dev 环境接入 [`code-inspector-plugin`](https://github.com/zh-lx/code-inspector)，点击页面元素直接跳到编辑器对应源码。在 `vite.config.ts` 注册（仅开发生效）：
+  ```ts
+  import { codeInspectorPlugin } from 'code-inspector-plugin'
+
+  export default defineConfig({
+  	plugins: [
+  		vue(),
+  		codeInspectorPlugin({ bundler: 'vite' }), // 插件内部自动仅在 dev 生效
+  	],
+  })
+  ```
+
 ## 环境变量
 - 默认创建三份（Vite 命名规范，点号分隔）：
   - `.env`：所有环境共享的默认值

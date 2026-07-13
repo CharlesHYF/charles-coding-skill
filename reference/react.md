@@ -44,6 +44,22 @@
 - **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
 - 命名约定：请求 `XxxReq`、响应 `XxxResp`。示例：登录接口的 `LoginReq` / `LoginResp` 放在 `src/types/auth.d.ts`
 
+## 开发体验（dev）
+- **启动自动打开浏览器**：Next.js 15+ 的 `next dev` 支持 `--open`（`"dev": "next dev --open"`）；旧版本无该 flag，可用 `concurrently` 等在 dev 脚本里并行执行 `open`/`opener` 打开地址
+- **codeInspectorPlugin**：dev 环境接入 [`code-inspector-plugin`](https://github.com/zh-lx/code-inspector)，点击页面元素直接跳到编辑器对应源码。在 `next.config` 的 webpack 钩子注册（仅开发生效）：
+  ```ts
+  import { codeInspectorPlugin } from 'code-inspector-plugin'
+
+  const nextConfig = {
+  	webpack: (config, { dev, isServer }) => {
+  		config.plugins.push(codeInspectorPlugin({ bundler: 'webpack', dev, isServer }))
+  		return config
+  	},
+  }
+  export default nextConfig
+  ```
+  > 使用 Turbopack（`next dev --turbopack`）时按插件文档改用其 Turbopack 接入方式。
+
 ## 环境变量
 - 默认创建三份（Next.js 命名规范，点号分隔）：
   - `.env`：所有环境共享的默认值
