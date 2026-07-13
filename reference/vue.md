@@ -17,6 +17,7 @@
 
 ## 代码风格
 - 单文件组件顺序：`<template>` → `<script setup lang="ts">` → `<style scoped>`
+- **文件头注释块**：SFC 只在 **`<script setup lang="ts">` 顶部**写一次（含文件作用、创建日期、修改日期，见 [SKILL.md](../SKILL.md) 注释规范）。**禁止**在 `<template>` 之前的 HTML 注释里重复书写，避免一份文件头出现两处。
 - 样式方案：优先 Tailwind CSS，必要时用 `<style scoped>` 补充组件私有样式
 - 格式化：Prettier + ESLint（eslint-plugin-vue）；Prettier 设 `useTabs: true` 以符合全局 Tab 约定
 
