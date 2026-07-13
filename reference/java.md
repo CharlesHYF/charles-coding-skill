@@ -7,7 +7,7 @@
 
 ## 技术栈与工具
 - JDK：1.8、17、最新 LTS 灵活切换
-- 构建：Maven（主）
+- 构建：Maven（主）；Gradle（Kotlin DSL，`build.gradle.kts`）为可选备选，同一项目只用一种
 - 框架：Spring Boot
 - ORM：MyBatis / MyBatis-Plus
 - 日志：SLF4J + Logback

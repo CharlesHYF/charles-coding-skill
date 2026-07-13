@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.8.0
+version: 2.9.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -46,6 +46,17 @@ author: Charles <w1400214654@outlook.com>
 ### Markdown 规范
 - **严禁**使用 `---` / `***` / `___` 等任何形式的分割线（水平线）
 - 段落正文开头**缩进一个 Tab**（两个字符宽）
+
+### README 规范
+- **每次修改代码后**必须检查 `README.md` 是否需要同步更新（技术栈、功能列表、目录结构、启动方式、配置说明等发生变化时同步改动），保持文档与代码一致
+- README **必须包含徽章（badge）**，置于标题下方，至少涵盖：主要语言/框架及版本、构建/CI 状态（如有）、License、版本号；按项目补充覆盖率、依赖等。统一用 [shields.io](https://shields.io) 风格
+- 徽章示例：
+  ```markdown
+  ![Java](https://img.shields.io/badge/Java-17-orange)
+  ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7-brightgreen)
+  ![License](https://img.shields.io/badge/license-MIT-blue)
+  ```
+- **推荐章节结构**（按项目裁剪）：`# 标题` → 徽章 → `## 介绍` → `## 软件架构`（附架构图）→ `## 技术栈` → `## 项目亮点/特点` → `## 使用说明`（启动步骤、账号、配置项）
 
 ### 数据传输命名规范
 - **前后端交互**：请求参数用 `XxxReqVO`，响应返回给前端用 `XxxRespVO`。示例：`LoginReqVO` / `LoginRespVO`
