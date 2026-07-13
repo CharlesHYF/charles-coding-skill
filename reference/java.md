@@ -1,5 +1,4 @@
 # Charles Coding — Java
-
 > charles-coding 的 Java 分册。**先遵循 [SKILL.md](../SKILL.md) 的「全局约定」**（缩进=Tab、中文注释、Git 分支、覆盖率策略等），本文件只列 Java 专属规范。
 
 ## 能力范围

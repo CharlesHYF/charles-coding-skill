@@ -1,15 +1,12 @@
 # charles-coding-skill
-
-![Version](https://img.shields.io/badge/version-2.9.2-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-2.10.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 	Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
 
 	覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：Tab 缩进、中文注释、文件头规范、命名约定、格式化工具链、测试要求、Git 分支与提交规范。
 
 ## 安装
-
 ### Claude Code
-
 ```bash
 # 全局（推荐，对所有项目生效）
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.claude/skills/charles-coding
@@ -19,7 +16,6 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .claude/skills/char
 ```
 
 ### Codex CLI
-
 ```bash
 # 全局
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.agents/skills/charles-coding
@@ -29,31 +25,26 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .agents/skills/char
 ```
 
 ### OpenCode
-
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .opencode/skills/charles-coding
 ```
 
 ### Cursor
-
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/skills/charles-coding
 ```
 
 ### Gemini CLI
-
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .gemini/skills/charles-coding
 ```
 
 ### GitHub Copilot
-
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .github/skills/charles-coding
 ```
 
 ### Trae
-
 ```bash
 # 国际版
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae/skills/charles-coding
@@ -63,7 +54,6 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae-cn/skills/c
 ```
 
 ### Rovo Dev
-
 ```bash
 # 全局
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.rovodev/skills/charles-coding
@@ -73,7 +63,6 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .rovodev/skills/cha
 ```
 
 ### Qoder
-
 ```bash
 # 全局
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.qoder/skills/charles-coding
@@ -83,23 +72,19 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .qoder/skills/charl
 ```
 
 ### Pi
-
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git .pi/skills/charles-coding
 ```
 
 ### Hermes Agent / OpenClaw
-
 	无需手动安装目录，将 [SKILL.md](SKILL.md) 内容作为 system prompt 或上下文注入即可。
 
 ## 更新
-
 ```bash
 cd <上述安装目录> && git pull origin main
 ```
 
 ## 目录结构
-
 ```
 .
 ├── SKILL.md                  # Skill 主入口：全局约定 + 速查索引
@@ -115,7 +100,6 @@ cd <上述安装目录> && git pull origin main
 ```
 
 ## 核心约定（速览）
-
 | 项目 | 规范 |
 |------|------|
 | 缩进 | Tab（Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格） |
@@ -128,5 +112,4 @@ cd <上述安装目录> && git pull origin main
 	详见 [SKILL.md](SKILL.md)。
 
 ## 新项目脚手架
-
 	复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/`。

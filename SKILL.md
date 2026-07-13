@@ -1,22 +1,19 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.9.2
+version: 2.10.0
 author: Charles <w1400214654@outlook.com>
 ---
 
 # Charles Coding
-
 > Charles 专用的全栈编码规范。**本文件只放「全局约定」+「速查索引」;各语言细则在 [`reference/`](reference/) 下的分册里。**
 
 ## 何时使用
-
 - 在 Charles 的任意 **全栈 / 后端 / 前端 / 安卓 / 数据库 / 微服务 / CLI / 数据处理 / AI·ML** 项目中写代码或做代码审查时
 - 需要遵循统一的 **注释、命名、格式化、测试、Git 分支与 PR** 规范时
 - 开新项目需要脚手架时 —— 见 [`reference/project-template/`](reference/project-template/)
 
 ## 速查索引
-
 > **写代码前**：先读下方「全局约定」，再点开对应语言的**分册**（领域名即链接）阅读细则。
 
 | 领域（分册）                                | 主框架 / 运行时            | 格式化 / Lint                  | 测试                      |
@@ -32,7 +29,6 @@ author: Charles <w1400214654@outlook.com>
 > **缩进**默认 **Tab**；例外：**Python / Kotlin 4 空格**、**SQL / YAML / JSON 2 空格**。**行尾**统一 **LF**。以上由脚手架里的 `.editorconfig` + `.gitattributes` 强制，不靠自觉。
 
 ## 全局约定
-
 ### 编辑与格式
 | 项目       | 规范                                                              |
 | ---------- | ----------------------------------------------------------------- |
@@ -46,6 +42,7 @@ author: Charles <w1400214654@outlook.com>
 ### Markdown 规范
 - **严禁**使用 `---` / `***` / `___` 等任何形式的分割线（水平线）
 - 段落正文开头**缩进一个 Tab**（两个字符宽）
+- **标题与其正文之间不留空行**：标题行的下一行直接紧接正文（或子标题），不插入空行
 
 ### README 规范
 - **每次修改代码后**必须检查 `README.md` 是否需要同步更新（技术栈、功能列表、目录结构、启动方式、配置说明等发生变化时同步改动），保持文档与代码一致
@@ -119,5 +116,4 @@ author: Charles <w1400214654@outlook.com>
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
 
 ## 新项目脚手架
-
 开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
