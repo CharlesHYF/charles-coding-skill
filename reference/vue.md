@@ -13,7 +13,7 @@
 - 路由：Vue Router **history 模式**（`createWebHistory`），使用导航守卫检查登录状态；部署到不支持 URL rewrite 的静态托管时才退回 hash 模式
 - UI 库：Element Plus、Ant Design Vue、Vuetify 按场景选用，亦会搭配 Tailwind CSS 快速原型
 - 数据请求：axios 封装（统一拦截、错误处理、token 注入）
-- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新——响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页
+- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新——响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页。**例外**：若当前已在登录页，401 不触发刷新（登录接口本身返回 401 是凭证错误，直接向上抛出交由页面处理）
 - 常用组合函数：`useAuth`、`useRequest`、`usePermission` 等
 
 ## 代码风格

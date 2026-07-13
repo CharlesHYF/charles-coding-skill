@@ -10,7 +10,7 @@
 - 类型：TypeScript 严格模式
 - 状态管理：Zustand（轻量全局态），React Context 仅用于主题/鉴权等少数场景
 - 数据请求：TanStack Query (React Query) + axios
-- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新——响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页
+- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新——响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页。**例外**：若当前已在登录页，401 不触发刷新（登录接口本身返回 401 是凭证错误，直接向上抛出交由页面处理）
 - 表单：React Hook Form + Zod 校验
 - UI 方案：Tailwind CSS + shadcn/ui，构建可复用组件库
 - 路由：Next.js 文件系统路由，动态路由采用 `[slug]` 形式
