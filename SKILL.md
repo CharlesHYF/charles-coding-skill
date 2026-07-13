@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.9.1
+version: 2.9.2
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -61,6 +61,7 @@ author: Charles <w1400214654@outlook.com>
   - 一律用 Markdown 图片语法 `![label](url)`，**禁止**手写 `<svg>`/`<img>` 内联标签（多个内联 SVG 的重复 `id` 会互相冲突，导致徽章显示成 SVG 源码）
   - URL 中的特殊字符必须转义：空格 `%20`、非 ASCII（如中文）用 URL 编码，`-` 在字段值内写 `--`
   - 徽章数量克制（建议 ≤6），信息优先于装饰
+  - **同一组徽章写在同一行**（各 `![]()` 之间用空格分隔，不要每个徽章单独占一行），确保水平排列
   - **提交前必须实际验证渲染效果**：确认在目标平台（GitHub / Gitee）以图片正常显示，不能只看 URL 拼对
 
 ### 数据传输命名规范
