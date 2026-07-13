@@ -42,7 +42,7 @@
 
 ## 类型（types）
 - **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
-- 命名约定：请求 `XxxReq`、响应 `XxxResp`。示例：登录接口的 `LoginReq` / `LoginResp` 放在 `src/types/auth.d.ts`
+- 命名约定：请求 `XxxReq`、响应 `XxxRespVO`。示例：登录接口的 `LoginReq` / `LoginRespVO` 放在 `src/types/auth.d.ts`（数据传输命名总规约见 [SKILL.md](../SKILL.md)）
 
 ## 开发体验（dev）
 - **启动自动打开浏览器**：Next.js 15+ 的 `next dev` 支持 `--open`（`"dev": "next dev --open"`）；旧版本无该 flag，可用 `concurrently` 等在 dev 脚本里并行执行 `open`/`opener` 打开地址

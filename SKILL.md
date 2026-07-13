@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.6.0
+version: 2.7.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -46,6 +46,12 @@ author: Charles <w1400214654@outlook.com>
 ### Markdown 规范
 - **严禁**使用 `---` / `***` / `___` 等任何形式的分割线（水平线）
 - 段落正文开头**缩进一个 Tab**（两个字符宽）
+
+### 数据传输命名规范
+- **前后端交互**：请求参数用 `XxxReq`，响应返回给前端用 `XxxRespVO`。示例：`LoginReq` / `LoginRespVO`
+- **内部传输**（服务/模块之间、Service 层内部）：用 `XxxDTO`
+- 三者边界：`Req` = 入参（前端 → 后端）、`RespVO` = 出参（后端 → 前端展示）、`DTO` = 内部流转，不直接暴露给前端
+- 后端（Java / Go / Python）与前端（Vue / React 的 `types/`）均遵循此命名
 
 ### 注释规范
 - **所有开发类源代码文件**顶部必须包含注释块，说明：
