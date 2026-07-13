@@ -17,6 +17,7 @@
 - 字段：`redisTemplate`（小驼峰）
 - 常量：`ABC_CCC`（全大写下划线）
 - 包名：全小写
+- **实体类包名统一为 `entity`**：所有数据库实体（`@Entity` / MyBatis 映射的 PO）一律放在 `entity` 包下。**禁止**自行新建 `pojo`、`model`、`domain` 等同义包名（`Req` / `RespVO` / `DTO` 各自按 [SKILL.md](../SKILL.md) 数据传输命名规范分包，不要混入 `entity`）
 - 缩进：Tab
 - 格式化工具：强制使用 Checkstyle + Spotless（Maven 插件）
 - 异常处理：全局 `@RestControllerAdvice` 统一捕获，返回规范 `Result` 对象
