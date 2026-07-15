@@ -7,6 +7,16 @@
 ## 技术栈与工具
 - JDK：1.8、17、最新 LTS 灵活切换
 - 构建：Maven（主）；Gradle（Kotlin DSL，`build.gradle.kts`）为可选备选，同一项目只用一种
+- **`pom.xml` 必须显式锁定 JDK 版本**：不写则 IDE（IntelliJ Project Structure）会回落到默认 JDK 5，导致编译/语法级别错乱。父 pom 里用 `<properties>` 定 `<java.version>` 并配置编译插件（多模块项目在**父 pom** 统一声明，子模块继承）：
+  ```xml
+  <properties>
+  	<java.version>17</java.version>
+  	<maven.compiler.source>${java.version}</maven.compiler.source>
+  	<maven.compiler.target>${java.version}</maven.compiler.target>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  ```
+  JDK 9+ 也可用 `<maven.compiler.release>${java.version}</maven.compiler.release>` 替代 source/target。Gradle 则用 `java { sourceCompatibility = JavaVersion.VERSION_17 }`
 - 框架：Spring Boot
 - ORM：MyBatis / MyBatis-Plus
 - 日志：SLF4J + Logback
@@ -31,6 +41,7 @@
 - **业务模块**（如 `xx-system`、`xx-platform`）再拆两个子模块：
   - `xx-xxx-api`：对外暴露的 **RPC 接口（Dubbo）** 与其 `dto` 包，供其它模块依赖
   - `xx-xxx-service`：接口实现与全部业务代码
+- **嵌套子模块必须是标准 Maven 模块**：业务模块下的 `-api` / `-service` 这类「模块中的模块」，各自**必须有独立 `pom.xml`**，父模块 `<packaging>pom</packaging>` 并在 `<modules>` 中声明它们，子模块 `<parent>` 指回父模块。**禁止**出现只是普通文件夹、没被 Maven 识别为 module 的伪子模块（IDE 里不显示为模块、无法独立构建即为错误）
 
 ### service 模块内分层（包结构）
 - `controller/{业务域}/`：控制器，其下 `vo/` 包放该域的 `XxxReqVO` / `XxxRespVO`（见命名）
