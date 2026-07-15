@@ -37,10 +37,11 @@
    * 举报表 DO
    *
    * @author Charles_XDXD
-   * @since 2026-07-15        创建日期
-   * @lastModified 2026-07-15 修改日期（每次实质性修改时更新）
+   * 创建日期：2026-07-15
+   * 修改日期：2026-07-15
    */
   ```
+  （修改日期每次实质性修改时更新为当前日期）
   说明性注释一律 `/** */`，禁止用 `//` 写类/方法/字段文档
 - **判空兜底用 `Optional`**：可能为空的返回值/查询结果用 `Optional` 表达与处理（`Optional.ofNullable(...).map(...).orElse(...)` / `orElseThrow(...)`），**禁止**层层 `if (x != null)` 手写判空堆叠；对外可能返回空的方法优先声明返回 `Optional<T>`
 - **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO ↔ VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
