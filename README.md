@@ -1,5 +1,5 @@
 # charles-coding-skill
-![Version](https://img.shields.io/badge/version-2.12.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-2.13.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
 

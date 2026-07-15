@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.12.0
+version: 2.13.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -74,6 +74,7 @@ author: Charles <w1400214654@outlook.com>
   - 创建日期（格式：`YYYY-MM-DD`）
   - 修改日期（格式：`YYYY-MM-DD`，紧跟在创建日期下方；每次实质性修改时更新为当前日期）
 - 文件的**详细修改历史由 git 记录**，文件头只维护上述最近一次的修改日期，不逐条罗列变更
+- **优先使用语言标准的块/文档注释**：类、方法、字段的说明性注释优先用 `/** */`（文档注释）或 `/* */`，而**不是** `//`。`//` 只用于函数体内部的临时/单行说明。凡语言有文档注释标准（Javadoc / JSDoc / TSDoc / Go doc / docstring 等）的，一律按标准写
 - **所有函数/方法**必须注释其功能，复杂逻辑需额外说明设计意图
 - **Python 文件额外要求**：文件首行声明 `# -*- coding: utf-8 -*-`，置于文件作用注释之前
 - **SQL 文件**：复杂查询或迁移脚本须在文件顶部注释目的及影响范围

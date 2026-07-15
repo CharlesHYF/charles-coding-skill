@@ -18,7 +18,7 @@
   ```
   JDK 9+ 也可用 `<maven.compiler.release>${java.version}</maven.compiler.release>` 替代 source/target。Gradle 则用 `java { sourceCompatibility = JavaVersion.VERSION_17 }`
 - 框架：Spring Boot
-- ORM：MyBatis / MyBatis-Plus
+- ORM：**Spring Boot 项目一律用 MyBatis-Plus**（不用裸 MyBatis），善用其 `BaseMapper` / `IService` / 条件构造器 / 分页插件
 - 日志：SLF4J + Logback
 - 测试：JUnit 5 + Mockito（单元测试），集成测试按需扩展
 
@@ -31,6 +31,19 @@
 - 缩进：Tab
 - 格式化工具：强制使用 Checkstyle + Spotless（Maven 插件）
 - 异常处理：全局 `@RestControllerAdvice` 统一捕获，返回规范 `Result` 对象
+- **文件头注释用标准 Javadoc**（类上方），在标准格式基础上补「创建日期 / 修改日期」（见 [SKILL.md](../SKILL.md) 注释规范）：
+  ```java
+  /**
+   * 举报表 DO
+   *
+   * @author Charles_XDXD
+   * @since 2026-07-15        创建日期
+   * @lastModified 2026-07-15 修改日期（每次实质性修改时更新）
+   */
+  ```
+  说明性注释一律 `/** */`，禁止用 `//` 写类/方法/字段文档
+- **判空兜底用 `Optional`**：可能为空的返回值/查询结果用 `Optional` 表达与处理（`Optional.ofNullable(...).map(...).orElse(...)` / `orElseThrow(...)`），**禁止**层层 `if (x != null)` 手写判空堆叠；对外可能返回空的方法优先声明返回 `Optional<T>`
+- **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO ↔ VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
 
 ## 微服务架构规范
 > 中大型 / 微服务项目遵循以下 Maven 多模块与分层约定（源自实践项目，Spring Cloud Alibaba + Dubbo）。小型单体项目可只保留分层与统一响应部分。

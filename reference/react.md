@@ -19,6 +19,7 @@
 - 组件：函数式组件 + Hooks
 - 客户端组件：仅在必要时添加 `'use client'`，数据获取优先在服务端组件中进行
 - 格式化：Prettier + ESLint（或 Biome 一把梭）；用 Prettier 时设 `useTabs: true`，用 Biome 时设 `indentStyle: tab`
+- **导入路径用别名 `@/`**：一律用 `@/xxx/xxx`（`@` 指向 `src`），**禁止**用 `../../xxx` 这类多级相对路径。在 `tsconfig.json` 的 `paths` 配置 `@/*` → `src/*`（Next.js 默认已内置该别名）
 
 ## 目录结构
 - **路由页面**：Next.js App Router 强制以 `app/` 为路由目录，路由入口文件为框架约定的 `page.tsx` / `layout.tsx`（此处不改名为 `index`，遵循框架要求）
