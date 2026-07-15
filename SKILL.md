@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.11.0
+version: 2.12.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -41,7 +41,7 @@ author: Charles <w1400214654@outlook.com>
 
 ### Markdown 规范
 - **严禁**使用 `---` / `***` / `___` 等任何形式的分割线（水平线）
-- 段落正文开头**缩进一个 Tab**（两个字符宽）
+- 段落正文开头**缩进一个 Tab**（两个字符宽）；**例外：`README.md` 正文开头不缩进**（顶格书写）
 - **标题与其正文之间不留空行**：标题行的下一行直接紧接正文（或子标题），不插入空行
 
 ### README 规范

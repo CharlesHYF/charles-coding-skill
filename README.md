@@ -1,9 +1,9 @@
 # charles-coding-skill
-![Version](https://img.shields.io/badge/version-2.11.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-2.12.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
-	Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
+Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
 
-	覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：Tab 缩进、中文注释、文件头规范、命名约定、格式化工具链、测试要求、Git 分支与提交规范。
+覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：Tab 缩进、中文注释、文件头规范、命名约定、格式化工具链、测试要求、Git 分支与提交规范。
 
 ## 安装
 ### Claude Code
@@ -77,7 +77,7 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .pi/skills/charles-
 ```
 
 ### Hermes Agent / OpenClaw
-	无需手动安装目录，将 [SKILL.md](SKILL.md) 内容作为 system prompt 或上下文注入即可。
+无需手动安装目录，将 [SKILL.md](SKILL.md) 内容作为 system prompt 或上下文注入即可。
 
 ## 更新
 ```bash
@@ -109,7 +109,7 @@ cd <上述安装目录> && git pull origin main
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止 AI 联合署名 |
 | AI 分支 | 提交到 `agents/feature/xxx`，不直接推主干 |
 
-	详见 [SKILL.md](SKILL.md)。
+详见 [SKILL.md](SKILL.md)。
 
 ## 新项目脚手架
-	复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/`。
+复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/`。

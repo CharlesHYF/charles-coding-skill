@@ -26,7 +26,8 @@
 - 字段：`redisTemplate`（小驼峰）
 - 常量：`ABC_CCC`（全大写下划线）
 - 包名：全小写
-- **实体类包名统一为 `entity`**：所有数据库实体（`@Entity` / MyBatis 映射的 PO）一律放在 `entity` 包下。**禁止**自行新建 `pojo`、`model`、`domain`、`dataobject` 等同义包名（`ReqVO` / `RespVO` / `DTO` 各自按 [SKILL.md](../SKILL.md) 数据传输命名规范分包，不要混入 `entity`）
+- **数据库实体包名统一为 `entity`**：所有**数据库实体**（`@Entity` / MyBatis 映射的 PO）一律放在 `entity` 包下，**禁止**把数据库实体放进 `pojo`、`model`、`domain`、`dataobject` 等包。`ReqVO` / `RespVO` / `DTO` 各自按 [SKILL.md](../SKILL.md) 数据传输命名规范分包，不要混入 `entity`
+  - 注意：`pojo` 不是被禁的包，它有**另一种正当用途**——见下方「通用层（common）包结构」，放 `Result` / `PageResult` / `PageParam` 等框架基础类。禁的只是「把数据库实体塞进 pojo」
 - 缩进：Tab
 - 格式化工具：强制使用 Checkstyle + Spotless（Maven 插件）
 - 异常处理：全局 `@RestControllerAdvice` 统一捕获，返回规范 `Result` 对象
@@ -58,8 +59,15 @@
 
 ### 统一响应与异常
 - **统一响应体** `Result<T>`：字段 `code` / `msg` / `data`，提供静态 `Result.success(data)` 与 `Result.error(errorCode)`；分页统一用 `PageResult<T>`
-- **异常体系**：业务异常抛 `ServiceException(ErrorCode)`；`ErrorCode` 承载 code+msg；每个模块集中定义 `ErrorCodeConstants`；全局 `@RestControllerAdvice` 统一转换为 `Result`
+- **异常体系**：业务异常抛 `ServiceException(ErrorCode)`；`ErrorCode` 承载 code+msg；全局错误码 `GlobalErrorCodeConstants`；全局 `@RestControllerAdvice` 统一转换为 `Result`
 - Controller 方法一律返回 `Result<T>` / `Result<PageResult<T>>`，用静态 `success(...)` 包装
+
+### 通用层（common）包结构
+> 这些跨模块共用的基础类**不放 `entity`**，各有专属子包（以 `framework.common` 为例，如 `com.xx.framework.common`）：
+- `common/exception/`：`ErrorCode`、`GlobalErrorCodeConstants`、`ServiceException`
+- `common/pojo/`：`Result`、`PageResult`、`PageParam` 等统一响应/分页基础类（这里的 `pojo` 是框架基础类，不是数据库实体）
+- `common/enums/`：全局通用枚举；`common/util/`：工具类
+- **常量/错误码不集中在一个包**：全局错误码放 `common/exception/GlobalErrorCodeConstants`；**每个业务模块另有自己的 `ErrorCodeConstants`**（放在该模块下，如 `xx-system-api` 的根包），承载本模块专属错误码，互不干扰
 
 ### 惯用注解与写法
 - **依赖注入**：字段注入用 `@Resource`（非 `@Autowired`）
