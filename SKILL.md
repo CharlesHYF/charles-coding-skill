@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.13.1
+version: 2.14.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -39,6 +39,37 @@ author: Charles <w1400214654@outlook.com>
 | 代码格式化 | 强制使用各语言对应的格式化工具（见各分册），并由 `.editorconfig` 兜底 |
 | 禁用符号   | **严禁**在代码、注释、提交信息中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号 |
 
+### 代码块与大括号规范
+- **强制使用大括号**：`if`、`else`、`for`、`while`、`function` 等所有控制流/函数体语句，**无论内部只有一行还是多行，都必须使用大括号 `{}`**，禁止省略
+- **大括号前后留空行**：代码块（`{}`）与上方相邻代码之间留一个空行，与下方相邻代码之间也留一个空行，让代码块的起止边界清晰可辨
+- 示例：
+  ```java
+  int a = 10;
+
+  if (a > 10) {
+      // 即使只有一行也必须用大括号
+      doSomething();
+  } else {
+      doOther();
+  }
+
+  System.out.println(a);
+  ```
+
+### 常量与魔法数字规范
+- **禁止魔法数字**：代码中**严禁**直接出现裸数字（如 `if (count > 100)`、`Thread.sleep(5000)`），所有有语义的数字必须定义为具名常量，置于文件/类顶部
+- **常量命名**：全大写下划线 `MAX_RETRY_COUNT`、`DEFAULT_TIMEOUT_MS`，见名知义
+- 示例：
+  ```java
+  // 文件顶部定义
+  private static final int MAX_RETRY_COUNT = 3;
+
+  // 使用（禁止 if (retryCount > 3)）
+  if (retryCount > MAX_RETRY_COUNT) {
+      // ...
+  }
+  ```
+
 ### Markdown 规范
 - **严禁**使用 `---` / `***` / `___` 等任何形式的分割线（水平线）
 - 段落正文开头**缩进一个 Tab**（两个字符宽）；**例外：`README.md` 正文开头不缩进**（顶格书写）
@@ -46,12 +77,17 @@ author: Charles <w1400214654@outlook.com>
 
 ### README 规范
 - **每次修改代码后**必须检查 `README.md` 是否需要同步更新（技术栈、功能列表、目录结构、启动方式、配置说明等发生变化时同步改动），保持文档与代码一致
-- README **必须包含徽章（badge）**，置于标题下方，至少涵盖：主要语言/框架及版本、构建/CI 状态（如有）、License、版本号；按项目补充覆盖率、依赖等。统一用 [shields.io](https://shields.io) 风格
-- 徽章示例：
+- README 标题**居中**，使用 `<h1 align="center">` 写法：`<h1 align="center">项目名称</h1>`
+- README **必须包含徽章（badge）**，置于标题下方并**居中**，至少涵盖：主要语言/框架及版本、构建/CI 状态（如有）、License、版本号；按项目补充覆盖率、依赖等。统一用 [shields.io](https://shields.io) 风格
+- 徽章示例（居中，`<div align="center">` 包裹）：
   ```markdown
+  <div align="center">
+
   ![Java](https://img.shields.io/badge/Java-17-orange)
   ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7-brightgreen)
   ![License](https://img.shields.io/badge/license-MIT-blue)
+
+  </div>
   ```
 - **推荐章节结构**（按项目裁剪）：`# 标题` → 徽章 → `## 介绍` → `## 软件架构`（附架构图）→ `## 技术栈` → `## 项目亮点/特点` → `## 使用说明`（启动步骤、账号、配置项）
 - **徽章健壮性约束**（避免渲染成源码/裂图）：
@@ -66,7 +102,45 @@ author: Charles <w1400214654@outlook.com>
   - 细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`
 - **内部/跨服务传输**（RPC、服务/模块之间）：用 `XxxReqDTO` / `XxxRespDTO`（统称 `XxxDTO`）
 - 三者边界：`ReqVO` = 入参（前端 → 后端）、`RespVO` = 出参（后端 → 前端展示）、`DTO` = 内部流转，不直接暴露给前端
-- 后端（Java / Go / Python）与前端（Vue / React 的 `types/`）均遵循此命名
+- **适用语言**：上述 `XxxReqVO` / `XxxRespVO` / `XxxDTO` 命名是 **Java / Kotlin / TypeScript（前端 types/）** 的规范，Go 和 Python 按各自生态习惯等义表达，不照搬后缀：
+  - **Go**：请求 `XxxRequest` / 响应 `XxxResponse`，内部 DTO 用 `XxxDTO`（或直接传领域对象），放在对应 `model/` 或 `dto/` 包下
+  - **Python（FastAPI + Pydantic）**：用 Pydantic model，命名 `XxxCreate` / `XxxUpdate` / `XxxResponse` / `XxxFilter` 等，放在 `schemas/` 或 `models/` 下，语义与 VO/DTO 对齐即可
+
+### 变量与函数命名规范
+- **见名知义**：变量名、函数名必须能清晰表达其用途，**禁止**单字母变量（`i`/`j`/`k` 仅限循环索引）、缩写拼凑、无意义命名（`n`、`tmp`、`data`、`obj`、`item1` 等）
+- **集合遍历**：循环变量要体现元素含义，用 `for (Item item : items)` 而非 `for (Item i : items)`；用 `for (User user : users)` 而非 `for (User u : users)`
+- 示例：
+  ```java
+  // ✔ 正确
+  for (Order order : orders) { process(order); }
+  String customerName = order.getCustomerName();
+
+  // ✗ 禁止
+  for (Order o : orders) { process(o); }
+  String n = order.getCustomerName();
+  ```
+
+### 分层架构规范
+> 无论语言，所有后端项目**强制**遵循三层架构，Agent 不得把所有逻辑写在一个文件/一个函数里。
+
+- **控制层（Controller / Handler / Router）**：只做参数校验、路由转发、调用 Service，**不写业务逻辑**
+- **业务层（Service）**：承载全部业务逻辑、事务编排、跨模块调用，**不直接操作数据库**
+- **数据层（Repository / DAO / Mapper / DAL）**：只做数据存取（CRUD），**不写业务判断**
+- **层间调用链**：Controller → Service → Repository，**禁止跨层**（Controller 不直接调 Repository）
+- 各语言对应：
+  | 层 | Java / Kotlin | Go | Python（FastAPI） |
+  |---|---|---|---|
+  | 控制层 | `controller/` | `handler/` 或 `controller/` | `routers/` 或 `api/` |
+  | 业务层 | `service/` | `service/` | `services/` |
+  | 数据层 | `dal/mapper/` + `dal/entity/` | `repository/` 或 `dao/` | `repositories/` 或 `models/` |
+
+#### 解耦原则
+- **非必要不耦合**：模块之间尽量松耦合，一个模块的修改不应导致无关模块连锁改动
+- 具体约束：
+  - **禁止循环依赖**：A 调 B 则 B 不能直接/间接调 A
+  - **禁止跨层耦合**：上层可依赖下层，下层不可反向依赖上层（数据层不能 import 业务层）
+  - **禁止横向耦合过深**：两个平级业务模块（如订单模块、用户模块）之间只允许通过 Service 接口调用，禁止直接 import 对方的内部实现（Mapper、私有工具类等）
+  - **重复即耦合信号**：发现两个模块有「逐字一致」的代码段，说明耦合未抽离——必须提取公共模块，而非各自保留一份
 
 ### 注释规范
 - **所有开发类源代码文件**顶部必须包含注释块，说明：
@@ -74,8 +148,19 @@ author: Charles <w1400214654@outlook.com>
   - 创建日期（格式：`YYYY-MM-DD`）
   - 修改日期（格式：`YYYY-MM-DD`，紧跟在创建日期下方；每次实质性修改时更新为当前日期）
 - 文件的**详细修改历史由 git 记录**，文件头只维护上述最近一次的修改日期，不逐条罗列变更
+  - **文件头只写作用，不写实现**：文件头注释仅用 1-3 句话概括本文件职责，**禁止**在文件头写入实现细节、设计推演、查证结论、环境差异分析——这些内容属于函数注释或 git commit message
 - **优先使用语言标准的块/文档注释**：类、方法、字段的说明性注释优先用 `/** */`（文档注释）或 `/* */`，而**不是** `//`。`//` 只用于函数体内部的临时/单行说明。凡语言有文档注释标准（Javadoc / JSDoc / TSDoc / Go doc / docstring 等）的，一律按标准写
+- **多行块注释首行换行**：`/** */` / `/* */` 等多行块注释，首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
+  ```java
+  /**
+   * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
+   * phase 缺省 1（关键词，向后兼容）；phase=2 市场调研 / phase=3 Listing 聚合
+   * narrative 内部结构因阶段而异，调用方按需收窄（见 PhaseArtifactVO）
+   */
+  ```
 - **所有函数/方法**必须注释其功能，复杂逻辑需额外说明设计意图
+- **注释简洁扼要**：说明「做什么、为什么」，不重复代码本身已表达的信息，不把 git commit message 的内容复制到注释里
+- **禁止用注释声明跨文件重复**：注释中**禁止**出现「与 xxx.py 逐字一致」「同 xxx.java 的实现」等声明。如果两处逻辑确实相同，应抽取为公共模块（import 复用）而非用注释标记重复——注释引用另一个文件意味着存在应消除的耦合
 - **Python 文件额外要求**：文件首行声明 `# -*- coding: utf-8 -*-`，置于文件作用注释之前
 - **SQL 文件**：复杂查询或迁移脚本须在文件顶部注释目的及影响范围
 
@@ -85,6 +170,15 @@ author: Charles <w1400214654@outlook.com>
 | 作者       | Charles <w1400214654@outlook.com>         |
 | 提交信息   | 符合社区常规（建议 Conventional Commits） |
 | 署名归属   | 仅署名 Charles，**禁止**任何 AI 联合署名  |
+
+#### .gitignore 规范
+- **所有 Git 项目必须包含 `.gitignore`**，覆盖以下常见忽略项（不限于此，按项目实际补充）：
+  - **IDE / 编辑器**：`.idea/`、`.vscode/`、`*.swp`、`*.swo`、`*~`
+  - **AI 工具残留**：`.superpower/`、`.claude/`、`.cursor/`、`.codex/`、`.agents/`、`.opencode/`
+  - **操作系统**：`.DS_Store`（macOS）、`Thumbs.db`（Windows）、`Desktop.ini`（Windows）、`*.lnk`（Windows）
+  - **依赖与构建**：`node_modules/`、`vendor/`、`__pycache__/`、`*.pyc`、`target/`（Java）、`dist/`、`build/`
+  - **运行时**：`.env`、`.env.local`、`*.log`、`*.pid`、`coverage/`
+- 脚手架模板 `reference/project-template/.gitignore` 已包含上述常见项，新项目直接复制为起点，再按语言/框架追加
 
 #### 禁止 AI 署名（commit/push 时必须遵守）
 > **目的**：避免 GitHub 上出现 `claude` / Agent 作为提交者或 contributor（如 "CharlesHYF and claude" 的联合署名）。
@@ -105,6 +199,23 @@ author: Charles <w1400214654@outlook.com>
   2. Charles 审查代码后，手动合并到 `main` 或通过 PR 合入
   3. AI 不参与代码审查和合并操作
 
+### Docker 规范
+- **强制使用 Docker Compose**：禁止手写 `docker run` 命令，所有容器编排通过 `docker-compose.yml`（或 `compose.yml`）管理
+- **服务命名在最前**：`docker-compose.yml` 中每个服务必须显式定义 `container_name`，放在该服务定义的最前面，见名知义
+- **数据持久化到项目目录**：所有容器数据目录必须挂载到项目根目录下的 `volumes/<服务名>/`，如 `./volumes/mysql:/var/lib/mysql`，禁止使用 Docker 匿名卷
+- **容器时区东八区**：所有容器**强制**设置环境变量 `TZ=Asia/Shanghai`，确保容器时间为北京时间
+- 示例：
+  ```yaml
+  services:
+    db:
+      container_name: myproject-mysql
+      image: mysql:8.0
+      environment:
+        - TZ=Asia/Shanghai
+      volumes:
+        - ./volumes/mysql:/var/lib/mysql
+  ```
+
 ### 调试与测试
 | 项目     | 规范                                                         |
 | -------- | ------------------------------------------------------------ |
@@ -112,9 +223,34 @@ author: Charles <w1400214654@outlook.com>
 | 调试方式 | 优先查看日志，万不得已才打断点                               |
 | 覆盖率   | 后端核心逻辑 ≥80%；前端关键路径与公共组件必测；脚本/原型按需 |
 
+#### 测试用例强制要求
+- **Agent 写完代码后必须提供测试用例**，放在项目根目录的 `test_cases/` 文件夹下，工整组织
+- 按模块/功能分文件命名，如 `test_cases/login_test_cases.md`（文档式）或各语言测试文件（`test_login.py`、`login_test.go` 等）
+- **必须实际运行并确保全部通过**后再交付，禁止交付未验证的测试
+
 ### AI 协作模式
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
 
+#### AGENT.md（项目级 AI 指令）
+- **每个项目根目录必须包含 `AGENT.md`**，作为 AI 工具进入项目时首先读取的指令文件
+- 内容至少包含：引用 `charles-coding` Skill、声明分支策略、列出常用命令
+- 模板：
+  ```markdown
+  # AGENT.md
+
+  ## 编码规范
+  请严格遵循 charles-coding Skill（https://github.com/CharlesHYF/charles-coding-skill）的全部约定。
+
+  ## 分支策略
+  所有代码提交到 `agents/feature/<描述>` 分支，禁止直接推 `main` 或发起 PR。
+  Charles 审查后手动合并。
+
+  ## 常用命令
+  # 启动：...
+  # 构建：...
+  # 测试：...
+  ```
+
 ## 新项目脚手架
-开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
+开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENT.md / README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。

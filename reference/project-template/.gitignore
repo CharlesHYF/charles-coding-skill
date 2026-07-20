@@ -21,6 +21,7 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.local
 
 # --- Go ---
 *.test
@@ -32,9 +33,25 @@ venv/
 *.swp
 *.swo
 *~
+
+# --- AI 工具残留 ---
+.superpower/
+.claude/
+.cursor/
+.codex/
+.agents/
+.opencode/
+
+# --- 操作系统 ---
 .DS_Store
 Thumbs.db
+Desktop.ini
+*.lnk
 
 # --- 日志 ---
 *.log
 logs/
+
+# --- 运行时 ---
+*.pid
+coverage/
