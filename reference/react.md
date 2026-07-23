@@ -64,6 +64,7 @@
 - 默认创建三份（Next.js 命名规范，点号分隔）：
   - `.env`：所有环境共享的默认值
   - `.env.development`：开发环境（`next dev` 时加载）
+  - `.env.test`：测试环境（测试运行 / `NODE_ENV=test` 时加载）
   - `.env.production`：生产环境（`next build` / `next start` 时加载）
 - 需暴露给浏览器的变量必须以 `NEXT_PUBLIC_` 前缀命名（如 `NEXT_PUBLIC_API_BASE_URL`），无前缀者仅服务端可读
 - 含密钥的本地覆盖文件用 `.env.local` / `.env.*.local`，并加入 `.gitignore`

@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.15.0
+version: 2.16.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -216,6 +216,16 @@ author: Charles <w1400214654@outlook.com>
         - ./volumes/mysql:/var/lib/mysql
   ```
 
+### 环境与配置规范
+- **三套环境齐全**：配置文件**必须**区分 **开发（dev）、测试（test）、生产（prod）** 三套环境，缺一不可；各环境的连接串、域名、密钥、开关等隔离，禁止用一份配置跑所有环境
+  - Java/Spring Boot：`application-dev.yml` / `application-test.yml` / `application-prod.yml` + `application.yml` 用 `spring.profiles.active` 切换
+  - 前端（Vite/Next）：`.env.development` / `.env.test` / `.env.production`（详见各前端分册）
+  - 其它语言按各自生态等义拆分（Go 的 config 目录分环境、Python 的 settings 分环境等）
+- **生产环境必须加密代码与配置**：交付/部署到生产时，**强制**对代码与配置文件做加密/脱敏保护，禁止明文暴露
+  - **配置加密**：生产配置中的敏感项（数据库密码、密钥、token 等）必须加密存储——Spring Boot 用 Jasypt（`ENC(...)`）或接入配置中心（Nacos 加密 / Vault / KMS），密钥不入库不进 git
+  - **代码加密/保护**：生产制品做代码混淆或加密——Java 用 ProGuard/字节码加密（如 classfinal / xjar），前端构建产物开启混淆压缩、关闭 sourcemap，禁止把可读源码与 `.map` 发布到生产
+  - **敏感文件不进版本库**：含真实密钥的 `application-prod.yml`、`.env.production`、证书私钥等一律加入 `.gitignore`，仓库内只保留 `*.example` 模板
+
 ### 调试与测试
 | 项目     | 规范                                                         |
 | -------- | ------------------------------------------------------------ |
@@ -240,6 +250,7 @@ author: Charles <w1400214654@outlook.com>
 - **Agent 写完代码后必须提供测试用例**，放在项目根目录的 `test_cases/` 文件夹下，工整组织
 - 按模块/功能分文件命名，如 `test_cases/login_test_cases.md`（文档式）或各语言测试文件（`test_login.py`、`login_test.go` 等）
 - **必须实际运行并确保全部通过**后再交付，禁止交付未验证的测试
+- **覆盖三套环境**：测试用例/测试内容必须覆盖 **开发、测试、生产** 三套环境的验证（如各环境配置能正确加载、连接对应资源），不能只在开发环境验证
 
 ### AI 协作模式
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）

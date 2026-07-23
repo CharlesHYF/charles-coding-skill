@@ -62,6 +62,7 @@
 - 默认创建三份（Vite 命名规范，点号分隔）：
   - `.env`：所有环境共享的默认值
   - `.env.development`：开发环境（`vite`、`vite dev` 时加载）
+  - `.env.test`：测试环境（通过 `--mode test` 加载）
   - `.env.production`：生产环境（`vite build` 时加载）
 - 自定义变量必须以 `VITE_` 前缀命名才会暴露给客户端（如 `VITE_API_BASE_URL`）
 - 含密钥的本地覆盖文件用 `.env.local` / `.env.*.local`，并加入 `.gitignore`
