@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.20.0
+version: 2.21.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -254,6 +254,7 @@ author: Charles <w1400214654@outlook.com>
 
 ### 环境与配置规范
 - **三套环境齐全**：配置文件**必须**区分 **开发（dev）、测试（test）、生产（prod）** 三套环境，缺一不可；各环境的连接串、域名、密钥、开关等隔离，禁止用一份配置跑所有环境
+- **配置文件由 Agent 主动创建与同步维护**：`.env` / `.env.*`、`application-*.yml` 等配置文件，**Agent 必须主动创建并随代码变更同步更新**（新增了需要的配置项就补进对应文件），**不许**让 Charles 自己手动补。含真实密钥的文件仍进 `.gitignore`，但要同步维护对应的 `*.example` 模板供参考
   - Java/Spring Boot：`application-dev.yml` / `application-test.yml` / `application-prod.yml` + `application.yml` 用 `spring.profiles.active` 切换
   - 前端（Vite/Next）：`.env.development` / `.env.test` / `.env.production`（详见各前端分册）
   - 其它语言按各自生态等义拆分（Go 的 config 目录分环境、Python 的 settings 分环境等）
@@ -307,6 +308,7 @@ author: Charles <w1400214654@outlook.com>
 - `print`/`console.log` 只允许在本地一次性调试时临时使用，**提交前必须清除**
 
 ### AI 协作模式
+- **一律用简体中文回答 Charles**：所有对话回复、解释、方案说明统一使用简体中文（代码内注释同样中文），禁止用英文或繁体作答
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
 - **严禁最小 MVP / 敷衍方案**：不许给「先跑起来再说」的残缺 demo、占位空实现、`TODO` 糊弄的代码。要给**完整、可用、有理有据**的方案，把边界情况、错误处理、配置都做全
