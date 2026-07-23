@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.17.0
+version: 2.17.1
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -29,6 +29,8 @@ author: Charles <w1400214654@outlook.com>
 > **缩进**默认 **Tab**；例外：**Python / Kotlin 4 空格**、**SQL / YAML / JSON 2 空格**。**行尾**统一 **LF**。以上由脚手架里的 `.editorconfig` + `.gitattributes` 强制，不靠自觉。
 
 ## 全局约定
+> 本节所有规范（大括号、代码展开/换行、魔法数字、命名、注释等）**适用所有语言，含前端**（JS / TS / Vue / React / HTML / CSS），不限于后端。
+
 ### 编辑与格式
 | 项目       | 规范                                                              |
 | ---------- | ----------------------------------------------------------------- |
