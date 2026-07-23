@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.16.0
+version: 2.17.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -55,6 +55,36 @@ author: Charles <w1400214654@outlook.com>
 
   System.out.println(a);
   ```
+
+### 代码展开与换行规范（严禁并排）
+- **对象/字典/结构体/映射字面量：每个键值独占一行**，并带行尾逗号，**严禁**多个键值并排在同一行：
+  ```js
+  // ✗ 禁止并排
+  const p = { x: 12, y: 13, z: 14 };
+
+  // ✔ 每项一行 + 行尾逗号
+  const p = {
+  	x: 12,
+  	y: 13,
+  	z: 14,
+  };
+  ```
+- **HTML / JSX：每个元素独占一行**，**严禁**把多个标签挤在同一行（如 `<li>a</li><li>b</li>`）；单个标签的多个属性可保留在同一行
+- **CSS：每条声明独占一行**；选择器分组时**每个选择器一行**（逗号后换行）；`{` 不另起行，跟在选择器后；**每个规则块之间空一行**。示例：
+  ```css
+  /* 响应式 */
+  @media (max-width: 1080px) {
+  	.hero,
+  	.scenario-wrap {
+  		grid-template-columns: 1fr;
+  	}
+
+  	.cards-3 {
+  		grid-template-columns: repeat(2, 1fr);
+  	}
+  }
+  ```
+- 完整可参考的范例文件：`/Library/CodeProject/sangkee-expo/sangkee-expo.html`
 
 ### 常量与魔法数字规范
 - **禁止魔法数字**：代码中**严禁**直接出现裸数字（如 `if (count > 100)`、`Thread.sleep(5000)`），所有有语义的数字必须定义为具名常量，置于文件/类顶部
