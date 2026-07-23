@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.14.0
+version: 2.15.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -226,13 +226,15 @@ author: Charles <w1400214654@outlook.com>
 
 #### 测试用例表格格式
 - 编写/交付测试用例文档时，**必须用 Markdown 表格**呈现，禁止只用几句话笼统描述
-- 表头固定包含以下列：**测试编号、测试用例、输入内容、预计结果、实际结果**
+- 表头固定包含以下列（按此顺序）：**测试编号、优先级、测试用例、前置条件、输入内容、预计结果、实际结果、是否通过、备注**
+  - 核心必填：测试编号、测试用例、输入内容、预计结果、实际结果、是否通过
+  - `是否通过` 填 Pass / Fail，是明确的达标判定；`优先级` 用 P0-P3 或 高/中/低；无前置条件填 `-`
 - 示例：
 
-  | 测试编号 | 测试用例         | 输入内容              | 预计结果            | 实际结果 |
-  | -------- | ---------------- | --------------------- | ------------------- | -------- |
-  | TC-001   | 正常登录         | 正确的账号密码        | 登录成功，返回 token | 待填写   |
-  | TC-002   | 密码错误         | 正确账号 + 错误密码   | 提示密码错误        | 待填写   |
+  | 测试编号 | 优先级 | 测试用例 | 前置条件     | 输入内容            | 预计结果             | 实际结果 | 是否通过 | 备注 |
+  | -------- | ------ | -------- | ------------ | ------------------- | -------------------- | -------- | -------- | ---- |
+  | TC-001   | P0     | 正常登录 | 账号已注册   | 正确的账号密码      | 登录成功，返回 token | 待填写   | 待填写   | -    |
+  | TC-002   | P1     | 密码错误 | 账号已注册   | 正确账号 + 错误密码 | 提示密码错误         | 待填写   | 待填写   | -    |
 
 #### 测试用例强制要求
 - **Agent 写完代码后必须提供测试用例**，放在项目根目录的 `test_cases/` 文件夹下，工整组织
