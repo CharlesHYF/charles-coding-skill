@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.17.1
+version: 2.18.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -287,6 +287,14 @@ author: Charles <w1400214654@outlook.com>
 ### AI 协作模式
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
+- **严禁最小 MVP / 敷衍方案**：不许给「先跑起来再说」的残缺 demo、占位空实现、`TODO` 糊弄的代码。要给**完整、可用、有理有据**的方案，把边界情况、错误处理、配置都做全
+- **务必说人话**：解释与文档用直白清楚的中文，讲清「是什么、为什么、怎么做」；**禁止**模棱两可、故弄玄虚、堆砌高深术语而不落地。有取舍就把利弊讲明，给明确推荐
+
+#### 编码前置流程（先问清、再动手）
+- **编码前必须从底层把每个功能问清楚**：进入写代码环节之前，逐个功能向 Charles 确认需求边界、入参出参、异常场景、依赖关系，需求没问清不许开写
+- **必须先写好模块文档**，放在 `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`），文档本身遵循本 Skill 的 Markdown 规范
+- 每个功能在文档里至少包含：**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）
+- 文档评审通过后再进入编码；代码实现须与文档一致，文档随功能变更同步更新
 
 #### AGENT.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENT.md`**，作为 AI 工具进入项目时首先读取的指令文件

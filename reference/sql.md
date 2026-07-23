@@ -15,7 +15,7 @@
 - **禁止 `TEXT` / `BLOB`**：除非单字段确实超过 65535 字符且很少被查询。大文本应拆表或使用独立存储
 - **金额字段**：**强制** `DECIMAL(m, n)`，**禁止** `FLOAT` / `DOUBLE`（精度丢失）
 - **布尔字段**：`TINYINT(1)`，**禁止** `BIT`（跨 ORM 兼容性差）
-- **自增 ID**：`BIGINT UNSIGNED AUTO_INCREMENT`（不分表场景）；分表场景用分布式 ID，字段类型 `VARCHAR(32)`
+- **主键 ID 严禁自增**：**禁止** `AUTO_INCREMENT`，一律用**雪花 ID（Snowflake）** 等分布式 ID，字段类型 `BIGINT`（应用层生成后写入）。理由：避免暴露业务量、分库分表冲突、迁移合并困难
 - **VARCHAR 长度不要拍脑袋定 255**：按实际业务需求设置合适长度（如手机号 20、姓名 50、URL 512）
 
 ### 约束
@@ -24,9 +24,26 @@
 - **禁止外键**在数据库层使用（由应用层保证数据一致性）
 - **字符集**：统一 `UTF8MB4`
 
-### 注释
-- **所有表和所有字段**必须添加 `COMMENT`，说明字段的业务含义
-- 状态字段注释必须列明所有枚举值含义（如 `COMMENT '状态: 0-禁用, 1-启用, 2-删除'`）
+### 注释（COMMENT 命名规范）
+- **所有表和所有字段**必须添加 `COMMENT`，说明字段的**业务含义**
+- **COMMENT 写业务语义，不写技术实现**：
+  - 主键/外键 ID 的注释写**它代表的业务实体**，如 `用户ID`、`订单ID`、`所属店铺ID`，**严禁**写成 `雪花ID`、`主键`、`自增ID` 这类实现细节
+  - 字段注释写它是什么、干什么用，不写它用什么类型/怎么存
+- **状态/类型等枚举字段**：注释必须列明所有枚举值含义，如 `COMMENT '订单状态: 0-待支付, 1-已支付, 2-已发货, 3-已完成, 4-已取消'`
+- **表注释**写这张表存什么业务数据，如 `COMMENT='订单主表'`
+- 时间字段注释写业务含义，如 `创建时间`、`支付时间`、`最后修改时间`
+- 示例：
+  ```sql
+  CREATE TABLE cv_order (
+  	id          BIGINT       NOT NULL COMMENT '订单ID',
+  	user_id     BIGINT       NOT NULL COMMENT '下单用户ID',
+  	shop_id     BIGINT       NOT NULL COMMENT '所属店铺ID',
+  	amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '订单金额(元)',
+  	status      TINYINT      NOT NULL DEFAULT 0 COMMENT '订单状态: 0-待支付, 1-已支付, 2-已完成',
+  	create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  	PRIMARY KEY (id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
+  ```
 
 ### 查询
 - **三表 JOIN 上限**：一条 SQL 多表关联不得超过 3 张表
