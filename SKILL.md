@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.19.0
+version: 2.20.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -248,6 +248,10 @@ author: Charles <w1400214654@outlook.com>
         - ./volumes/mysql:/var/lib/mysql
   ```
 
+### 交付整洁规范
+- **交付时严禁残留无用文件**：临时脚本、调试文件、废弃代码、空目录、`xxx-copy`/`xxx备份`、注释掉的大段代码等一律清理，交付物只保留真正需要的文件
+- **过程产物禁止 commit**：开发过程中产生的 `spec`、`plan`、设计草稿、调研笔记、Agent 中间产物等**禁止提交到仓库**，一律写入 `.gitignore`（如 `*.spec.md`、`plan/`、`.agent/`、`scratch/` 等按项目约定），只提交最终代码与正式文档（`docs/`、`README`、`test_cases/`）
+
 ### 环境与配置规范
 - **三套环境齐全**：配置文件**必须**区分 **开发（dev）、测试（test）、生产（prod）** 三套环境，缺一不可；各环境的连接串、域名、密钥、开关等隔离，禁止用一份配置跑所有环境
   - Java/Spring Boot：`application-dev.yml` / `application-test.yml` / `application-prod.yml` + `application.yml` 用 `spring.profiles.active` 切换
@@ -283,6 +287,24 @@ author: Charles <w1400214654@outlook.com>
 - 按模块/功能分文件命名，如 `test_cases/login_test_cases.md`（文档式）或各语言测试文件（`test_login.py`、`login_test.go` 等）
 - **必须实际运行并确保全部通过**后再交付，禁止交付未验证的测试
 - **覆盖三套环境**：测试用例/测试内容必须覆盖 **开发、测试、生产** 三套环境的验证（如各环境配置能正确加载、连接对应资源），不能只在开发环境验证
+- **各类测试统一归入 `test_cases/`**：单元测试之外，**压力测试、冒烟测试、黑盒测试、白盒测试**的用例与脚本都放在 `test_cases/` 下，按类型分子目录组织：
+  - `test_cases/smoke/`：冒烟测试（核心链路能否跑通）
+  - `test_cases/stress/`：压力/性能测试（JMeter、k6、wrk 等脚本 + 结果）
+  - `test_cases/blackbox/`：黑盒测试（按接口/需求，不看实现）
+  - `test_cases/whitebox/`：白盒测试（覆盖分支/边界，看实现）
+  - `test_cases/unit/`（或各语言默认测试目录）：单元测试
+
+### 日志规范
+- **所有服务端程序必须有日志**：用成熟的日志框架输出结构化日志，**禁止**用 `print` / `console.log` / `System.out.println` 打业务日志（同步 IO 阻塞、无级别、无法落盘与采集）
+- **用各语言当前主流最优的日志库**（异步、分级、可结构化）：
+  | 语言 | 推荐日志库 |
+  | ---- | ---------- |
+  | Java / Kotlin | SLF4J + Logback（异步 `AsyncAppender`） |
+  | Go | zap 或 zerolog（结构化、高性能） |
+  | Python | loguru，或标准 `logging` + `structlog` |
+  | Node / 前端服务 | pino（高性能结构化） |
+- **要求**：分级别（DEBUG/INFO/WARN/ERROR）、带时间戳与上下文（traceId/请求ID）、生产按级别与滚动策略落盘（按天/大小切割），敏感信息脱敏后再打日志
+- `print`/`console.log` 只允许在本地一次性调试时临时使用，**提交前必须清除**
 
 ### AI 协作模式
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
