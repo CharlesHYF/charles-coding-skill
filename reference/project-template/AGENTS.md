@@ -1,5 +1,5 @@
-# AGENT.md
-
+# AGENTS.md
+> 项目级 AI 指令文件。各主流 AI 编码工具（Claude Code / Codex / Cursor 等）进入项目时优先读取本文件。
 ## 编码规范
 请严格遵循 charles-coding Skill（https://github.com/CharlesHYF/charles-coding-skill）的全部约定。
 

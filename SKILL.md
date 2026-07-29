@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.0.0
+version: 3.0.1
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -214,10 +214,10 @@ author: Charles <w1400214654@outlook.com>
 - **模块文档闸门**：**新模块/新功能必写** `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`），文档本身遵循 [reference/readme-md.md](reference/readme-md.md) 的 Markdown 规范；每个功能至少包含**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）；**文档评审通过后再进入编码**，代码实现须与文档一致，文档随功能变更同步更新
 - **豁免**：小改/bugfix/重构可不写模块文档，但需在 commit/PR 说明改动内容
 
-#### AGENT.md（项目级 AI 指令）
-- **每个项目根目录必须包含 `AGENT.md`**，作为 AI 工具进入项目时首先读取的指令文件
+#### AGENTS.md（项目级 AI 指令）
+- **每个项目根目录必须包含 `AGENTS.md`**（复数，跨工具事实标准，Claude Code / Codex / Cursor 等均优先读取），作为 AI 工具进入项目时首先读取的指令文件
 - 内容至少包含：引用本 `charles-coding` Skill 的全部约定、声明 `agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、列出常用命令（启动/构建/测试）
-- 完整模板见 [reference/project-template/AGENT.md](reference/project-template/AGENT.md)
+- 完整模板见 [reference/project-template/AGENTS.md](reference/project-template/AGENTS.md)
 
 ## 新项目脚手架
-开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENT.md / README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
+开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENTS.md / README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。

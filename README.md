@@ -1,7 +1,7 @@
 <h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-3.0.1-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
@@ -132,7 +132,7 @@ cd <上述安装目录> && git pull origin main
 Skill 靠 description 软触发，为兜底"老项目被忽略/不确认就改"，可在本机 `~/.claude/settings.json` 配置一个 SessionStart hook，每次会话开始注入固定提醒（非阻断）。
 
 配置步骤：
-1. 新建提醒文本 `~/.claude/charles-coding-reminder.txt`，内容为三条：老项目无 AGENT.md 先确认；新功能/新模块先写 docs/modules 文档评审再编码，小改/bugfix 豁免但需 commit 说明；交付前测试必须实跑通过。
+1. 新建提醒文本 `~/.claude/charles-coding-reminder.txt`，内容为三条：老项目无 AGENTS.md 先确认；新功能/新模块先写 docs/modules 文档评审再编码，小改/bugfix 豁免但需 commit 说明；交付前测试必须实跑通过。
 2. 在 `~/.claude/settings.json` 的 `hooks.SessionStart` 加一条 command hook：`cat ~/.claude/charles-coding-reminder.txt`。
 
 ```json
