@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-echo "🔧 启动开发环境..."
+echo "启动开发环境..."
 
 # 确保 Docker 服务运行
 docker-compose up -d
 
 # 并行启动前后端（按项目实际调整）
-echo "🌐 启动后端..."
+echo "启动后端..."
 # 示例: Spring Boot
 if [ -f pom.xml ]; then
   mvn spring-boot:run &
@@ -21,7 +21,7 @@ if [ -f go.mod ]; then
   go run ./cmd/server &
 fi
 
-echo "🎨 启动前端..."
+echo "启动前端..."
 cd frontend
 if [ -f package.json ]; then
   npm run dev &

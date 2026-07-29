@@ -112,7 +112,7 @@ cd <上述安装目录> && git pull origin main
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
 | 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名 |
 | 注释 | 中文；文件头只写作用不写实现；`/** */` 首行换行 |
-| 分层架构 | 所有后端项目 Controller → Service → Repository |
+| 分层架构 | 所有后端项目 Controller -> Service -> Repository |
 | 解耦 | 非必要不耦合，禁止循环依赖，重复代码必须抽离 |
 | Docker | 强制 compose，`./volumes/` 持久化，东八区 |
 | 测试 | 交付必须附带 `test_cases/`，确保通过 |

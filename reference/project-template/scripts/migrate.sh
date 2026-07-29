@@ -19,21 +19,21 @@ elif [ "$DB_PORT" = "3306" ]; then
   DB_TYPE="mysql"
   CMD="mysql -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASS $DB_NAME -e"
 else
-  echo "❌ 不支持的数据库端口: $DB_PORT"
+  echo "[ERROR] 不支持的数据库端口: $DB_PORT"
   exit 1
 fi
 
 # 创建历史记录文件
 touch "$HISTORY_FILE"
 
-echo "🔄 开始执行数据库迁移..."
+echo "开始执行数据库迁移..."
 
 for file in $(ls "$MIGRATIONS_DIR"/*.sql 2>/dev/null | sort); do
   filename=$(basename "$file")
   if grep -Fxq "$filename" "$HISTORY_FILE"; then
-    echo "⏭️  跳过已执行: $filename"
+    echo "[SKIP] 跳过已执行: $filename"
   else
-    echo "▶️  执行: $filename"
+    echo "执行: $filename"
     if [ "$DB_TYPE" = "postgresql" ]; then
       PGPASSWORD="$DB_PASS" $CMD "$file"
     else
@@ -43,4 +43,4 @@ for file in $(ls "$MIGRATIONS_DIR"/*.sql 2>/dev/null | sort); do
   fi
 done
 
-echo "✅ 数据库迁移完成！"
+echo "[OK] 数据库迁移完成！"

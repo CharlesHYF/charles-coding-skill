@@ -44,7 +44,7 @@
   （修改日期每次实质性修改时更新为当前日期）
   说明性注释一律 `/** */`，禁止用 `//` 写类/方法/字段文档
 - **判空兜底用 `Optional`**：可能为空的返回值/查询结果用 `Optional` 表达与处理（`Optional.ofNullable(...).map(...).orElse(...)` / `orElseThrow(...)`），**禁止**层层 `if (x != null)` 手写判空堆叠；对外可能返回空的方法优先声明返回 `Optional<T>`
-- **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO ↔ VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
+- **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO <-> VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
 
 ## 微服务架构规范
 > 中大型 / 微服务项目遵循以下 Maven 多模块与分层约定（源自实践项目，Spring Cloud Alibaba + Dubbo）。小型单体项目可只保留分层与统一响应部分。

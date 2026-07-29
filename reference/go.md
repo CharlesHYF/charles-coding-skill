@@ -34,7 +34,7 @@
 - 使用 `gofmt` 统一格式化（注意：gofmt 用 Tab，与全局一致）
 - **错误处理**：一律用 `fmt.Errorf("读取用户信息失败: %w", err)` 包装错误以保留调用链，禁止用 `%v`（会丢失底层错误类型，无法用 `errors.Is`/`errors.As` 判断）；上层用 `errors.Is(err, ErrTargetErr)` 判断哨兵错误、`errors.As(err, &customErr)` 提取自定义错误类型做进一步处理
 - **并发**：优先使用 `goroutine` + `channel`，必要时使用 `sync` 原语；启动的 goroutine 必须能被外部取消（传入 `context.Context` 并在内部 `select` 监听 `ctx.Done()`），禁止起「野生」永不退出的 goroutine
-- **context 传递**：所有跨层调用（handler → service → repository）的第一个参数一律是 `ctx context.Context`，用于传递超时、取消信号与请求级元数据（如 traceId）；禁止把 `context.Background()` 传到业务函数内部临时创建，应从最外层 handler 一路透传
+- **context 传递**：所有跨层调用（handler -> service -> repository）的第一个参数一律是 `ctx context.Context`，用于传递超时、取消信号与请求级元数据（如 traceId）；禁止把 `context.Background()` 传到业务函数内部临时创建，应从最外层 handler 一路透传
 - **defer / panic 约定**：
   - `defer` 用于资源释放（`file.Close()`、`db.Close()`、解锁），紧跟在资源获取语句之后，避免中间插入逻辑导致遗漏
   - **禁止**用 `panic` 做正常的错误处理流程；只在程序无法继续（如初始化失败）时使用

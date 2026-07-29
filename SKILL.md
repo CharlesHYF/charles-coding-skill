@@ -53,6 +53,7 @@ author: Charles <w1400214654@outlook.com>
 | ---------------- | ----------------------------------------------------------------- | --------- |
 | 注释语言         | 中文                                                              | 无法配置，纯手动 |
 | 禁用符号         | **严禁**在代码、注释、提交信息中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号 | 无法配置，纯手动 |
+| 禁用 Emoji       | **严禁**在代码、注释、文档、提交信息中使用 Emoji；确需图标时用 SVG 或 icon 字体，不用 Emoji | 无法配置，纯手动 |
 | 大括号前后空行   | 见下方「代码块与大括号规范」                                       | 无法配置，纯手动 |
 | 键值独占一行     | 见下方「代码展开与换行规范」                                       | ESLint `object-curly-newline` |
 | 魔法数字         | 见下方「常量与魔法数字规范」                                       | `no-magic-numbers` |
@@ -78,10 +79,10 @@ author: Charles <w1400214654@outlook.com>
 ### 代码展开与换行规范（严禁并排）
 - **对象/字典/结构体/映射字面量：每个键值独占一行**，并带行尾逗号，**严禁**多个键值并排在同一行：
   ```js
-  // ✗ 禁止并排
+  // 禁止：并排
   const p = { x: 12, y: 13, z: 14 };
 
-  // ✔ 每项一行 + 行尾逗号
+  // 正确：每项一行 + 行尾逗号
   const p = {
   	x: 12,
   	y: 13,
@@ -120,7 +121,7 @@ author: Charles <w1400214654@outlook.com>
   ```
 
 ### 数据传输命名规范
-- **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 → 后端）、响应 = 出参（后端 → 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
+- **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 -> 后端）、响应 = 出参（后端 -> 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
 - **Java / Kotlin / TypeScript（前端 types/）**：请求 `XxxReqVO`、响应 `XxxRespVO`、内部 `XxxDTO`（`XxxReqDTO` / `XxxRespDTO`）。细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`。示例：`LoginReqVO` / `LoginRespVO`
 - **Go**：请求 `XxxRequest`、响应 `XxxResponse`，内部 `XxxDTO` 或直接传领域对象，放 `model/` 或 `dto/` 包
 - **Python（FastAPI + Pydantic）**：用 Pydantic model，命名 `XxxCreate` / `XxxUpdate` / `XxxResponse` / `XxxFilter`，放 `schemas/` 或 `models/`
@@ -130,11 +131,11 @@ author: Charles <w1400214654@outlook.com>
 - **集合遍历**：循环变量要体现元素含义，用 `for (Item item : items)` 而非 `for (Item i : items)`；用 `for (User user : users)` 而非 `for (User u : users)`
 - 示例：
   ```java
-  // ✔ 正确
+  // 正确：
   for (Order order : orders) { process(order); }
   String customerName = order.getCustomerName();
 
-  // ✗ 禁止
+  // 禁止：
   for (Order o : orders) { process(o); }
   String n = order.getCustomerName();
   ```
@@ -145,7 +146,7 @@ author: Charles <w1400214654@outlook.com>
 - **控制层（Controller / Handler / Router）**：只做参数校验、路由转发、调用 Service，**不写业务逻辑**
 - **业务层（Service）**：承载全部业务逻辑、事务编排、跨模块调用，**不直接操作数据库**
 - **数据层（Repository / DAO / Mapper / DAL）**：只做数据存取（CRUD），**不写业务判断**
-- **层间调用链**：Controller → Service → Repository，**禁止跨层**（Controller 不直接调 Repository）
+- **层间调用链**：Controller -> Service -> Repository，**禁止跨层**（Controller 不直接调 Repository）
 - 各语言对应：
   | 层 | Java / Kotlin | Go | Python（FastAPI） |
   |---|---|---|---|
@@ -172,7 +173,7 @@ author: Charles <w1400214654@outlook.com>
 - **多行块注释首行换行**：`/** */` / `/* */` 等多行块注释，首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
   ```java
   /**
-   * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
+   * 拉阶段产物 -> GET /api/tasks/{taskId}/artifact?phase=
    * phase 缺省 1（关键词，向后兼容）；phase=2 市场调研 / phase=3 Listing 聚合
    * narrative 内部结构因阶段而异，调用方按需收窄（见 PhaseArtifactVO）
    */
@@ -205,7 +206,7 @@ author: Charles <w1400214654@outlook.com>
 - **禁止** 在提交信息中添加任何 AI 联合署名 trailer，包括但不限于：
   - `Co-Authored-By: Claude <noreply@anthropic.com>`
   - `Co-Authored-By: <任何 AI / Agent / Bot>`
-  - 末尾的 `🤖 Generated with ...` 之类的 AI 生成声明
+  - 末尾的 `Generated with ...` 之类的 AI 生成声明
 - **禁止** 把 author / committer 设为 Agent 或 AI 身份；author 与 committer 必须始终为 `Charles <w1400214654@outlook.com>`
 - 提交前确认 `git config user.name` = `Charles`、`user.email` = `w1400214654@outlook.com`；必要时用 `git commit --author="Charles <w1400214654@outlook.com>"` 显式指定
 - 提交信息正文只描述「做了什么、为什么」，不出现任何 AI / 工具相关的署名或水印
