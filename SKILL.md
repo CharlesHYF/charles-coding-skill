@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 2.21.0
+version: 3.0.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -28,18 +28,35 @@ author: Charles <w1400214654@outlook.com>
 
 > **缩进**默认 **Tab**；例外：**Python / Kotlin 4 空格**、**SQL / YAML / JSON 2 空格**。**行尾**统一 **LF**。以上由脚手架里的 `.editorconfig` + `.gitattributes` 强制，不靠自觉。
 
+## 专项规范
+- [文档与Markdown](reference/readme-md.md)
+- [DevOps与部署安全](reference/devops.md)
+- [测试与压测](reference/testing.md)
+- [日志](reference/logging.md)
+- [AI/ML](reference/ai-ml.md)
+
 ## 全局约定
 > 本节所有规范（大括号、代码展开/换行、魔法数字、命名、注释等）**适用所有语言，含前端**（JS / TS / Vue / React / HTML / CSS），不限于后端。
 
 ### 编辑与格式
+#### 工具强制类（由 Prettier/gofmt/Ruff + editorconfig 自动保证，不靠自觉）
 | 项目       | 规范                                                              |
 | ---------- | ----------------------------------------------------------------- |
 | 缩进       | 默认 Tab；Python / Kotlin 4 空格、SQL / YAML / JSON 2 空格（见 `.editorconfig`） |
 | 行尾       | 统一 LF，由 `.gitattributes` 强制（不再"跟随 OS 默认"）           |
 | 编码       | UTF-8                                                             |
-| 注释语言   | 中文                                                              |
-| 代码格式化 | 强制使用各语言对应的格式化工具（见各分册），并由 `.editorconfig` 兜底 |
-| 禁用符号   | **严禁**在代码、注释、提交信息中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号 |
+| import 排序 | 由各语言格式化工具（Prettier/gofmt/Ruff 等）自动整理             |
+| 代码格式化 | 强制使用各语言对应的格式化工具（见各分册）自动执行                |
+
+#### 手动约定类（工具不保证，Agent 须手动遵守并自查）
+| 项目             | 规范                                                              | lint 提示 |
+| ---------------- | ----------------------------------------------------------------- | --------- |
+| 注释语言         | 中文                                                              | 无法配置，纯手动 |
+| 禁用符号         | **严禁**在代码、注释、提交信息中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号 | 无法配置，纯手动 |
+| 大括号前后空行   | 见下方「代码块与大括号规范」                                       | 无法配置，纯手动 |
+| 键值独占一行     | 见下方「代码展开与换行规范」                                       | ESLint `object-curly-newline` |
+| 魔法数字         | 见下方「常量与魔法数字规范」                                       | `no-magic-numbers` |
+| 命名见名知义     | 见下方「变量与函数命名规范」                                       | 无法配置，纯手动 |
 
 ### 代码块与大括号规范
 - **强制使用大括号**：`if`、`else`、`for`、`while`、`function` 等所有控制流/函数体语句，**无论内部只有一行还是多行，都必须使用大括号 `{}`**，禁止省略
@@ -101,10 +118,6 @@ author: Charles <w1400214654@outlook.com>
       // ...
   }
   ```
-
-### Markdown 规范
-
-### README 规范
 
 ### 数据传输命名规范
 - **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 → 后端）、响应 = 出参（后端 → 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
@@ -209,13 +222,6 @@ author: Charles <w1400214654@outlook.com>
 - **交付时严禁残留无用文件**：临时脚本、调试文件、废弃代码、空目录、`xxx-copy`/`xxx备份`、注释掉的大段代码等一律清理，交付物只保留真正需要的文件
 - **过程产物禁止 commit**：开发过程中产生的 `spec`、`plan`、设计草稿、调研笔记、Agent 中间产物等**禁止提交到仓库**，一律写入 `.gitignore`（如 `*.spec.md`、`plan/`、`.agent/`、`scratch/` 等按项目约定），只提交最终代码与正式文档（`docs/`、`README`、`test_cases/`）
 
-### 调试与测试
-调试与测试规范（含测试用例表格格式、强制要求、压测规范）详见 [reference/testing.md](reference/testing.md)
-
-### 日志规范
-
-详见 [reference/logging.md](reference/logging.md)。
-
 ### AI 协作模式
 - **一律用简体中文回答 Charles**：所有对话回复、解释、方案说明统一使用简体中文（代码内注释同样中文），禁止用英文或繁体作答
 - 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
@@ -225,9 +231,8 @@ author: Charles <w1400214654@outlook.com>
 
 #### 编码前置流程（先问清、再动手）
 - **编码前必须从底层把每个功能问清楚**：进入写代码环节之前，逐个功能向 Charles 确认需求边界、入参出参、异常场景、依赖关系，需求没问清不许开写
-- **必须先写好模块文档**，放在 `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`），文档本身遵循本 Skill 的 Markdown 规范
-- 每个功能在文档里至少包含：**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）
-- 文档评审通过后再进入编码；代码实现须与文档一致，文档随功能变更同步更新
+- **模块文档闸门**：**新模块/新功能必写** `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`），文档本身遵循 [reference/readme-md.md](reference/readme-md.md) 的 Markdown 规范；每个功能至少包含**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）；**文档评审通过后再进入编码**，代码实现须与文档一致，文档随功能变更同步更新
+- **豁免**：小改/bugfix/重构可不写模块文档，但需在 commit/PR 说明改动内容
 
 #### AGENT.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENT.md`**，作为 AI 工具进入项目时首先读取的指令文件
