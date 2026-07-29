@@ -128,5 +128,24 @@ cd <上述安装目录> && git pull origin main
 
 详见 [SKILL.md](SKILL.md)。
 
+## 遵从率兜底 · SessionStart Hook
+Skill 靠 description 软触发，为兜底"老项目被忽略/不确认就改"，可在本机 `~/.claude/settings.json` 配置一个 SessionStart hook，每次会话开始注入固定提醒（非阻断）。
+
+配置步骤：
+1. 新建提醒文本 `~/.claude/charles-coding-reminder.txt`，内容为三条：老项目无 AGENT.md 先确认；新功能/新模块先写 docs/modules 文档评审再编码，小改/bugfix 豁免但需 commit 说明；交付前测试必须实跑通过。
+2. 在 `~/.claude/settings.json` 的 `hooks.SessionStart` 加一条 command hook：`cat ~/.claude/charles-coding-reminder.txt`。
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "cat ~/.claude/charles-coding-reminder.txt" } ] }
+    ]
+  }
+}
+```
+
+新增后需新开会话或在 Claude Code 打开一次 /hooks 使其加载。
+
 ## 新项目脚手架
 复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/` / `test_cases/stress/`（k6 压测模板）。
