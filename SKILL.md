@@ -95,7 +95,9 @@ author: Charles <w1400214654@outlook.com>
 - 示例：
   ```java
   private static final int MAX_RETRY_COUNT = 3;
-  if (retryCount > MAX_RETRY_COUNT) { }
+  if (retryCount > MAX_RETRY_COUNT) {
+      return;
+  }
   ```
 
 ### 数据传输命名规范
