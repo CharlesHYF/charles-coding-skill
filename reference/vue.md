@@ -17,8 +17,20 @@
 
 ## 代码风格
 - 单文件组件顺序：`<template>` → `<script setup lang="ts">` → `<style scoped>`
-- **文件头注释块**：SFC 只在**文件最开头**（`<template>` 上方）用一个 HTML 注释块 `<!-- ... -->` 写一次（含文件作用、创建日期、修改日期，见 [SKILL.md](../SKILL.md) 注释规范）。**禁止**在 `<script setup>` 内重复书写，避免一份文件头出现两处。
+- **文件头注释块**：SFC 只在**文件最开头**（`<template>` 上方）用一个 HTML 注释块 `<!-- ... -->` 写一次（含文件作用、创建日期、修改日期，见 [SKILL.md](../SKILL.md) 注释规范）。**禁止**在 `<script setup>` 内重复书写，避免一份文件头出现两处。文件头模板：
+  ```html
+  <!--
+    用户登录页
+
+    创建日期：2026-07-29
+    修改日期：2026-07-29
+  -->
+  <template>
+  	...
+  </template>
+  ```
 - 格式化：Prettier + ESLint（eslint-plugin-vue）；Prettier 设 `useTabs: true` 以符合全局 Tab 约定
+- **命名**：组件文件夹/组件名 `PascalCase`（如 `LoginForm`）；组合式函数（composables）文件与函数名一律 `useXxx` 前缀（如 `useAuth`、`useRequest`），放在 `src/composables/`（全局复用）或页面目录下（页面私有，与私有组件同级）
 - **导入路径用别名 `@/`**：一律用 `@/xxx/xxx`（`@` 指向 `src`），**禁止**用 `../../xxx` 这类多级相对路径。在 `vite.config.ts` 的 `resolve.alias` 与 `tsconfig.json` 的 `paths` 中配置 `@` → `src`
 
 ## 目录结构

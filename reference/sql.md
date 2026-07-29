@@ -57,6 +57,13 @@
 - **简单 CRUD**：优先使用 MyBatis Plus 内置方法（BaseMapper、ServiceImpl 等），不手写
 - **复杂查询/优化**：手写 SQL（Mapper XML 或注解），按需使用 Explain 分析执行计划
 - **关键字全部大写**，缩进 **2 空格**（⚠️ **全局 Tab 的例外**），每个子句独立一行
+- **文件头注释**：复杂查询（多表 JOIN、子查询、窗口函数等）与迁移脚本（DDL 变更、数据回填）文件顶部必须加注释，说明目的与影响，禁止只有裸 SQL 无上下文：
+  ```sql
+  -- 目的：将历史订单表 order_2024 中已完成订单迁移至归档表 order_archive
+  -- 影响：涉及 order_2024 全表扫描（约 500 万行），需在低峰期执行；执行后 order_2024 对应记录物理删除
+  -- 创建日期：2026-07-29
+  INSERT INTO order_archive SELECT * FROM order_2024 WHERE status = 3;
+  ```
 - 示例：
   ```sql
   SELECT u.id, u.name, o.amount

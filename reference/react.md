@@ -20,6 +20,21 @@
 - 客户端组件：仅在必要时添加 `'use client'`，数据获取优先在服务端组件中进行
 - 格式化：Prettier + ESLint（或 Biome 一把梭）；用 Prettier 时设 `useTabs: true`，用 Biome 时设 `indentStyle: tab`
 - **导入路径用别名 `@/`**：一律用 `@/xxx/xxx`（`@` 指向 `src`），**禁止**用 `../../xxx` 这类多级相对路径。在 `tsconfig.json` 的 `paths` 配置 `@/*` → `src/*`（Next.js 默认已内置该别名）
+- **文件头注释块**：每个 `.tsx` / `.ts` 文件最开头用块注释写一次文件作用与日期（见 [SKILL.md](../SKILL.md) 注释规范），模板：
+  ```tsx
+  /**
+   * 登录表单组件
+   *
+   * 创建日期：2026-07-29
+   * 修改日期：2026-07-29
+   */
+  'use client'
+
+  export default function LoginForm() {
+  	...
+  }
+  ```
+- **命名**：组件文件夹/组件名 `PascalCase`（如 `LoginForm`）；自定义 Hook 文件与函数名一律 `useXxx` 前缀（如 `useAuth`、`useDebounce`），全局复用放 `src/hooks/`，页面私有放该路由 `_components/` 同级
 
 ## 目录结构
 - **路由页面**：Next.js App Router 强制以 `app/` 为路由目录，路由入口文件为框架约定的 `page.tsx` / `layout.tsx`（此处不改名为 `index`，遵循框架要求）
