@@ -64,44 +64,27 @@ author: Charles <w1400214654@outlook.com>
 - **大括号前后留空行**：代码块（`{}`）与上方相邻代码之间留一个空行，与下方相邻代码之间也留一个空行，让代码块的起止边界清晰可辨
 - 示例：
   ```java
-  int a = 10;
-
   if (a > 10) {
-      // 即使只有一行也必须用大括号
       doSomething();
   } else {
       doOther();
   }
-
-  System.out.println(a);
   ```
 
 ### 代码展开与换行规范（严禁并排）
 - **对象/字典/结构体/映射字面量：每个键值独占一行**，并带行尾逗号，**严禁**多个键值并排在同一行：
   ```js
-  // 禁止：并排
-  const p = { x: 12, y: 13, z: 14 };
-
-  // 正确：每项一行 + 行尾逗号
   const p = {
   	x: 12,
   	y: 13,
-  	z: 14,
   };
   ```
 - **HTML / JSX：每个元素独占一行**，**严禁**把多个标签挤在同一行（如 `<li>a</li><li>b</li>`）；单个标签的多个属性可保留在同一行
 - **CSS：每条声明独占一行**；选择器分组时**每个选择器一行**（逗号后换行）；`{` 不另起行，跟在选择器后；**每个规则块之间空一行**。示例：
   ```css
-  /* 响应式 */
-  @media (max-width: 1080px) {
-  	.hero,
-  	.scenario-wrap {
-  		grid-template-columns: 1fr;
-  	}
-
-  	.cards-3 {
-  		grid-template-columns: repeat(2, 1fr);
-  	}
+  .hero,
+  .scenario-wrap {
+  	grid-template-columns: 1fr;
   }
   ```
 - 完整可参考的范例文件：`/Library/CodeProject/sangkee-expo/sangkee-expo.html`
@@ -111,13 +94,8 @@ author: Charles <w1400214654@outlook.com>
 - **常量命名**：全大写下划线 `MAX_RETRY_COUNT`、`DEFAULT_TIMEOUT_MS`，见名知义
 - 示例：
   ```java
-  // 文件顶部定义
   private static final int MAX_RETRY_COUNT = 3;
-
-  // 使用（禁止 if (retryCount > 3)）
-  if (retryCount > MAX_RETRY_COUNT) {
-      // ...
-  }
+  if (retryCount > MAX_RETRY_COUNT) { }
   ```
 
 ### 数据传输命名规范
@@ -174,8 +152,7 @@ author: Charles <w1400214654@outlook.com>
   ```java
   /**
    * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
-   * phase 缺省 1（关键词，向后兼容）；phase=2 市场调研 / phase=3 Listing 聚合
-   * narrative 内部结构因阶段而异，调用方按需收窄（见 PhaseArtifactVO）
+   * phase 缺省 1，向后兼容
    */
   ```
 - **所有函数/方法**必须注释其功能，复杂逻辑需额外说明设计意图
@@ -237,23 +214,8 @@ author: Charles <w1400214654@outlook.com>
 
 #### AGENT.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENT.md`**，作为 AI 工具进入项目时首先读取的指令文件
-- 内容至少包含：引用 `charles-coding` Skill、声明分支策略、列出常用命令
-- 模板：
-  ```markdown
-  # AGENT.md
-
-  ## 编码规范
-  请严格遵循 charles-coding Skill（https://github.com/CharlesHYF/charles-coding-skill）的全部约定。
-
-  ## 分支策略
-  所有代码提交到 `agents/feature/<描述>` 分支，禁止直接推 `main` 或发起 PR。
-  Charles 审查后手动合并。
-
-  ## 常用命令
-  # 启动：...
-  # 构建：...
-  # 测试：...
-  ```
+- 内容至少包含：引用本 `charles-coding` Skill 的全部约定、声明 `agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、列出常用命令（启动/构建/测试）
+- 完整模板见 [reference/project-template/AGENT.md](reference/project-template/AGENT.md)
 
 ## 新项目脚手架
 开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENT.md / README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
