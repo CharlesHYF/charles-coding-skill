@@ -107,13 +107,10 @@ author: Charles <w1400214654@outlook.com>
 ### README 规范
 
 ### 数据传输命名规范
-- **前后端交互**：请求参数用 `XxxReqVO`，响应返回给前端用 `XxxRespVO`。示例：`LoginReqVO` / `LoginRespVO`
-  - 细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`
-- **内部/跨服务传输**（RPC、服务/模块之间）：用 `XxxReqDTO` / `XxxRespDTO`（统称 `XxxDTO`）
-- 三者边界：`ReqVO` = 入参（前端 → 后端）、`RespVO` = 出参（后端 → 前端展示）、`DTO` = 内部流转，不直接暴露给前端
-- **适用语言**：上述 `XxxReqVO` / `XxxRespVO` / `XxxDTO` 命名是 **Java / Kotlin / TypeScript（前端 types/）** 的规范，Go 和 Python 按各自生态习惯等义表达，不照搬后缀：
-  - **Go**：请求 `XxxRequest` / 响应 `XxxResponse`，内部 DTO 用 `XxxDTO`（或直接传领域对象），放在对应 `model/` 或 `dto/` 包下
-  - **Python（FastAPI + Pydantic）**：用 Pydantic model，命名 `XxxCreate` / `XxxUpdate` / `XxxResponse` / `XxxFilter` 等，放在 `schemas/` 或 `models/` 下，语义与 VO/DTO 对齐即可
+- **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 → 后端）、响应 = 出参（后端 → 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
+- **Java / Kotlin / TypeScript（前端 types/）**：请求 `XxxReqVO`、响应 `XxxRespVO`、内部 `XxxDTO`（`XxxReqDTO` / `XxxRespDTO`）。细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`。示例：`LoginReqVO` / `LoginRespVO`
+- **Go**：请求 `XxxRequest`、响应 `XxxResponse`，内部 `XxxDTO` 或直接传领域对象，放 `model/` 或 `dto/` 包
+- **Python（FastAPI + Pydantic）**：用 Pydantic model，命名 `XxxCreate` / `XxxUpdate` / `XxxResponse` / `XxxFilter`，放 `schemas/` 或 `models/`
 
 ### 变量与函数命名规范
 - **见名知义**：变量名、函数名必须能清晰表达其用途，**禁止**单字母变量（`i`/`j`/`k` 仅限循环索引）、缩写拼凑、无意义命名（`n`、`tmp`、`data`、`obj`、`item1` 等）
