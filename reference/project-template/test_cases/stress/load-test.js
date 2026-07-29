@@ -12,7 +12,7 @@ const tps = new Counter('tps');
 const dataReceivedBytes = new Trend('data_received_bytes');
 
 export const options = {
-	// 阶梯加压：0-1min 1VU -> 1-2min 10VU -> 2-3min 20VU -> 3-4min 10VU -> 4-5min 0VU
+	// 阶梯加压：0-1min 1VU → 1-2min 10VU → 2-3min 20VU → 3-4min 10VU → 4-5min 0VU
 	stages: [
 		{ duration: '1m', target: 1 },
 		{ duration: '1m', target: 10 },

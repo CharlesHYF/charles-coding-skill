@@ -121,7 +121,7 @@ author: Charles <w1400214654@outlook.com>
   ```
 
 ### 数据传输命名规范
-- **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 -> 后端）、响应 = 出参（后端 -> 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
+- **原则：每种语言遵循自己生态的主流命名，不强制统一后缀**。三类边界一致：请求 = 入参（前端 → 后端）、响应 = 出参（后端 → 前端展示）、DTO = 内部/跨服务流转（不直接暴露给前端）；后缀按各语言生态取用。
 - **Java / Kotlin / TypeScript（前端 types/）**：请求 `XxxReqVO`、响应 `XxxRespVO`、内部 `XxxDTO`（`XxxReqDTO` / `XxxRespDTO`）。细分：新增/保存 `XxxSaveReqVO`、分页查询 `XxxPageReqVO`。示例：`LoginReqVO` / `LoginRespVO`
 - **Go**：请求 `XxxRequest`、响应 `XxxResponse`，内部 `XxxDTO` 或直接传领域对象，放 `model/` 或 `dto/` 包
 - **Python（FastAPI + Pydantic）**：用 Pydantic model，命名 `XxxCreate` / `XxxUpdate` / `XxxResponse` / `XxxFilter`，放 `schemas/` 或 `models/`
@@ -146,7 +146,7 @@ author: Charles <w1400214654@outlook.com>
 - **控制层（Controller / Handler / Router）**：只做参数校验、路由转发、调用 Service，**不写业务逻辑**
 - **业务层（Service）**：承载全部业务逻辑、事务编排、跨模块调用，**不直接操作数据库**
 - **数据层（Repository / DAO / Mapper / DAL）**：只做数据存取（CRUD），**不写业务判断**
-- **层间调用链**：Controller -> Service -> Repository，**禁止跨层**（Controller 不直接调 Repository）
+- **层间调用链**：Controller → Service → Repository，**禁止跨层**（Controller 不直接调 Repository）
 - 各语言对应：
   | 层 | Java / Kotlin | Go | Python（FastAPI） |
   |---|---|---|---|
@@ -173,7 +173,7 @@ author: Charles <w1400214654@outlook.com>
 - **多行块注释首行换行**：`/** */` / `/* */` 等多行块注释，首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
   ```java
   /**
-   * 拉阶段产物 -> GET /api/tasks/{taskId}/artifact?phase=
+   * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
    * phase 缺省 1（关键词，向后兼容）；phase=2 市场调研 / phase=3 Listing 聚合
    * narrative 内部结构因阶段而异，调用方按需收窄（见 PhaseArtifactVO）
    */
