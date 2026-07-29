@@ -37,23 +37,32 @@
   src/package_name/
   ├── api/                # FastAPI 路由（按业务域分文件）
   │   └── user.py
-  ├── schemas/             # 请求/响应 DTO（Pydantic 模型），XxxReqVO / XxxRespVO 落位于此
+  ├── schemas/             # 请求/响应 DTO（Pydantic 模型），XxxCreate/XxxUpdate/XxxResponse/XxxFilter 落位于此
   │   └── user.py
   ├── service/             # 业务逻辑
   ├── models/              # SQLAlchemy ORM 实体
   ├── repository/          # 数据访问层
   └── core/                # 配置、依赖注入、公共工具
   ```
-- **请求/响应 DTO 统一放 `schemas/`**：按业务域分文件（如 `schemas/user.py`），命名 `XxxReqVO` / `XxxRespVO`（与 [SKILL.md](../SKILL.md) 数据传输命名规范一致），例如：
+- **请求/响应 DTO 统一放 `schemas/`**：按业务域分文件（如 `schemas/user.py`）。Python（FastAPI + Pydantic）**不照搬** Java/Kotlin/TypeScript 的 `ReqVO`/`RespVO` 后缀，改用 Pydantic 生态惯用命名：创建用 `XxxCreate`、更新用 `XxxUpdate`、响应用 `XxxResponse`、查询过滤用 `XxxFilter`，语义上与 VO/DTO 对齐即可（与 [SKILL.md](../SKILL.md) 一致），例如：
   ```python
   # schemas/user.py
-  class UserCreateReqVO(BaseModel):
+  class UserCreate(BaseModel):
       """创建用户请求"""
       username: str
       email: str
 
-  class UserRespVO(BaseModel):
+  class UserUpdate(BaseModel):
+      """更新用户请求"""
+      username: str | None = None
+      email: str | None = None
+
+  class UserResponse(BaseModel):
       """用户信息响应"""
       id: int
       username: str
+
+  class UserFilter(BaseModel):
+      """用户查询过滤条件"""
+      username: str | None = None
   ```
