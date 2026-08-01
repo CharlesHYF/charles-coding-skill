@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.0.1
+version: 3.0.2
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -52,7 +52,8 @@ author: Charles <w1400214654@outlook.com>
 | 项目             | 规范                                                              | lint 提示 |
 | ---------------- | ----------------------------------------------------------------- | --------- |
 | 注释语言         | 中文                                                              | 无法配置，纯手动 |
-| 禁用符号         | **严禁**在代码、注释、提交信息中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号 | 无法配置，纯手动 |
+| 禁用符号         | **严禁**在任何文字表达中使用「」这类弯角引号；统一用 `""` / `''` 或直接不加引号                 | 无法配置，纯手动 |
+| 禁用符号         | **严禁**在任何文字表达中使用 `——`（中文长破折号）；统一用 `--`（半角双连字符）                    | 无法配置，纯手动 |
 | 禁用 Emoji       | **严禁**在代码、注释、文档、提交信息中使用 Emoji；确需图标时用 SVG 或 icon 字体，不用 Emoji | 无法配置，纯手动 |
 | 大括号前后空行   | 见下方「代码块与大括号规范」                                       | 无法配置，纯手动 |
 | 键值独占一行     | 见下方「代码展开与换行规范」                                       | ESLint `object-curly-newline` |
@@ -87,7 +88,7 @@ author: Charles <w1400214654@outlook.com>
   	grid-template-columns: 1fr;
   }
   ```
-- 完整可参考的范例文件：`/Library/CodeProject/sangkee-expo/sangkee-expo.html`
+- 完整可参考的范例文件：[`example.html`](example.html)；测试用例范例见 [`reference/examples/test_cases/`](reference/examples/test_cases/)；模块文档范例见 [`reference/examples/docs/modules/`](reference/examples/docs/modules/)
 
 ### 常量与魔法数字规范
 - **禁止魔法数字**：代码中**严禁**直接出现裸数字（如 `if (count > 100)`、`Thread.sleep(5000)`），所有有语义的数字必须定义为具名常量，置于文件/类顶部
@@ -144,11 +145,17 @@ author: Charles <w1400214654@outlook.com>
 
 ### 注释规范
 - **所有开发类源代码文件**顶部必须包含注释块，说明：
-  - 文件作用
+  - 文件作用（**一到两句话**简洁描述本文件职责，句号结尾）
   - 创建日期（格式：`YYYY-MM-DD`）
   - 修改日期（格式：`YYYY-MM-DD`，紧跟在创建日期下方；每次实质性修改时更新为当前日期）
+- 标准化模板（各语言按各自注释语法适配，示例见各分册「文件头模板」章节）：
+  ```
+  文件作用：应用入口——启动 Spring Boot 并加载全部配置。
+  创建日期：2026-07-15
+  修改日期：2026-08-01
+  ```
 - 文件的**详细修改历史由 git 记录**，文件头只维护上述最近一次的修改日期，不逐条罗列变更
-  - **文件头只写作用，不写实现**：文件头注释仅用 1-3 句话概括本文件职责，**禁止**在文件头写入实现细节、设计推演、查证结论、环境差异分析——这些内容属于函数注释或 git commit message
+  - **文件头只写作用，不写实现**：文件头注释仅用 1-2 句话概括本文件职责，**禁止**在文件头写入实现细节、设计推演、查证结论、环境差异分析——这些内容属于函数注释或 git commit message
 - **优先使用语言标准的块/文档注释**：类、方法、字段的说明性注释优先用 `/** */`（文档注释）或 `/* */`，而**不是** `//`。`//` 只用于函数体内部的临时/单行说明。凡语言有文档注释标准（Javadoc / JSDoc / TSDoc / Go doc / docstring 等）的，一律按标准写
 - **多行块注释首行换行**：`/** */` / `/* */` 等多行块注释，首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
   ```java

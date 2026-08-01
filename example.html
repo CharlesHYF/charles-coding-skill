@@ -1,0 +1,1708 @@
+<!--
+	文件作用：Example Demo 展会前端示例页面 —— 按客户类型入口 + 交互式场景热点展示，预约表单对接后端 API
+	创建日期：2026-08-01
+	说明：本文件为完整可参考的范例，展示网格布局、自定义下拉、模态表单、Toast 提示等前端组件的实现方式。
+		   所有内容均为示例数据，无实际业务含义。
+-->
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Example Demo</title>
+	<meta name="description" content="Example demo page with interactive scenarios and product hotspots." />
+	<style>
+		/* 全局设计变量 */
+		:root {
+			--bg: #f5f5f7;
+			--surface: #fdfdfd;
+			--surface-2: #eeeeee;
+			--text: #1d1d1f;
+			--muted: #86868b;
+			--line: #d2d2d7;
+			--primary: #0071e3;
+			--primary-2: #0060c7;
+			--accent: #e8f1fb;
+			--shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+			--radius: 22px;
+			--radius-sm: 14px;
+			--max: 1280px;
+		}
+
+		/* 基础重置与排版 */
+		* {
+			box-sizing: border-box !important;
+		}
+
+		html {
+			scroll-behavior: smooth !important;
+		}
+
+		body {
+			margin: 0 !important;
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+			color: var(--text) !important;
+			background: linear-gradient(180deg, #f5f5f7 0%, #fafafa 100%) !important;
+		}
+
+		a {
+			color: inherit !important;
+			text-decoration: none !important;
+		}
+
+		img {
+			max-width: 100% !important;
+			display: block !important;
+		}
+
+		.container {
+			width: min(var(--max), calc(100% - 40px)) !important;
+			margin: 0 auto !important;
+		}
+
+		/* 通用按钮 */
+		.btn {
+			font-family: inherit !important;
+			display: inline-flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			gap: 8px !important;
+			border-radius: 999px !important;
+			padding: 13px 20px !important;
+			font-weight: 600 !important;
+			font-size: 14px !important;
+			transition: .2s ease !important;
+			cursor: pointer !important;
+			border: 1px solid transparent !important;
+		}
+
+		.btn-primary {
+			background: var(--primary) !important;
+			color: #fff !important;
+			box-shadow: var(--shadow) !important;
+		}
+
+		.btn-primary:hover {
+			background: var(--primary-2) !important;
+			transform: translateY(-1px) !important;
+		}
+
+		.btn-secondary {
+			background: transparent !important;
+			border-color: rgba(0, 113, 227, .25) !important;
+			color: var(--primary) !important;
+		}
+
+		.btn-secondary:hover {
+			background: rgba(0, 113, 227, .06) !important;
+		}
+
+		/* 首屏 Hero */
+		.hero {
+			padding: 56px 0 28px !important;
+			display: grid !important;
+			grid-template-columns: 1.08fr .92fr !important;
+			gap: 28px !important;
+			align-items: stretch !important;
+		}
+
+		.hero-card,
+		.panel {
+			background: rgba(253, 253, 253, 0.84) !important;
+			border: 1px solid rgba(210, 210, 215, .9) !important;
+			border-radius: 30px !important;
+			box-shadow: var(--shadow) !important;
+		}
+
+		.hero-copy {
+			padding: 40px !important;
+		}
+
+		.eyebrow {
+			display: inline-flex !important;
+			gap: 8px !important;
+			align-items: center !important;
+			margin-bottom: 18px !important;
+			padding: 8px 12px !important;
+			border-radius: 999px !important;
+			background: var(--accent) !important;
+			color: var(--primary) !important;
+			font-size: 12px !important;
+			font-weight: 700 !important;
+			letter-spacing: .05em !important;
+			text-transform: uppercase !important;
+		}
+
+		h1 {
+			margin: 0 0 16px !important;
+			font-size: clamp(34px, 5vw, 64px) !important;
+			line-height: 1.04 !important;
+			letter-spacing: -.04em !important;
+			max-width: 20ch !important;
+		}
+
+		.hero-copy p {
+			font-size: 17px !important;
+			margin: 0 0 22px !important;
+			color: var(--muted) !important;
+			max-width: 58ch !important;
+		}
+
+		.hero-meta {
+			display: flex !important;
+			flex-wrap: wrap !important;
+			gap: 10px !important;
+			margin-bottom: 24px !important;
+		}
+
+		.pill {
+			padding: 8px 12px !important;
+			border-radius: 999px !important;
+			background: var(--surface-2) !important;
+			color: #4c473f !important;
+			border: 1px solid rgba(210, 210, 215, .9) !important;
+			font-size: 13px !important;
+		}
+
+		.cta-row {
+			display: flex !important;
+			gap: 12px !important;
+			flex-wrap: wrap !important;
+		}
+
+		.hero-visual {
+			padding: 20px !important;
+			display: grid !important;
+			gap: 14px !important;
+		}
+
+		.mini-scene {
+			position: relative !important;
+			min-height: 360px !important;
+			height: 100% !important;
+			border-radius: 24px !important;
+			overflow: hidden !important;
+			background-color: var(--surface-2) !important;
+			background-position: center !important;
+			background-size: cover !important;
+			background-repeat: no-repeat !important;
+		}
+
+		.mini-map {
+			position: absolute !important;
+			inset: auto 16px 16px 16px !important;
+			height: 200px !important;
+			border-radius: 18px !important;
+			overflow: hidden !important;
+			border: 1px solid rgba(210, 210, 215, .9) !important;
+			box-shadow: var(--shadow) !important;
+		}
+
+		.mini-map iframe {
+			position: absolute !important;
+			inset: 0 !important;
+			width: 100% !important;
+			height: 100% !important;
+			border: 0 !important;
+			display: block !important;
+		}
+
+		/* 通用分区标题 */
+		section {
+			padding: 24px 0 !important;
+		}
+
+		.section-head {
+			display: flex !important;
+			justify-content: space-between !important;
+			gap: 18px !important;
+			align-items: end !important;
+			margin-bottom: 18px !important;
+		}
+
+		.section-head h2 {
+			margin: 0 0 8px !important;
+			font-size: 30px !important;
+			letter-spacing: -.03em !important;
+		}
+
+		.section-head p {
+			margin: 0 !important;
+			color: var(--muted) !important;
+			max-width: 60ch !important;
+		}
+
+		/* 客户类型入口卡片 */
+		.cards-3 {
+			display: grid !important;
+			grid-template-columns: repeat(3, 1fr) !important;
+			gap: 18px !important;
+		}
+
+		.entry-card {
+			background: rgba(253, 253, 253, 0.86) !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 24px !important;
+			padding: 22px !important;
+			display: flex !important;
+			flex-direction: column !important;
+			gap: 14px !important;
+			box-shadow: var(--shadow) !important;
+		}
+
+		.entry-card .num {
+			width: 34px !important;
+			height: 34px !important;
+			display: inline-grid !important;
+			place-items: center !important;
+			border-radius: 50% !important;
+			background: var(--accent) !important;
+			color: var(--primary) !important;
+			font-size: 13px !important;
+			font-weight: 700 !important;
+		}
+
+		.entry-card h3 {
+			margin: 0 !important;
+			font-size: 20px !important;
+		}
+
+		.entry-card p {
+			margin: 0 !important;
+			color: var(--muted) !important;
+			flex: 1 1 auto !important;
+		}
+
+		/* 场景交互区 */
+		.scenario-wrap {
+			display: grid !important;
+			grid-template-columns: 320px 1fr !important;
+			gap: 18px !important;
+			align-items: start !important;
+		}
+
+		.scenario-menu,
+		.scene-stage {
+			background: rgba(253, 253, 253, 0.86) !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 28px !important;
+			box-shadow: var(--shadow) !important;
+		}
+
+		.scenario-menu {
+			padding: 14px !important;
+			position: sticky !important;
+			top: 24px !important;
+		}
+
+		.scenario-tab {
+			width: 100% !important;
+			border: 1px solid transparent !important;
+			background: transparent !important;
+			text-align: left !important;
+			padding: 14px 14px !important;
+			border-radius: 18px !important;
+			cursor: pointer !important;
+			color: var(--text) !important;
+			transition: .2s ease !important;
+			margin-bottom: 8px !important;
+		}
+
+		.scenario-tab:last-child {
+			margin-bottom: 0 !important;
+		}
+
+		.scenario-tab strong {
+			display: block !important;
+			margin-bottom: 5px !important;
+			font-size: 14px !important;
+		}
+
+		.scenario-tab span {
+			display: block !important;
+			font-size: 12px !important;
+			color: var(--muted) !important;
+		}
+
+		.scenario-tab.active {
+			background: linear-gradient(180deg, rgba(0, 113, 227, .12), rgba(0, 113, 227, .06)) !important;
+			border-color: rgba(0, 113, 227, .2) !important;
+		}
+
+		.scenario-tab:hover,
+		.scenario-tab:focus,
+		.scenario-tab:focus-visible,
+		.scenario-tab:active {
+			background: transparent !important;
+			color: var(--text) !important;
+			outline: none !important;
+		}
+
+		.scenario-tab.active,
+		.scenario-tab.active:hover,
+		.scenario-tab.active:focus,
+		.scenario-tab.active:focus-visible,
+		.scenario-tab.active:active {
+			background: linear-gradient(180deg, rgba(0, 113, 227, .12), rgba(0, 113, 227, .06)) !important;
+			border-color: rgba(0, 113, 227, .2) !important;
+			color: var(--text) !important;
+		}
+
+		.scenario-tab strong {
+			color: inherit !important;
+		}
+
+		.scenario-tab span {
+			color: var(--muted) !important;
+		}
+
+		.scene-stage {
+			padding: 18px !important;
+		}
+
+		.scene-top {
+			display: flex !important;
+			justify-content: space-between !important;
+			gap: 18px !important;
+			align-items: start !important;
+			margin-bottom: 14px !important;
+		}
+
+		.scene-top h3 {
+			margin: 0 0 8px !important;
+			font-size: 26px !important;
+		}
+
+		.scene-top p {
+			margin: 0 !important;
+			color: var(--muted) !important;
+			max-width: 58ch !important;
+		}
+
+		.client-tag {
+			padding: 8px 12px !important;
+			border-radius: 999px !important;
+			background: var(--surface-2) !important;
+			font-size: 12px !important;
+			color: #4a443d !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			white-space: nowrap !important;
+		}
+
+		.scene {
+			position: relative !important;
+			aspect-ratio: 16 / 9 !important;
+			border-radius: 24px !important;
+			overflow: visible !important;
+			border: 1px solid rgba(210, 210, 215, .9) !important;
+			background-size: cover !important;
+			background-position: center !important;
+		}
+
+		.scene::after {
+			content: '' !important;
+			position: absolute !important;
+			inset: 0 !important;
+			border-radius: 24px !important;
+			background: linear-gradient(180deg, rgba(17, 16, 14, 0.06) 0%, rgba(17, 16, 14, 0.24) 100%) !important;
+			pointer-events: none !important;
+		}
+
+		/* 场景热点与提示气泡 */
+		.hotspot {
+			box-sizing: border-box !important;
+			position: absolute !important;
+			z-index: 3 !important;
+			width: 28px !important;
+			height: 28px !important;
+			min-width: 28px !important;
+			min-height: 28px !important;
+			max-width: 28px !important;
+			max-height: 28px !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			border: none !important;
+			border-radius: 50% !important;
+			-webkit-appearance: none !important;
+			appearance: none !important;
+			cursor: pointer !important;
+			background: var(--primary) !important;
+			color: white !important;
+			box-shadow: 0 10px 24px rgba(0, 113, 227, .28) !important;
+			display: grid !important;
+			place-items: center !important;
+			font-weight: 700 !important;
+			font-size: 14px !important;
+			line-height: 1 !important;
+		}
+
+		.hotspot-num {
+			position: absolute !important;
+			top: 50% !important;
+			left: 50% !important;
+			transform: translate(-50%, -50%) !important;
+			line-height: 1 !important;
+			pointer-events: none !important;
+		}
+
+		.hotspot::before {
+			content: '' !important;
+			position: absolute !important;
+			inset: -10px !important;
+			border-radius: 50% !important;
+			border: 1px solid rgba(0, 113, 227, .3) !important;
+			animation: pulse 2.2s infinite !important;
+		}
+
+		.hotspot:hover,
+		.hotspot.active {
+			transform: scale(1.04) !important;
+			background: var(--primary-2) !important;
+			z-index: 10 !important;
+		}
+
+		@keyframes pulse {
+			0% {
+				transform: scale(.8);
+				opacity: .85;
+			}
+			70% {
+				transform: scale(1.35);
+				opacity: 0;
+			}
+			100% {
+				transform: scale(1.35);
+				opacity: 0;
+			}
+		}
+
+		.tooltip {
+			position: absolute !important;
+			z-index: 5 !important;
+			width: 280px !important;
+			left: calc(100% + 10px) !important;
+			top: 50% !important;
+			transform: translateY(-50%) !important;
+			padding: 14px !important;
+			border-radius: 18px !important;
+			background: rgba(255, 255, 255, .96) !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			box-shadow: var(--shadow) !important;
+			opacity: 0 !important;
+			pointer-events: none !important;
+			transition: opacity .18s ease !important;
+		}
+
+		.hotspot.tip-left .tooltip {
+			left: auto !important;
+			right: calc(100% + 10px) !important;
+		}
+
+		.hotspot:hover .tooltip,
+		.hotspot.active .tooltip {
+			opacity: 1 !important;
+		}
+
+		.tooltip h4 {
+			color: black !important;
+			margin: 0 0 6px !important;
+			font-size: 15px !important;
+			line-height: 1.2 !important;
+		}
+
+		.tooltip p {
+			margin: 0 0 8px !important;
+			font-size: 12px !important;
+			color: var(--muted) !important;
+		}
+
+		.tooltip ul {
+			margin: 0 !important;
+			padding-left: 18px !important;
+			color: #4e483f !important;
+			font-size: 12px !important;
+		}
+
+		/* 页脚 */
+		footer {
+			padding: 24px 0 48px !important;
+			color: var(--muted) !important;
+			font-size: 14px !important;
+		}
+
+		/* 场景操作按钮 */
+		.scene-actions {
+			display: flex !important;
+			gap: 12px !important;
+			margin-top: 16px !important;
+			flex-wrap: wrap !important;
+		}
+
+		/* 预约表单弹窗 */
+		.form-dialog {
+			width: min(560px, calc(100% - 32px)) !important;
+			max-height: 90vh !important;
+			overflow-x: hidden !important;
+			overflow-y: auto !important;
+			padding: 0 !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 24px !important;
+			background: var(--surface) !important;
+			color: var(--text) !important;
+			box-shadow: 0 30px 80px rgba(28, 23, 17, .28) !important;
+		}
+
+		.form-dialog::backdrop {
+			background: rgba(17, 16, 14, .45) !important;
+			backdrop-filter: blur(2px) !important;
+		}
+
+		html:has(.form-dialog[open]) {
+			overflow: hidden !important;
+		}
+
+		.form-body {
+			display: grid !important;
+			grid-template-columns: minmax(0, 1fr) !important;
+			gap: 16px !important;
+			padding: 24px !important;
+		}
+
+		.form-head {
+			display: flex !important;
+			align-items: flex-start !important;
+			justify-content: space-between !important;
+			gap: 12px !important;
+		}
+
+		.form-head h3 {
+			margin: 0 !important;
+			font-size: 22px !important;
+			letter-spacing: -.02em !important;
+		}
+
+		.form-close {
+			box-sizing: border-box !important;
+			flex: none !important;
+			width: 34px !important;
+			height: 34px !important;
+			min-width: 34px !important;
+			min-height: 34px !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			border: none !important;
+			border-radius: 50% !important;
+			-webkit-appearance: none !important;
+			appearance: none !important;
+			cursor: pointer !important;
+			font-size: 0 !important;
+			background-color: var(--surface-2) !important;
+			background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%2386868b'%20stroke-width='2.4'%20stroke-linecap='round'%3E%3Cline%20x1='6'%20y1='6'%20x2='18'%20y2='18'/%3E%3Cline%20x1='18'%20y1='6'%20x2='6'%20y2='18'/%3E%3C/svg%3E") !important;
+			background-repeat: no-repeat !important;
+			background-position: center !important;
+			background-size: 16px 16px !important;
+		}
+
+		.form-close:hover {
+			background-color: #e0e0e0 !important;
+		}
+
+		.form-close:disabled {
+			opacity: .45 !important;
+			cursor: default !important;
+			pointer-events: none !important;
+		}
+
+		.form-close:focus,
+		.form-close:focus-visible,
+		.form-close:active {
+			background-color: var(--surface-2) !important;
+			outline: none !important;
+			box-shadow: none !important;
+		}
+
+		.btn-primary:hover {
+			background: var(--primary-2) !important;
+		}
+
+		.btn-primary:focus,
+		.btn-primary:focus-visible,
+		.btn-primary:active {
+			background: var(--primary) !important;
+		}
+
+		.form-dialog:focus,
+		.form-dialog:focus-visible {
+			outline: none !important;
+		}
+
+		.form-dialog button,
+		.form-dialog input {
+			-webkit-tap-highlight-color: transparent !important;
+		}
+
+		.multi-select-option:hover,
+		.multi-select-option:focus,
+		.multi-select-option:active,
+		.single-select-option:hover,
+		.single-select-option:focus,
+		.single-select-option:active {
+			background-color: var(--surface-2) !important;
+			color: var(--text) !important;
+			outline: none !important;
+		}
+
+		.single-select-option.selected {
+			background-color: transparent !important;
+			color: var(--primary) !important;
+		}
+
+		.multi-select-toggle:hover,
+		.multi-select-toggle:focus,
+		.multi-select-toggle:focus-visible,
+		.multi-select-toggle:active,
+		.single-select-toggle:hover,
+		.single-select-toggle:focus,
+		.single-select-toggle:focus-visible,
+		.single-select-toggle:active {
+			background-color: #fff !important;
+		}
+
+		.multi-select-toggle,
+		.single-select-toggle {
+			color: var(--muted) !important;
+		}
+
+		.multi-select-toggle.has-value,
+		.single-select-toggle.has-value {
+			color: var(--text) !important;
+		}
+
+		.multi-select-text,
+		.single-select-text {
+			color: inherit !important;
+		}
+
+		.form-field {
+			display: grid !important;
+			grid-template-columns: minmax(0, 1fr) !important;
+			min-width: 0 !important;
+			gap: 8px !important;
+		}
+
+		.form-field label {
+			font-size: 14px !important;
+			font-weight: 600 !important;
+		}
+
+		.form-field .req {
+			color: #e5484d !important;
+		}
+
+		.form-field input {
+			width: 100% !important;
+			padding: 13px 14px !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 14px !important;
+			background: #fff !important;
+			font: inherit !important;
+			color: inherit !important;
+		}
+
+		.form-field input:focus {
+			outline: none !important;
+			border-color: var(--primary) !important;
+			box-shadow: 0 0 0 3px rgba(0, 113, 227, .12) !important;
+		}
+
+		/* 自定义下拉 */
+		.multi-select,
+		.single-select {
+			position: relative !important;
+			min-width: 0 !important;
+		}
+
+		.multi-select-toggle,
+		.single-select-toggle {
+			width: 100% !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			gap: 10px !important;
+			padding: 13px 14px !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 14px !important;
+			background: #fff !important;
+			font: inherit !important;
+			color: var(--muted) !important;
+			text-align: left !important;
+			cursor: pointer !important;
+		}
+
+		.multi-select-toggle:focus-visible,
+		.single-select-toggle:focus-visible {
+			outline: none !important;
+			border-color: var(--primary) !important;
+			box-shadow: 0 0 0 3px rgba(0, 113, 227, .12) !important;
+		}
+
+		.multi-select-toggle.has-value,
+		.single-select-toggle.has-value {
+			color: var(--text) !important;
+		}
+
+		.single-select-toggle.error,
+		.multi-select-toggle.error {
+			border-color: #e5484d !important;
+		}
+
+		.multi-select-text,
+		.single-select-text {
+			flex: 1 !important;
+			min-width: 0 !important;
+			overflow: hidden !important;
+			text-overflow: ellipsis !important;
+			white-space: nowrap !important;
+		}
+
+		.multi-select-caret,
+		.single-select-caret {
+			flex: none !important;
+			width: 16px !important;
+			height: 16px !important;
+			background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='16'%20height='16'%20viewBox='0%200%2016%2016'%20fill='none'%20stroke='%2386868b'%20stroke-width='1.6'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M4%206l4%204%204-4'/%3E%3C/svg%3E") center / 16px no-repeat !important;
+			transition: transform .2s ease !important;
+		}
+
+		.multi-select.open .multi-select-caret,
+		.single-select.open .single-select-caret {
+			transform: rotate(180deg) !important;
+		}
+
+		.multi-select-menu,
+		.single-select-menu {
+			display: none !important;
+			position: fixed !important;
+			z-index: 2147483000 !important;
+			max-height: 240px !important;
+			overflow-y: auto !important;
+			overscroll-behavior: contain !important;
+			padding: 6px !important;
+			border: 1px solid rgba(210, 210, 215, .95) !important;
+			border-radius: 14px !important;
+			background: #fff !important;
+			box-shadow: var(--shadow) !important;
+			scrollbar-width: thin !important;
+			scrollbar-color: rgba(134, 134, 139, .35) transparent !important;
+		}
+
+		.multi-select-menu::-webkit-scrollbar,
+		.single-select-menu::-webkit-scrollbar {
+			width: 10px !important;
+		}
+
+		.multi-select-menu::-webkit-scrollbar-track,
+		.single-select-menu::-webkit-scrollbar-track {
+			background: transparent !important;
+			margin: 6px 0 !important;
+		}
+
+		.multi-select-menu::-webkit-scrollbar-thumb,
+		.single-select-menu::-webkit-scrollbar-thumb {
+			background: rgba(134, 134, 139, .32) !important;
+			border-radius: 999px !important;
+			border: 3px solid #fff !important;
+			background-clip: padding-box !important;
+		}
+
+		.multi-select-menu::-webkit-scrollbar-thumb:hover,
+		.single-select-menu::-webkit-scrollbar-thumb:hover {
+			background: rgba(134, 134, 139, .5) !important;
+			background-clip: padding-box !important;
+		}
+
+		.multi-select.open .multi-select-menu,
+		.single-select.open .single-select-menu {
+			display: block !important;
+		}
+
+		.multi-select-option,
+		.single-select-option {
+			display: flex !important;
+			align-items: center !important;
+			gap: 10px !important;
+			width: 100% !important;
+			padding: 10px !important;
+			border: none !important;
+			border-radius: 10px !important;
+			background: transparent !important;
+			font: inherit !important;
+			font-size: 14px !important;
+			color: inherit !important;
+			text-align: left !important;
+			cursor: pointer !important;
+		}
+
+		.multi-select-option:hover,
+		.single-select-option:hover {
+			background: var(--surface-2) !important;
+		}
+
+		.multi-select-option input {
+			width: 16px !important;
+			height: 16px !important;
+			accent-color: var(--primary) !important;
+		}
+
+		.single-select-option.selected {
+			color: var(--primary) !important;
+			font-weight: 600 !important;
+		}
+
+		.form-actions {
+			display: flex !important;
+			justify-content: center !important;
+			margin-top: 4px !important;
+		}
+
+		.form-submit {
+			min-width: 200px !important;
+		}
+
+		/* 提交按钮加载态 */
+		.btn.is-loading {
+			color: transparent !important;
+			pointer-events: none !important;
+			position: relative !important;
+		}
+
+		.btn.is-loading::after {
+			content: '' !important;
+			position: absolute !important;
+			top: 50% !important;
+			left: 50% !important;
+			width: 18px !important;
+			height: 18px !important;
+			margin: -9px 0 0 -9px !important;
+			border: 2px solid rgba(255, 255, 255, .45) !important;
+			border-top-color: #fff !important;
+			border-radius: 50% !important;
+			animation: btn-spin .6s linear infinite !important;
+		}
+
+		@keyframes btn-spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* 浮动结果提示 toast */
+		.toast-container {
+			position: fixed !important;
+			top: 24px !important;
+			left: 50% !important;
+			transform: translateX(-50%) !important;
+			z-index: 2147483647 !important;
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
+			gap: 12px !important;
+			width: max-content !important;
+			max-width: min(92vw, 460px) !important;
+			pointer-events: none !important;
+		}
+
+		.toast {
+			display: flex !important;
+			align-items: center !important;
+			gap: 12px !important;
+			padding: 14px 20px 14px 16px !important;
+			border-radius: 14px !important;
+			background: #fff !important;
+			box-shadow: 0 12px 34px rgba(28, 23, 17, .18) !important;
+			font-size: 15px !important;
+			font-weight: 600 !important;
+			line-height: 1.3 !important;
+			opacity: 0 !important;
+			transform: translateY(-10px) !important;
+			transition: opacity .25s ease, transform .25s ease !important;
+		}
+
+		.toast.toast--show {
+			opacity: 1 !important;
+			transform: translateY(0) !important;
+		}
+
+		.toast-icon {
+			flex: none !important;
+			width: 22px !important;
+			height: 22px !important;
+			border-radius: 50% !important;
+			background-repeat: no-repeat !important;
+			background-position: center !important;
+			background-size: 14px !important;
+		}
+
+		.toast--success {
+			color: #15803d !important;
+		}
+
+		.toast--success .toast-icon {
+			background-color: #16a34a !important;
+			background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M5%2013l4%204L19%207'/%3E%3C/svg%3E") !important;
+		}
+
+		.toast--warning {
+			color: #d97706 !important;
+		}
+
+		.toast--warning .toast-icon {
+			background-color: #f59e0b !important;
+			background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cline%20x1='12'%20y1='7'%20x2='12'%20y2='13'/%3E%3Cline%20x1='12'%20y1='17.5'%20x2='12'%20y2='17.5'/%3E%3C/svg%3E") !important;
+		}
+
+		.toast--error {
+			color: #e5484d !important;
+		}
+
+		.toast--error .toast-icon {
+			background-color: #ef4444 !important;
+			background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='white'%20stroke-width='3.2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cline%20x1='7'%20y1='7'%20x2='17'%20y2='17'/%3E%3Cline%20x1='17'%20y1='7'%20x2='7'%20y2='17'/%3E%3C/svg%3E") !important;
+		}
+
+		/* 已选内容悬浮提示 */
+		.field-tooltip {
+			position: fixed !important;
+			z-index: 2147483647 !important;
+			max-width: min(320px, 90vw) !important;
+			padding: 10px 12px !important;
+			border-radius: 12px !important;
+			background: #1f2430 !important;
+			color: #fff !important;
+			font-size: 13px !important;
+			font-weight: 500 !important;
+			line-height: 1.5 !important;
+			box-shadow: 0 12px 30px rgba(0, 0, 0, .28) !important;
+			pointer-events: none !important;
+			opacity: 0 !important;
+			transform: translateY(4px) !important;
+			transition: opacity .15s ease, transform .15s ease !important;
+		}
+
+		.field-tooltip.show {
+			opacity: 1 !important;
+			transform: translateY(0) !important;
+		}
+
+		.field-tooltip span {
+			display: block !important;
+			max-width: 100% !important;
+			overflow: hidden !important;
+			text-overflow: ellipsis !important;
+			white-space: nowrap !important;
+		}
+
+		/* 响应式 */
+		@media (max-width: 1080px) {
+			.hero,
+			.scenario-wrap {
+				grid-template-columns: 1fr !important;
+			}
+
+			.cards-3 {
+				grid-template-columns: repeat(2, 1fr) !important;
+			}
+
+			.scenario-menu {
+				position: static !important;
+			}
+		}
+
+		@media (max-width: 720px) {
+			.container {
+				width: min(var(--max), calc(100% - 24px)) !important;
+			}
+
+			.hero-copy {
+				padding: 18px !important;
+			}
+
+			.hero {
+				padding-top: 28px !important;
+			}
+
+			.cards-3 {
+				grid-template-columns: 1fr !important;
+			}
+
+			.scene-top {
+				flex-direction: column !important;
+			}
+
+			.tooltip {
+				width: min(240px, calc(100vw - 60px)) !important;
+			}
+
+			h1 {
+				max-width: 18ch !important;
+			}
+		}
+
+		/* 字体写死 */
+		main,
+		main *,
+		.form-dialog,
+		.form-dialog *,
+		.toast-container,
+		.toast-container *,
+		.field-tooltip,
+		.field-tooltip * {
+			font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+		}
+	</style>
+</head>
+<body>
+	<main>
+		<div class="container">
+			<!-- 首屏 Hero -->
+			<section class="hero">
+				<div class="hero-card hero-copy">
+					<div class="eyebrow">Demo Expo 2026 · 展位 <strong>A12</strong></div>
+					<h1 style="max-width: 100% !important;">
+						欢迎来到示例展会<br>了解我们的产品
+					</h1>
+					<p>从<strong>2026年9月3日至5日</strong>，在北京国家会议中心为您展示最新的技术解决方案。欢迎预约一对一演示。</p>
+					<div class="hero-meta">
+						<span class="pill">EXPO</span>
+						<span class="pill">智能设备</span>
+						<span class="pill">北京</span>
+					</div>
+					<div class="cta-row">
+						<button type="button" class="btn btn-primary" data-open-form>预约参观</button>
+						<button type="button" class="btn btn-secondary" data-catalog>下载产品手册</button>
+					</div>
+				</div>
+				<div class="hero-card hero-visual">
+					<div class="mini-scene">
+						<div class="mini-map">
+							<iframe
+								title="国家会议中心"
+								src="https://maps.google.com/maps?q=北京国家会议中心&z=16&hl=zh-CN&output=embed"
+								loading="lazy"
+								referrerpolicy="no-referrer-when-downgrade"
+								allowfullscreen></iframe>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- 客户类型入口 -->
+			<section id="entry">
+				<div class="section-head">
+					<div>
+						<h2>按客户类型选择入口</h2>
+						<p>三种客户类型入口卡片，点击后跳转到对应场景展示，帮助快速找到适合您的解决方案。</p>
+					</div>
+				</div>
+				<div class="cards-3">
+					<article class="entry-card">
+						<div class="num">01</div>
+						<h3>小型团队方案</h3>
+						<p>适合 5-20 人团队的高效协作工具。在展位 A12 您可以亲身体验一站式工作流程。</p>
+						<button type="button" class="btn btn-secondary" data-goto-scene="small-team">查看方案</button>
+					</article>
+					<article class="entry-card">
+						<div class="num">02</div>
+						<h3>企业级方案</h3>
+						<p>为 100+ 人组织设计的可扩展平台。了解我们的安全架构和自动化部署能力。</p>
+						<button type="button" class="btn btn-secondary" data-goto-scene="enterprise">查看方案</button>
+					</article>
+					<article class="entry-card">
+						<div class="num">03</div>
+						<h3>个人开发者方案</h3>
+						<p>轻量级工具集，助您快速构建原型。开箱即用的 API 和丰富的文档支持。</p>
+						<button type="button" class="btn btn-secondary" data-goto-scene="developer">查看方案</button>
+					</article>
+				</div>
+			</section>
+
+			<!-- 交互式场景 -->
+			<section id="scenarios">
+				<div class="section-head">
+					<div>
+						<h2>产品解决方案展示</h2>
+						<p>每张场景图展示一组产品组合，移动鼠标悬停在热点上可以查看详情。</p>
+					</div>
+				</div>
+
+				<div class="scenario-wrap">
+					<aside class="scenario-menu panel" id="scenarioMenu"></aside>
+
+					<div class="scene-stage panel">
+						<div class="scene-top">
+							<div>
+								<h3 id="sceneTitle"></h3>
+								<p id="sceneDesc"></p>
+							</div>
+							<div class="client-tag" id="sceneClient"></div>
+						</div>
+						<div class="scene" id="sceneCanvas"></div>
+						<div class="scene-actions">
+							<button type="button" class="btn btn-primary" data-open-form>预约演示</button>
+							<a class="btn btn-secondary" href="#" target="_blank" rel="noopener">查看全部产品</a>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</main>
+
+	<!-- 预约表单弹窗 -->
+	<dialog id="formDialog" class="form-dialog" tabindex="-1">
+		<form class="form-body" id="formEl">
+			<div class="form-head">
+				<h3>预约表单</h3>
+				<button type="button" class="form-close" id="formClose" aria-label="关闭"></button>
+			</div>
+
+			<div class="form-field">
+				<label for="fName">
+					<span class="req">*</span> 姓名
+				</label>
+				<input id="fName" name="name" type="text" placeholder="请输入姓名" required />
+			</div>
+
+			<div class="form-field">
+				<label for="fPhone">
+					<span class="req">*</span> 电话
+				</label>
+				<input id="fPhone" name="phone" type="text" placeholder="请输入电话" required />
+			</div>
+
+			<div class="form-field">
+				<label id="sectorLabel">
+					<span class="req">*</span> 行业
+				</label>
+				<div class="single-select" id="sectorSelect" data-value="">
+					<button type="button" class="single-select-toggle" id="sectorToggle" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sectorLabel">
+						<span class="single-select-text" id="sectorText">请选择行业</span>
+						<span class="single-select-caret" aria-hidden="true"></span>
+					</button>
+					<div class="single-select-menu" id="sectorMenu" role="listbox">
+						<button type="button" class="single-select-option" data-value="互联网">互联网</button>
+						<button type="button" class="single-select-option" data-value="金融">金融</button>
+						<button type="button" class="single-select-option" data-value="教育">教育</button>
+						<button type="button" class="single-select-option" data-value="医疗">医疗</button>
+						<button type="button" class="single-select-option" data-value="制造业">制造业</button>
+						<button type="button" class="single-select-option" data-value="零售">零售</button>
+						<button type="button" class="single-select-option" data-value="物流">物流</button>
+						<button type="button" class="single-select-option" data-value="政府">政府</button>
+						<button type="button" class="single-select-option" data-value="其他">其他</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-field">
+				<label id="productLabel">
+					<span class="req">*</span> 感兴趣的产品
+				</label>
+				<div class="multi-select" id="productSelect">
+					<button type="button" class="multi-select-toggle" id="productToggle" aria-haspopup="listbox" aria-expanded="false">
+						<span class="multi-select-text" id="productText">请选择产品</span>
+						<span class="multi-select-caret" aria-hidden="true"></span>
+					</button>
+					<div class="multi-select-menu" id="productMenu" role="listbox" aria-multiselectable="true">
+						<label class="multi-select-option">
+							<input type="checkbox" value="协作平台" />
+							<span>协作平台</span>
+						</label>
+						<label class="multi-select-option">
+							<input type="checkbox" value="数据分析" />
+							<span>数据分析</span>
+						</label>
+						<label class="multi-select-option">
+							<input type="checkbox" value="自动化工具" />
+							<span>自动化工具</span>
+						</label>
+						<label class="multi-select-option">
+							<input type="checkbox" value="安全方案" />
+							<span>安全方案</span>
+						</label>
+						<label class="multi-select-option">
+							<input type="checkbox" value="云服务" />
+							<span>云服务</span>
+						</label>
+						<label class="multi-select-option">
+							<input type="checkbox" value="AI 助手" />
+							<span>AI 助手</span>
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary form-submit">提交</button>
+			</div>
+
+		</form>
+	</dialog>
+
+	<script>
+		/* ============================================================
+		 * 示例 API 端点 —— 实际使用时替换为你的后端接口地址
+		 * ============================================================ */
+		const API_ENDPOINT = '/api/v1/demo-lead';
+
+		/* ============================================================
+		 * 图片地址集中配置（使用占位图，实际使用时替换为真实图片 URL）
+		 * ============================================================ */
+		const IMAGES = {
+			hero: 'https://placehold.co/800x500/e8f1fb/0071e3?text=Hero+Image',
+			'small-team': 'https://placehold.co/1600x900/f5f5f7/333333?text=Small+Team+Solution',
+			enterprise: 'https://placehold.co/1600x900/f5f5f7/333333?text=Enterprise+Solution',
+			developer: 'https://placehold.co/1600x900/f5f5f7/333333?text=Developer+Solution'
+		};
+
+		/* 场景数据 */
+		const scenarios = [
+			{
+				id: 'small-team',
+				name: '小型团队协作方案',
+				short: '轻量高效、开箱即用',
+				desc: '一套为 5-20 人团队设计的工作套件，包含项目管理、即时通讯和文档协作功能。',
+				client: '创业公司 · 远程团队 · 敏捷小组',
+				hotspots: [
+					{
+						x: 54, y: 54,
+						title: '项目管理看板',
+						body: '',
+						points: ['拖拽式任务管理，支持看板、列表、甘特图三种视图。', '内置自动化规则，减少重复操作。', '实时协作编辑，团队成员随时同步进度。']
+					},
+					{
+						x: 17, y: 62,
+						title: '即时通讯模块',
+						body: '',
+						points: []
+					},
+					{
+						x: 79, y: 64,
+						title: '文档协作中心',
+						body: '',
+						points: []
+					}
+				]
+			},
+			{
+				id: 'enterprise',
+				name: '企业级平台方案',
+				short: '安全可靠、灵活扩展',
+				desc: '面向100+人组织的完整解决方案，支持私有化部署、单点登录和细粒度权限控制。',
+				client: '大型企业 · 金融机构 · 政府单位',
+				hotspots: [
+					{
+						x: 62, y: 49,
+						title: '统一身份认证平台',
+						body: '',
+						points: ['支持 SAML、OAuth、LDAP 等多种协议。', '细粒度 RBAC 权限模型。', '操作审计日志，满足合规要求。']
+					},
+					{
+						x: 34, y: 54,
+						title: '数据安全网关',
+						body: '',
+						points: []
+					},
+					{
+						x: 93, y: 66,
+						title: '自动化运维中心',
+						body: '',
+						points: []
+					}
+				]
+			},
+			{
+				id: 'developer',
+				name: '个人开发者工具集',
+				short: 'API 优先、文档齐全',
+				desc: '面向独立开发者的 SDK 套件，涵盖认证、存储、推送等常用能力，提供多语言支持。',
+				client: '独立开发者 · 开源项目 · 学生',
+				hotspots: [
+					{
+						x: 51, y: 47,
+						title: '多语言 SDK',
+						body: '',
+						points: ['支持 Python、JavaScript、Go、Java。', '一键生成 API 调用代码。', '内置错误重试和限速处理。']
+					},
+					{
+						x: 38, y: 52,
+						title: '交互式文档',
+						body: '',
+						points: []
+					},
+					{
+						x: 80, y: 58,
+						title: '本地调试工具',
+						body: '',
+						points: []
+					}
+				]
+			}
+		];
+
+		/* 场景交互相关的 DOM 引用 */
+		const menu = document.getElementById('scenarioMenu');
+		const sceneCanvas = document.getElementById('sceneCanvas');
+		const sceneTitle = document.getElementById('sceneTitle');
+		const sceneDesc = document.getElementById('sceneDesc');
+		const sceneClient = document.getElementById('sceneClient');
+		let current = 0;
+
+		/**
+		 * 渲染左侧场景菜单
+		 */
+		function renderMenu() {
+			menu.innerHTML = scenarios.map((item, index) => `
+				<button class="scenario-tab ${index === current ? 'active' : ''}" data-index="${index}">
+					<strong>${item.name}</strong>
+					<span>${item.short}</span>
+				</button>
+			`).join('');
+			menu.querySelectorAll('.scenario-tab').forEach(btn => {
+				btn.addEventListener('click', () => {
+					current = Number(btn.dataset.index);
+					renderMenu();
+					renderScene();
+				});
+			});
+		}
+
+		/**
+		 * 渲染场景舞台文本与热点按钮
+		 */
+		function renderScene() {
+			const item = scenarios[current];
+			sceneTitle.textContent = item.name;
+			sceneDesc.textContent = item.desc;
+			sceneClient.textContent = item.client;
+			sceneCanvas.style.backgroundImage = `url("${IMAGES[item.id]}")`;
+			sceneCanvas.querySelectorAll('.hotspot').forEach(el => el.remove());
+
+			item.hotspots.forEach((spot, idx) => {
+				const btn = document.createElement('button');
+				btn.className = 'hotspot';
+				if (spot.x > 55) {
+					btn.classList.add('tip-left');
+				}
+				btn.style.left = `${spot.x}%`;
+				btn.style.top = `${spot.y}%`;
+				btn.setAttribute('type', 'button');
+				btn.setAttribute('aria-label', spot.title);
+				const bodyHtml = spot.body ? `<p>${spot.body}</p>` : '';
+				const pointsHtml = (spot.points && spot.points.length) ? `<ul>${spot.points.map(point => `<li>${point}</li>`).join('')}</ul>` : '';
+				btn.innerHTML = `<span class="hotspot-num">${idx + 1}</span>
+					<div class="tooltip">
+						<h4>${spot.title}</h4>
+						${bodyHtml}
+						${pointsHtml}
+					</div>`;
+				btn.addEventListener('click', () => {
+					sceneCanvas.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+					btn.classList.add('active');
+				});
+				sceneCanvas.appendChild(btn);
+			});
+		}
+
+		/* ===== 预约表单弹窗 ===== */
+		const formDialog = document.getElementById('formDialog');
+		const formEl = document.getElementById('formEl');
+		const formClose = document.getElementById('formClose');
+
+		/**
+		 * 打开预约表单弹窗
+		 */
+		function openForm() {
+			if (typeof formDialog.showModal === 'function') {
+				formDialog.showModal();
+			} else {
+				formDialog.setAttribute('open', '');
+			}
+			formDialog.focus();
+		}
+
+		document.querySelectorAll('[data-open-form]').forEach(btn => {
+			btn.addEventListener('click', openForm);
+		});
+
+		/* 入口卡按钮：滚动到场景区并切换到对应场景 */
+		document.querySelectorAll('[data-goto-scene]').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const targetIndex = scenarios.findIndex(item => item.id === btn.dataset.gotoScene);
+				if (targetIndex >= 0) {
+					current = targetIndex;
+					renderMenu();
+					renderScene();
+				}
+				document.getElementById('scenarios').scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+		});
+
+		formClose.addEventListener('click', () => {
+			resetForm();
+			formDialog.close();
+		});
+
+		/* 禁止点击遮罩层与按 Esc 关闭 */
+		formDialog.addEventListener('cancel', (e) => e.preventDefault());
+
+		/**
+		 * 清空表单：重置输入、多选、单选，收起下拉与提示
+		 */
+		function resetForm() {
+			formEl.reset();
+			refreshProductText();
+			resetSector();
+			productToggle.classList.remove('error');
+			productSelect.classList.remove('open');
+			sectorSelect.classList.remove('open');
+			productToggle.setAttribute('aria-expanded', 'false');
+			sectorToggle.setAttribute('aria-expanded', 'false');
+			hideFieldTooltip();
+		}
+
+		formDialog.addEventListener('close', resetForm);
+
+		/* ===== 产品多选下拉 ===== */
+		const productSelect = document.getElementById('productSelect');
+		const productToggle = document.getElementById('productToggle');
+		const productText = document.getElementById('productText');
+		const productMenu = document.getElementById('productMenu');
+
+		function refreshProductText() {
+			const checked = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			if (checked.length) {
+				productText.textContent = checked.join(', ');
+				productToggle.classList.add('has-value');
+				productToggle.classList.remove('error');
+			} else {
+				productText.textContent = '请选择产品';
+				productToggle.classList.remove('has-value');
+			}
+		}
+
+		productToggle.addEventListener('click', () => {
+			hideFieldTooltip();
+			const open = productSelect.classList.toggle('open');
+			productToggle.setAttribute('aria-expanded', String(open));
+			if (open) positionSelectMenu(productToggle, productMenu);
+		});
+
+		productMenu.addEventListener('change', refreshProductText);
+
+		/* ===== 已选内容悬浮提示 ===== */
+		let fieldTooltipEl = null;
+
+		function hideFieldTooltip() {
+			if (fieldTooltipEl) {
+				fieldTooltipEl.remove();
+				fieldTooltipEl = null;
+			}
+		}
+
+		function showFieldTooltip(anchor, lines) {
+			hideFieldTooltip();
+			if (!lines.length) return;
+
+			const host = formDialog.open ? formDialog : document.body;
+			const tip = document.createElement('div');
+			tip.className = 'field-tooltip';
+			lines.forEach(line => {
+				const span = document.createElement('span');
+				span.textContent = line;
+				tip.appendChild(span);
+			});
+			host.appendChild(tip);
+
+			const anchorRect = anchor.getBoundingClientRect();
+			const tipRect = tip.getBoundingClientRect();
+			let left = anchorRect.left + anchorRect.width / 2 - tipRect.width / 2;
+			left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
+			let top = anchorRect.top - tipRect.height - 8;
+			if (top < 8) {
+				top = anchorRect.bottom + 8;
+			}
+			tip.style.left = `${left}px`;
+			tip.style.top = `${top}px`;
+			requestAnimationFrame(() => tip.classList.add('show'));
+			fieldTooltipEl = tip;
+		}
+
+		productToggle.addEventListener('mouseenter', () => {
+			const checked = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			showFieldTooltip(productToggle, checked);
+		});
+		productToggle.addEventListener('mouseleave', hideFieldTooltip);
+
+		/* ===== 行业单选下拉 ===== */
+		const sectorSelect = document.getElementById('sectorSelect');
+		const sectorToggle = document.getElementById('sectorToggle');
+		const sectorText = document.getElementById('sectorText');
+		const sectorMenu = document.getElementById('sectorMenu');
+
+		sectorToggle.addEventListener('click', () => {
+			const open = sectorSelect.classList.toggle('open');
+			sectorToggle.setAttribute('aria-expanded', String(open));
+			if (open) positionSelectMenu(sectorToggle, sectorMenu);
+		});
+
+		/**
+		 * 将下拉菜单以 fixed 方式定位到触发按钮正下方
+		 */
+		function positionSelectMenu(toggle, menu) {
+			const rect = toggle.getBoundingClientRect();
+			menu.style.width = `${rect.width}px`;
+			menu.style.left = `${rect.left}px`;
+			const menuHeight = menu.offsetHeight;
+			const spaceBelow = window.innerHeight - rect.bottom;
+			if (spaceBelow < menuHeight + 12 && rect.top > spaceBelow) {
+				menu.style.top = `${Math.max(8, rect.top - menuHeight - 6)}px`;
+			} else {
+				menu.style.top = `${rect.bottom + 6}px`;
+			}
+		}
+
+		function repositionOpenSelectMenus() {
+			if (productSelect.classList.contains('open')) positionSelectMenu(productToggle, productMenu);
+			if (sectorSelect.classList.contains('open')) positionSelectMenu(sectorToggle, sectorMenu);
+		}
+		window.addEventListener('resize', repositionOpenSelectMenus);
+		window.addEventListener('scroll', repositionOpenSelectMenus, true);
+
+		sectorMenu.querySelectorAll('.single-select-option').forEach(opt => {
+			opt.addEventListener('click', () => {
+				sectorSelect.dataset.value = opt.dataset.value;
+				sectorText.textContent = opt.dataset.value;
+				sectorText.title = opt.dataset.value;
+				sectorToggle.classList.add('has-value');
+				sectorToggle.classList.remove('error');
+				sectorMenu.querySelectorAll('.single-select-option').forEach(o => o.classList.toggle('selected', o === opt));
+				sectorSelect.classList.remove('open');
+				sectorToggle.setAttribute('aria-expanded', 'false');
+			});
+		});
+
+		function resetSector() {
+			sectorSelect.dataset.value = '';
+			sectorText.textContent = '请选择行业';
+			sectorText.removeAttribute('title');
+			sectorToggle.classList.remove('has-value', 'error');
+			sectorMenu.querySelectorAll('.single-select-option').forEach(o => o.classList.remove('selected'));
+		}
+
+		/* 点击外部收起下拉 */
+		document.addEventListener('click', (e) => {
+			document.querySelectorAll('.multi-select.open, .single-select.open').forEach(sel => {
+				if (!sel.contains(e.target)) {
+					sel.classList.remove('open');
+					const tgl = sel.querySelector('.multi-select-toggle, .single-select-toggle');
+					if (tgl) tgl.setAttribute('aria-expanded', 'false');
+				}
+			});
+		});
+
+		/* ===== Toast 提示 ===== */
+		const formSubmitBtn = formEl.querySelector('.form-submit');
+
+		function showFormResult(message, type) {
+			const toastType = ['success', 'warning', 'error'].includes(type) ? type : 'success';
+			const host = formDialog.open ? formDialog : document.body;
+			let container = host.querySelector(':scope > .toast-container');
+			if (!container) {
+				container = document.createElement('div');
+				container.className = 'toast-container';
+				container.setAttribute('aria-live', 'polite');
+				host.appendChild(container);
+			}
+
+			const toast = document.createElement('div');
+			toast.className = `toast toast--${toastType}`;
+			toast.setAttribute('role', 'status');
+
+			const icon = document.createElement('span');
+			icon.className = 'toast-icon';
+			icon.setAttribute('aria-hidden', 'true');
+			const text = document.createElement('span');
+			text.className = 'toast-text';
+			text.textContent = message;
+			toast.append(icon, text);
+			container.appendChild(toast);
+
+			requestAnimationFrame(() => toast.classList.add('toast--show'));
+			setTimeout(() => {
+				toast.classList.remove('toast--show');
+				toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+			}, 3200);
+		}
+
+		/**
+		 * 提交预约表单
+		 */
+		formEl.addEventListener('submit', async (e) => {
+			e.preventDefault();
+
+			if (!sectorSelect.dataset.value) {
+				sectorToggle.classList.add('error');
+				sectorToggle.focus();
+				return;
+			}
+
+			const selectedProducts = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			if (selectedProducts.length === 0) {
+				productToggle.classList.add('error');
+				productToggle.focus();
+				return;
+			}
+
+			const data = {
+				name: document.getElementById('fName').value,
+				phone: document.getElementById('fPhone').value,
+				sector: sectorSelect.dataset.value,
+				products: selectedProducts
+			};
+
+			formSubmitBtn.disabled = true;
+			formSubmitBtn.classList.add('is-loading');
+			formClose.disabled = true;
+
+			try {
+				const response = await fetch(API_ENDPOINT, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json; charset=utf-8' },
+					body: JSON.stringify(data)
+				});
+				const result = await response.json().catch(() => ({}));
+
+				if (!response.ok) {
+					throw new Error(`提交失败 status=${response.status}`);
+				}
+
+				formEl.reset();
+				refreshProductText();
+				resetSector();
+				formDialog.close();
+				showFormResult('预约成功，我们会尽快与您联系。', 'success');
+			} catch (err) {
+				console.error('提交表单失败：', err);
+				showFormResult('提交失败，请重试。', 'error');
+			} finally {
+				formSubmitBtn.disabled = false;
+				formSubmitBtn.classList.remove('is-loading');
+				formClose.disabled = false;
+			}
+		});
+
+		/* 首屏主视觉背景图 */
+		document.querySelector('.mini-scene').style.backgroundImage = `url("${IMAGES.hero}")`;
+
+		renderMenu();
+		renderScene();
+	</script>
+</body>
+</html>

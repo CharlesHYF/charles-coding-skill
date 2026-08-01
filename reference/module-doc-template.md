@@ -2,7 +2,8 @@
 > charles-coding 的模块文档规范。**先遵循 [SKILL.md](../SKILL.md) 的「全局约定」（尤其 Markdown 规范）。**
 
 ## 用途
-- 编码前，每个模块必须先在 `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`）写好文档并评审通过
+- 编码前，每个模块必须先在 `docs/modules/` 下按**系统级模块**划分子目录写好文档并评审通过
+- **目录结构**：`docs/modules/backend/<模块名>.md`、`docs/modules/frontend/<模块名>.md`、`docs/modules/daemon/<模块名>.md`，按实际项目增减系统模块（如 `docs/modules/backend/orders.md`）
 - 一个模块一个 md，内含该模块的所有功能，每个功能一个二级标题
 - 文档遵循本 Skill 全部 Markdown 约定：标题与正文间不空行、正文顶格（README 除外，此处为普通文档需正文顶格与否按项目，模块文档正文顶格即可）、禁用分割线
 
@@ -12,6 +13,7 @@
 # 订单模块（orders）
 > 模块职责：管理订单的创建、支付、发货、取消等全生命周期
 > 负责人：<填写生成本文档的 Agent 模型名，如 Claude Opus 4.8>
+> 系统模块：backend
 > 关联表：cv_order、cv_order_item
 > 关联服务：CvOrderService、CvPayApi
 

@@ -27,15 +27,21 @@
 
 #### 测试用例强制要求
 - **Agent 写完代码后必须提供测试用例**，放在项目根目录的 `test_cases/` 文件夹下，工整组织
-- 按模块/功能分文件命名，如 `test_cases/login_test_cases.md`（文档式）或各语言测试文件（`test_login.py`、`login_test.go` 等）
+- **按系统模块（backend / frontend / daemon）→ 测试类型（unit / smoke / blackbox / whitebox）两级目录组织**，如 `test_cases/backend/unit/login_test_cases.md`、`test_cases/frontend/smoke/smoke_test_cases.md`
 - **必须实际运行并确保全部通过后再交付，禁止交付未验证的测试**
 - **功能验证在开发（dev）、测试（test）两套环境完成**；**生产（prod）仅做只读冒烟与配置加载校验**（连通性、配置能否正确加载、`/health` 探活），**严禁在 prod 执行写操作或全量用例**
-- **各类测试统一归入 `test_cases/`**：单元测试之外，**压力测试、冒烟测试、黑盒测试、白盒测试**的用例与脚本都放在 `test_cases/` 下，按类型分子目录组织：
-  - `test_cases/smoke/`：冒烟测试（核心链路能否跑通）
+- **各类测试统一归入 `test_cases/`**：单元测试之外，**压力测试、冒烟测试、黑盒测试、白盒测试**的用例与脚本都放在 `test_cases/` 下，按系统模块与类型分子目录组织：
+  - `test_cases/backend/unit/`：后端单元测试（按功能模块分文件：login、user、order、product 等）
+  - `test_cases/backend/smoke/`：后端冒烟测试
+  - `test_cases/backend/blackbox/`：后端黑盒测试
+  - `test_cases/backend/whitebox/`：后端白盒测试
+  - `test_cases/frontend/unit/`：前端单元测试（login、component 等）
+  - `test_cases/frontend/smoke/`：前端冒烟测试
+  - `test_cases/frontend/e2e/`：前端 E2E 测试
+  - `test_cases/daemon/unit/`：守护进程单元测试
+  - `test_cases/daemon/smoke/`：守护进程冒烟测试
   - `test_cases/stress/`：压力/性能测试（k6、JMeter、wrk 等脚本 + 结果）
-  - `test_cases/blackbox/`：黑盒测试（按接口/需求，不看实现）
-  - `test_cases/whitebox/`：白盒测试（覆盖分支/边界，看实现）
-  - `test_cases/unit/`（或各语言默认测试目录）：单元测试
+  - 每个模块中**每个功能（func）都要写测试用例**，覆盖正向、异常、边界、并发的所有场景
 
 #### 压测规范
 - **默认工具用 k6**：脚本统一放 `test_cases/stress/`，JMeter、wrk 作为备选（团队已有存量脚本或特殊协议场景可用）
@@ -47,4 +53,4 @@
   - 并发 VU（虚拟用户数，阶梯加压：如 10 → 50 → 100 → 200）
   - TPS（每秒事务数）
   - 数据传输量
-- **脚手架模板**：新项目直接参考 [`project-template/test_cases/stress/load-test.js`](project-template/test_cases/stress/load-test.js) 起步，按目标接口改造阈值与压测阶梯
+- **脚手架模板**：新项目直接参考 [`project-template/test_cases/stress/load-test.js`](project-template/test_cases/stress/load-test.js) 起步，按目标接口改造阈值与压测阶梯；测试用例范例见 [`examples/test_cases/`](examples/test_cases/)

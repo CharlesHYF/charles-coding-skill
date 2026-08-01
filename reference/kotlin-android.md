@@ -56,10 +56,9 @@ class UserProfileViewModel @Inject constructor(
 ## 文件头模板
 ```kotlin
 /**
- * 用户信息 ViewModel
- *
+ * 文件作用：用户信息 ViewModel——管理用户详情页的 UI 状态与数据加载。
  * 创建日期：2026-07-29
- * 作者：Charles
+ * 修改日期：2026-08-01
  */
 ```
 
