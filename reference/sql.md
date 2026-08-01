@@ -11,11 +11,11 @@
 - **长度上限**：表名、字段名 ≤ 32 个字符
 
 ### 字段类型（高频排雷）
-- **禁止 `ENUM`**：用 `TINYINT` 或 `VARCHAR` 代替。枚举值变化时 `ALTER TABLE` 有兼容性隐患，且 MySQL 行为不可预测
-- **禁止 `TEXT` / `BLOB`**：除非单字段确实超过 65535 字符且很少被查询。大文本应拆表或使用独立存储
+- **禁止 `ENUM`**：用 `TINYINT`（MySQL）或 `SMALLINT`（PostgreSQL）/ `VARCHAR` 代替。枚举值变化时 `ALTER TABLE` 有兼容性隐患
+- **禁止 `TEXT` / `BLOB`**：除非单字段确实超过 65535 字符且很少被查询。大文本应拆表或使用独立存储（PostgreSQL 对应 `TEXT` / `BYTEA`）
 - **金额字段**：**强制** `DECIMAL(m, n)`，**禁止** `FLOAT` / `DOUBLE`（精度丢失）
-- **布尔字段**：`TINYINT(1)`，**禁止** `BIT`（跨 ORM 兼容性差）
-- **主键 ID 严禁自增**：**禁止** `AUTO_INCREMENT`，一律用**雪花 ID（Snowflake）** 等分布式 ID，字段类型 `BIGINT`（应用层生成后写入）。理由：避免暴露业务量、分库分表冲突、迁移合并困难
+- **布尔字段**：MySQL 用 `TINYINT(1)`（**禁止** `BIT`）；PostgreSQL 用 `BOOLEAN` 或 `SMALLINT`
+- **主键 ID 严禁自增**：**禁止** `AUTO_INCREMENT`（MySQL）/ `SERIAL`（PostgreSQL），一律用**雪花 ID（Snowflake）** 等分布式 ID，字段类型 `BIGINT`（应用层生成后写入）。理由：避免暴露业务量、分库分表冲突、迁移合并困难
 - **VARCHAR 长度不要拍脑袋定 255**：按实际业务需求设置合适长度（如手机号 20、姓名 50、URL 512）
 
 ### 约束
@@ -33,8 +33,9 @@
 - **表注释**写这张表存什么业务数据，如 `COMMENT='订单主表'`
 - 时间字段注释写业务含义，如 `创建时间`、`支付时间`、`最后修改时间`
 - 示例：
+  ```sql
   -- ========================
-  -- cv_order 订单主表
+  -- cv_order 订单主表（MySQL）
   -- ========================
   CREATE TABLE cv_order (
   	id          BIGINT          NOT NULL COMMENT '订单ID',
@@ -49,10 +50,49 @@
     COMMENT = '订单主表';
   ```
 
+  ```sql
+  -- ========================
+  -- cv_order 订单主表（PostgreSQL）
+  -- ========================
+  CREATE TABLE cv_order (
+  	id          BIGINT          NOT NULL,
+  	user_id     BIGINT          NOT NULL,
+  	shop_id     BIGINT          NOT NULL,
+  	amount      DECIMAL(10,2)   NOT NULL DEFAULT 0.00,
+  	status      SMALLINT        NOT NULL DEFAULT 0,
+  	create_time TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	PRIMARY KEY (id)
+  );
+
+  COMMENT ON TABLE  cv_order           IS '订单主表';
+  COMMENT ON COLUMN cv_order.id        IS '订单ID';
+  COMMENT ON COLUMN cv_order.user_id   IS '下单用户ID';
+  COMMENT ON COLUMN cv_order.shop_id   IS '所属店铺ID';
+  COMMENT ON COLUMN cv_order.amount    IS '订单金额(元)';
+  COMMENT ON COLUMN cv_order.status    IS '订单状态: 0-待支付, 1-已支付, 2-已完成';
+  COMMENT ON COLUMN cv_order.create_time IS '创建时间';
+  ```
+
 ### 查询
 - **三表 JOIN 上限**：一条 SQL 多表关联不得超过 3 张表
 - **禁止** `SELECT *`，必须列名
 - 单表行数超过 **500 万**或单表列数超过 **50** 时，必须考虑分库分表
+
+## 类型对照：MySQL ↔ PostgreSQL
+> 本规范以 MySQL 为基准书写，以下为 PostgreSQL 等价类型，建表时直接替换。
+
+| 含义 | MySQL | PostgreSQL |
+|------|-------|------------|
+| 小整数 / 布尔 | `TINYINT` | `SMALLINT`（或 `BOOLEAN`） |
+| 整数 | `INT` | `INTEGER` |
+| 长整数 | `BIGINT` | `BIGINT` |
+| 定长字符串 | `VARCHAR(n)` | `VARCHAR(n)` |
+| 文本（禁止） | `TEXT` / `BLOB` | `TEXT` / `BYTEA` |
+| 定点小数 | `DECIMAL(m,n)` | `DECIMAL(m,n)` |
+| 日期时间 | `DATETIME` | `TIMESTAMP`（或 `TIMESTAMPTZ`） |
+| 默认当前时间 | `DEFAULT CURRENT_TIMESTAMP` | `DEFAULT CURRENT_TIMESTAMP` |
+| 自动更新时间 | `ON UPDATE CURRENT_TIMESTAMP` | 需触发器（见下方示例） |
+| 自增 ID（禁止） | `AUTO_INCREMENT` | `SERIAL` / `BIGSERIAL` |
 
 ## 数据库支持
 - PostgreSQL、MySQL、SQLite 均可，视项目需求选择
@@ -61,14 +101,21 @@
 - **简单 CRUD**：优先使用 MyBatis Plus 内置方法（BaseMapper、ServiceImpl 等），不手写
 - **复杂查询/优化**：手写 SQL（Mapper XML 或注解），按需使用 Explain 分析执行计划
 - **关键字全部大写**，缩进 **2 空格**（**全局 Tab 的例外**），每个子句独立一行
-- **文件头注释**：每个 `.sql` 文件顶部必须包含缩写文件头 + 数据库声明，结构如下：
+- **文件头注释**：每个 `.sql` 文件顶部必须包含缩写文件头 + 数据库声明，MySQL / PostgreSQL 分别如下：
   ```sql
   -- AI 绘图平台数据库表结构
-  -- Database: ai_drawing
-
+  -- Database: ai_drawing  (MySQL)
   SET NAMES utf8mb4;
   SET CHARACTER SET utf8mb4;
   USE ai_drawing;
+  ```
+
+  ```sql
+  -- AI 绘图平台数据库表结构
+  -- Database: ai_drawing  (PostgreSQL)
+  -- 通过 psql 连接指定：psql -d ai_drawing -f this_file.sql
+  -- 或在文件内执行（不推荐用于 migration 脚本）：
+  -- \c ai_drawing
   ```
 - **分区注释**：表按业务域分组，组间用双线分隔，组内表间空一行：
   ```sql
@@ -86,7 +133,7 @@
 - 完整建表示例：
   ```sql
   -- ========================
-  -- sys_user 系统用户表
+  -- sys_user 系统用户表（MySQL）
   -- ========================
   CREATE TABLE sys_user
   (
@@ -103,6 +150,47 @@
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci
     COMMENT = '系统用户表';
+  ```
+
+  ```sql
+  -- ========================
+  -- sys_user 系统用户表（PostgreSQL）
+  -- ========================
+  CREATE TABLE sys_user
+  (
+  	id          BIGINT       NOT NULL,
+  	username    VARCHAR(50)  NOT NULL,
+  	password    VARCHAR(100) NOT NULL,
+  	status      SMALLINT     NOT NULL DEFAULT 1,
+  	create_time TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	update_time TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	deleted     SMALLINT     NOT NULL DEFAULT 0,
+  	PRIMARY KEY (id)
+  );
+
+  -- PostgreSQL 不支持 ON UPDATE，需用触发器自动更新 update_time
+  CREATE OR REPLACE FUNCTION update_sys_user_time()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.update_time = CURRENT_TIMESTAMP;
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+
+  CREATE TRIGGER trg_sys_user_update
+    BEFORE UPDATE ON sys_user
+    FOR EACH ROW EXECUTE FUNCTION update_sys_user_time();
+
+  COMMENT ON TABLE  sys_user            IS '系统用户表';
+  COMMENT ON COLUMN sys_user.id         IS '主键 ID';
+  COMMENT ON COLUMN sys_user.username   IS '用户名';
+  COMMENT ON COLUMN sys_user.password   IS '密码';
+  COMMENT ON COLUMN sys_user.status     IS '状态 1正常 0禁用';
+  COMMENT ON COLUMN sys_user.create_time IS '创建时间';
+  COMMENT ON COLUMN sys_user.update_time IS '更新时间';
+  COMMENT ON COLUMN sys_user.deleted    IS '逻辑删除';
+
+  CREATE INDEX ix_username ON sys_user (username);
   ```
 - migration / 数据变动脚本文件头：
   ```sql
@@ -122,6 +210,7 @@
 
 ## 索引策略
 - 命名：`ix_tablename_column`
+- **MySQL**：`KEY ix_xxx (col)` 写在 CREATE TABLE 内部；**PostgreSQL**：`CREATE INDEX ix_xxx ON tablename (col)` 写在 CREATE TABLE 外部
 - 原则：为 `WHERE`、`JOIN`、`ORDER BY` 中频繁出现的列建立索引
 - 覆盖索引：在组合查询中优先创建覆盖索引
 
