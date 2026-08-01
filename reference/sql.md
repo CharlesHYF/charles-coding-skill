@@ -33,16 +33,20 @@
 - **表注释**写这张表存什么业务数据，如 `COMMENT='订单主表'`
 - 时间字段注释写业务含义，如 `创建时间`、`支付时间`、`最后修改时间`
 - 示例：
-  ```sql
+  -- ========================
+  -- cv_order 订单主表
+  -- ========================
   CREATE TABLE cv_order (
-  	id          BIGINT       NOT NULL COMMENT '订单ID',
-  	user_id     BIGINT       NOT NULL COMMENT '下单用户ID',
-  	shop_id     BIGINT       NOT NULL COMMENT '所属店铺ID',
-  	amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '订单金额(元)',
-  	status      TINYINT      NOT NULL DEFAULT 0 COMMENT '订单状态: 0-待支付, 1-已支付, 2-已完成',
-  	create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  	id          BIGINT          NOT NULL COMMENT '订单ID',
+  	user_id     BIGINT          NOT NULL COMMENT '下单用户ID',
+  	shop_id     BIGINT          NOT NULL COMMENT '所属店铺ID',
+  	amount      DECIMAL(10,2)   NOT NULL DEFAULT 0.00 COMMENT '订单金额(元)',
+  	status      TINYINT         NOT NULL DEFAULT 0 COMMENT '订单状态: 0-待支付, 1-已支付, 2-已完成',
+  	create_time DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   	PRIMARY KEY (id)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单主表';
+  ) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4
+    COMMENT = '订单主表';
   ```
 
 ### 查询
@@ -57,7 +61,50 @@
 - **简单 CRUD**：优先使用 MyBatis Plus 内置方法（BaseMapper、ServiceImpl 等），不手写
 - **复杂查询/优化**：手写 SQL（Mapper XML 或注解），按需使用 Explain 分析执行计划
 - **关键字全部大写**，缩进 **2 空格**（**全局 Tab 的例外**），每个子句独立一行
-- **文件头注释**：复杂查询（多表 JOIN、子查询、窗口函数等）与迁移脚本（DDL 变更、数据回填）文件顶部必须加注释，说明目的与影响，禁止只有裸 SQL 无上下文：
+- **文件头注释**：每个 `.sql` 文件顶部必须包含缩写文件头 + 数据库声明，结构如下：
+  ```sql
+  -- AI 绘图平台数据库表结构
+  -- Database: ai_drawing
+
+  SET NAMES utf8mb4;
+  SET CHARACTER SET utf8mb4;
+  USE ai_drawing;
+  ```
+- **分区注释**：表按业务域分组，组间用双线分隔，组内表间空一行：
+  ```sql
+  -- ============================================================
+  -- 公共基础
+  -- ============================================================
+  ```
+- **表级注释**：每个 CREATE TABLE 上方用单线分隔 + 中文名：
+  ```sql
+  -- ========================
+  -- res_upload_file 上传文件记录表
+  -- ========================
+  CREATE TABLE res_upload_file ( ...
+  ```
+- 完整建表示例：
+  ```sql
+  -- ========================
+  -- sys_user 系统用户表
+  -- ========================
+  CREATE TABLE sys_user
+  (
+  	id          BIGINT       NOT NULL COMMENT '主键 ID',
+  	username    VARCHAR(50)  NOT NULL COMMENT '用户名',
+  	password    VARCHAR(100) NOT NULL COMMENT '密码',
+  	status      TINYINT      NOT NULL DEFAULT 1 COMMENT '状态 1正常 0禁用',
+  	create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  	update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  	deleted     TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除',
+  	PRIMARY KEY (id),
+  	KEY idx_username (username)
+  ) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci
+    COMMENT = '系统用户表';
+  ```
+- migration / 数据变动脚本文件头：
   ```sql
   -- 文件作用：将历史订单表中已完成订单迁移至归档表。
   -- 创建日期：2026-07-29
