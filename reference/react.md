@@ -1,5 +1,5 @@
 # Charles Coding — React
-> charles-coding 的 React 分册。**先遵循 [SKILL.md](../SKILL.md) 的「全局约定」。**
+> charles-coding 的 React 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"。**
 
 ## 能力范围
 - 单页应用、SSR/SSG 全栈应用、高交互性后台
@@ -9,7 +9,7 @@
 - 类型：TypeScript 严格模式
 - 状态管理：Zustand（轻量全局态），React Context 仅用于主题/鉴权等少数场景
 - 数据请求：TanStack Query (React Query) + axios
-- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新——响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页。**例外**：若当前已在登录页，401 不触发刷新（登录接口本身返回 401 是凭证错误，直接向上抛出交由页面处理）
+- **无感刷新 Token**：凡涉及登录鉴权的前端，axios **必须**实现无感刷新 -- 响应拦截器捕获 401 时，用 refresh token 静默换取新 access token 后自动重放原请求；并发请求需用队列/单飞（single-flight）避免重复刷新，刷新失败才跳转登录页。**例外**：若当前已在登录页，401 不触发刷新（登录接口本身返回 401 是凭证错误，直接向上抛出交由页面处理）
 - 表单：React Hook Form + Zod 校验
 - UI 方案：Tailwind CSS + shadcn/ui，构建可复用组件库
 - 路由：Next.js 文件系统路由，动态路由采用 `[slug]` 形式
@@ -23,7 +23,7 @@
 - **文件头注释块**：每个 `.tsx` / `.ts` 文件最开头用块注释写一次文件作用与日期（见 [SKILL.md](../SKILL.md) 注释规范），模板：
   ```tsx
   /**
-   * 文件作用：登录表单组件——用户名密码输入与提交。
+   * 文件作用：登录表单组件 -- 用户名密码输入与提交。
    * 创建日期：2026-07-29
    * 修改日期：2026-08-01
    */

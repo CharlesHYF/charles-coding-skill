@@ -1,5 +1,5 @@
 # Charles Coding — Java
-> charles-coding 的 Java 分册。**先遵循 [SKILL.md](../SKILL.md) 的「全局约定」**（缩进=Tab、中文注释、Git 分支、覆盖率策略等），本文件只列 Java 专属规范。
+> charles-coding 的 Java 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"**（缩进=Tab、中文注释、Git 分支、覆盖率策略等），本文件只列 Java 专属规范。
 
 ## 能力范围
 - 后端 Web 服务、微服务架构（Android 见 [kotlin-android.md](kotlin-android.md)）
@@ -27,14 +27,14 @@
 - 常量：`ABC_CCC`（全大写下划线）
 - 包名：全小写
 - **数据库实体包名统一为 `entity`**：所有**数据库实体**（`@Entity` / MyBatis 映射的 PO）一律放在 `entity` 包下，**禁止**把数据库实体放进 `pojo`、`model`、`domain`、`dataobject` 等包。`ReqVO` / `RespVO` / `DTO` 各自按 [SKILL.md](../SKILL.md) 数据传输命名规范分包，不要混入 `entity`
-  - 注意：`pojo` 不是被禁的包，它有**另一种正当用途**——见下方「通用层（common）包结构」，放 `Result` / `PageResult` / `PageParam` 等框架基础类。禁的只是「把数据库实体塞进 pojo」
+  - 注意：`pojo` 不是被禁的包，它有**另一种正当用途** -- 见下方"通用层（common）包结构"，放 `Result` / `PageResult` / `PageParam` 等框架基础类。禁的只是"把数据库实体塞进 pojo"
 - 缩进：Tab
 - 格式化工具：强制使用 Checkstyle + Spotless（Maven 插件）
 - 异常处理：全局 `@RestControllerAdvice` 统一捕获，返回规范 `Result` 对象
-- **文件头注释用标准 Javadoc**（类上方），在标准格式基础上补「创建日期 / 修改日期」（见 [SKILL.md](../SKILL.md) 注释规范）：
+- **文件头注释用标准 Javadoc**（类上方），在标准格式基础上补"创建日期 / 修改日期"（见 [SKILL.md](../SKILL.md) 注释规范）：
   ```java
   /**
-   * 文件作用：举报表 DO——映射 report 表的数据库实体。
+   * 文件作用：举报表 DO -- 映射 report 表的数据库实体。
    *
    * @author Charles_XDXD
    * 创建日期：2026-07-15
@@ -56,12 +56,12 @@
 - **业务模块**（如 `xx-system`、`xx-platform`）再拆两个子模块：
   - `xx-xxx-api`：对外暴露的 **RPC 接口（Dubbo）** 与其 `dto` 包，供其它模块依赖
   - `xx-xxx-service`：接口实现与全部业务代码
-- **嵌套子模块必须是标准 Maven 模块**：业务模块下的 `-api` / `-service` 这类「模块中的模块」，各自**必须有独立 `pom.xml`**，父模块 `<packaging>pom</packaging>` 并在 `<modules>` 中声明它们，子模块 `<parent>` 指回父模块。**禁止**出现只是普通文件夹、没被 Maven 识别为 module 的伪子模块（IDE 里不显示为模块、无法独立构建即为错误）
+- **嵌套子模块必须是标准 Maven 模块**：业务模块下的 `-api` / `-service` 这类"模块中的模块"，各自**必须有独立 `pom.xml`**，父模块 `<packaging>pom</packaging>` 并在 `<modules>` 中声明它们，子模块 `<parent>` 指回父模块。**禁止**出现只是普通文件夹、没被 Maven 识别为 module 的伪子模块（IDE 里不显示为模块、无法独立构建即为错误）
 
 ### service 模块内分层（包结构）
 - `controller/{业务域}/`：控制器，其下 `vo/` 包放该域的 `XxxReqVO` / `XxxRespVO`（见命名）
 - `service/{业务域}/`：业务接口 `XxxService` + 实现 `XxxServiceImpl`
-- `dal/mapper/`：MyBatis-Plus Mapper 接口；`dal/entity/`：实体（见「实体类包名统一为 entity」）；`dal/es/repository/`：ES 仓储（如有）
+- `dal/mapper/`：MyBatis-Plus Mapper 接口；`dal/entity/`：实体（见"实体类包名统一为 entity"）；`dal/es/repository/`：ES 仓储（如有）
 - `api/{业务域}/XxxApiImpl`：本模块对外 RPC 接口的实现
 - `enums/`：枚举；模块内配置放 `framework/`
 
