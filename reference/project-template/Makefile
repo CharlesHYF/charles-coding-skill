@@ -1,8 +1,9 @@
 # 作用：脚手架工程通用 Makefile，提供 dev/test/prod 环境启动、Docker 系列子目标、
-#      代码检查(lint)与测试(check)入口，统一封装 docker compose(v2) 常用操作。
+#      规范校验(lint)与测试(check)入口，统一封装 docker compose(v2) 常用操作。
 # 创建日期：2026-07-29
+# 修改日期：2026-08-03
 
-.PHONY: help dev test prod docker-up docker-up-build docker-down docker-down-v docker-clean check lint
+.PHONY: help dev test prod docker-up docker-up-build docker-down docker-down-v docker-clean check lint verify
 
 # 环境变量：dev/test/prod，默认 dev，可用 ENV=xxx 覆盖
 ENV ?= dev
@@ -46,8 +47,12 @@ docker-down-v: ## 按 ENV 停止容器并删除数据卷（默认 dev，可 ENV=
 docker-clean: ## 按 ENV 彻底清理（停容器+删卷+删本地镜像+清孤儿容器，仅本项目，不影响其它项目）
 	$(COMPOSE) down -v --rmi local --remove-orphans
 
+lint: ## 规范校验（禁用字符/文件头/必需文件/命名，会 fail）
+	bash scripts/check.sh
+
 check: ## 运行所有测试
 	bash scripts/test.sh
 
-lint: ## 代码检查（各语言汇总）
-	@echo "请使用各自语言的 linter"
+verify: ## 交付前总闸门：先规范校验，全绿后再跑测试
+	bash scripts/check.sh
+	bash scripts/test.sh

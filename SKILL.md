@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.0.2
+version: 3.1.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -223,8 +223,22 @@ author: Charles <w1400214654@outlook.com>
 
 #### AGENTS.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENTS.md`**（复数，跨工具事实标准，Claude Code / Codex / Cursor 等均优先读取），作为 AI 工具进入项目时首先读取的指令文件
-- 内容至少包含：引用本 `charles-coding` Skill 的全部约定、声明 `agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、列出常用命令（启动/构建/测试）
+- **AGENTS.md 必须自足**：把命名、文件头、禁用字符、分层、模块文档闸门等**硬约束原文内联进去**，而非只写一句"请遵循 charles-coding Skill"。原因见下方"子 Agent 编排契约" -- 子 agent 是隔离上下文，只认它直接读到的文件，指针式引用会在转述中丢失
+- 内容至少包含：交付红线（`make verify` 全绿）、内联硬约束清单、`agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、常用命令（启动/构建/测试）
 - 完整模板见 [reference/project-template/AGENTS.md](reference/project-template/AGENTS.md)
 
+#### 子 Agent 编排契约（subagent-driven development 专用）
+> **背景**：用 subagent-driven development 派活时，每个子 agent 是**全新、隔离的上下文** -- 它读不到主 agent 的对话历史、读不到 SessionStart hook 注入、也不会主动去加载本 Skill。主 agent"知道"规范，不等于子 agent"收到"规范；中间隔着一次有损转述。规范遵守是全局约束，而 subagent 把活拆给隔离上下文，两者天然冲突，必须靠下述契约弥合。
+
+- **派发前置**：orchestrator 向任一子 agent 派发实现类 Task 前，**必须**在 Task brief 里做到以下三件，缺一不可：
+  1. **内联硬约束**：把该 Task 涉及语言的硬清单（命名 / 文件头模板 / 禁用字符 / 分层）**原文写进 brief**，不许只写"遵循 charles-coding"。可直接摘抄目标项目 `AGENTS.md` 的对应小节
+  2. **强制读取指令**：brief 里明确写"开工前先 `cat AGENTS.md` 全文，并读 `docs/modules/<本模块>.md`"
+  3. **声明交付闸门**：brief 里写死"交付前必须 `make verify` 全绿，否则本 Task 不算完成"
+- **依赖机器兜底，不依赖转述**：确定性规则（禁用字符 / 文件头 / 命名 / 必需文件）由 `scripts/check.sh` 校验，子 agent 写歪了 `make verify` 会 fail，返工循环自动触发 -- 不靠主 agent 肉眼审。脚手架的 `make verify` = `scripts/check.sh`（规范）+ `scripts/test.sh`（测试）
+- **review 阶段核对**：主 agent 收到子 agent 产物做 review 时，第一步先跑 `make verify` 看是否全绿，再看业务实现；规范类 finding 以脚本结论为准，不逐条肉眼找
+
 ## 新项目脚手架
-开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENTS.md / README / Makefile / `scripts/`（setup·dev·migrate·test）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
+开新项目时，直接复制 [`reference/project-template/`](reference/project-template/) 作为起点，内含：AGENTS.md（已内联硬约束清单）/ README / Makefile / `scripts/`（setup·dev·migrate·test·**check**）/ `.editorconfig` / `.gitattributes` / `.gitignore` / `.github/pull_request_template.md`。
+
+- **规范校验器 `scripts/check.sh`**：把确定性规则（禁用字符 / 文件头 / 必需文件 / 命名）变成会 fail 的检查，由 `make verify` 在交付前强制执行，不依赖 Agent 自觉。
+- **交付总闸门 `make verify`** = `scripts/check.sh`（规范）+ `scripts/test.sh`（测试），**全绿才算完成**。
