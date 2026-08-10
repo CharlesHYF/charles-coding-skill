@@ -1,4 +1,4 @@
-# Charles Coding — 模块文档模板
+# Charles Coding -- 模块文档模板
 > charles-coding 的模块文档规范。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"（尤其 Markdown 规范）。**
 
 ## 用途

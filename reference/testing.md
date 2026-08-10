@@ -1,4 +1,4 @@
-# Charles Coding — 测试与压测
+# Charles Coding -- 测试与压测
 <!--
 作用：调试与测试规范分册（含测试用例表格格式、强制要求、压测规范），从 SKILL.md 下沉迁移
 创建日期：2026-07-29
@@ -29,6 +29,7 @@
 - **Agent 写完代码后必须提供测试用例**，放在项目根目录的 `test_cases/` 文件夹下，工整组织
 - **按系统模块（backend / frontend / daemon）→ 测试类型（unit / smoke / blackbox / whitebox）两级目录组织**，如 `test_cases/backend/unit/login_test_cases.md`、`test_cases/frontend/smoke/smoke_test_cases.md`
 - **必须实际运行并确保全部通过后再交付，禁止交付未验证的测试**
+- **机器兜底的边界**：`make verify` 只硬保证两件事 -- `scripts/check.sh` 校验 `test_cases/` 结构存在(须按 `<系统模块>/<类型>` 两级)、`scripts/test.sh` 让自动化测试(mvn/go/pytest/npm)实跑且全绿;`test_cases/*.md` 里人工用例的 Pass/Fail 由 code review 核对,脚本不判定。确无自动化测试的原型/脚本项目,须显式 `ALLOW_NO_TESTS=1 make check` 放行,不允许静默跳过
 - **功能验证在开发（dev）、测试（test）两套环境完成**；**生产（prod）仅做只读冒烟与配置加载校验**（连通性、配置能否正确加载、`/health` 探活），**严禁在 prod 执行写操作或全量用例**
 - **各类测试统一归入 `test_cases/`**：单元测试之外，**压力测试、冒烟测试、黑盒测试、白盒测试**的用例与脚本都放在 `test_cases/` 下，按系统模块与类型分子目录组织：
   - `test_cases/backend/unit/`：后端单元测试（按功能模块分文件：login、user、order、product 等）

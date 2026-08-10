@@ -15,7 +15,11 @@ check_tool() {
 }
 
 check_tool docker
-check_tool docker-compose || check_tool "docker compose"
+
+if ! docker compose version >/dev/null 2>&1; then
+  echo "[ERROR] 未找到 docker compose(v2)，请安装 Docker Compose 插件。"
+  exit 1
+fi
 echo "[OK] Docker 环境已就绪"
 
 check_tool node
@@ -35,16 +39,14 @@ if [ ! -f .env ]; then
 fi
 
 # ---------- 安装依赖 ----------
-echo "安装前端依赖..."
-cd frontend
-if [ -f pnpm-lock.yaml ]; then
-  pnpm install
-elif [ -f package-lock.json ]; then
-  npm install
-else
-  npm install
+if [ -d frontend ]; then
+  echo "安装前端依赖..."
+  if [ -f frontend/pnpm-lock.yaml ]; then
+    (cd frontend && pnpm install)
+  else
+    (cd frontend && npm install)
+  fi
 fi
-cd ..
 
 echo "安装 Python 依赖（uv）..."
 if command -v uv &> /dev/null; then
@@ -65,6 +67,6 @@ fi
 
 # ---------- 启动 Docker 服务 ----------
 echo "启动 Docker 容器..."
-docker-compose up -d
+docker compose up -d
 
 echo "[OK] 初始化完成！运行 scripts/dev.sh 启动开发环境。"

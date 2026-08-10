@@ -1,4 +1,4 @@
-# Charles Coding — 日志
+# Charles Coding -- 日志
 <!-- 日志规范分册 · 创建于 2026-07-29 -->
 
 > charles-coding 日志规范分册。先遵循 [SKILL.md](../SKILL.md)。

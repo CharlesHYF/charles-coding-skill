@@ -1,4 +1,4 @@
-# Charles Coding — Vue
+# Charles Coding -- Vue
 > charles-coding 的 Vue 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"。**
 
 ## 能力范围

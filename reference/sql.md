@@ -1,4 +1,4 @@
-# Charles Coding — SQL
+# Charles Coding -- SQL
 > charles-coding 的 SQL 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"。**
 
 ## 数据库设计规范（阿里巴巴开发手册）

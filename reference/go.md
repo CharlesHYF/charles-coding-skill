@@ -1,4 +1,4 @@
-# Charles Coding — Go
+# Charles Coding -- Go
 > charles-coding 的 Go 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"。**
 
 ## 能力范围

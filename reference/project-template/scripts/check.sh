@@ -10,7 +10,7 @@ set -uo pipefail
 VIOLATIONS=0
 
 # 源码扩展名白名单：只有这些文件强制校验文件头注释块
-SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh)$'
+SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh|html|css|scss)$'
 
 # 文本扫描排除的二进制/资源扩展名(禁用字符检查跳过这些)
 BINARY_EXT_REGEX='\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tar|jar|class|woff2?|ttf|eot|mp[34]|mov|lock)$'
@@ -42,10 +42,10 @@ list_files() {
 	fi
 }
 
-# 检查一：禁用字符(弯角引号 / 中文长破折号 / Emoji)
+# 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/4] 检查禁用字符(弯引号 / 中文破折号 / Emoji)..."
+	echo "[1/4] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -58,22 +58,24 @@ check_forbidden_chars() {
 			continue
 		fi
 
-		# 弯角引号：U+201C U+201D U+2018 U+2019
+		# 引号类:弯引号 U+2018/2019/201C/201D、CJK 角引号 U+300C-300F、全角引号 U+FF02/FF07
+		# 排除:ASCII " ' 与书名号 U+300A/300B(合法);本行用 \x{} 转义,check.sh 自身不含被禁字符
 		# 注：-CSD 让 perl 按 UTF-8 解码输入，否则多字节字符按字节读取无法匹配 \x{}
 		local hits
-		hits=$(perl -CSD -ne 'print "L$.: $_" if /[\x{201c}\x{201d}\x{2018}\x{2019}]/' "${file}")
+		hits=$(perl -CSD -ne 'print "L$.: $_" if /[\x{2018}\x{2019}\x{201c}\x{201d}\x{300c}-\x{300f}\x{ff02}\x{ff07}]/' "${file}")
 
 		if [ -n "${hits}" ]; then
-			report "${file} 含弯角引号(应改用半角 \" 或 '):"
+			report "${file} 含非法引号(应改用半角 \" 或 '):"
 			echo "${hits}" | sed 's/^/         /'
 		fi
 
-		# 中文长破折号：U+2014(EM DASH)，应改用半角双连字符 --
+		# 破折号/横线类:U+2010-2015(hyphen/figure/en dash/em dash/horizontal bar)、U+2212 减号、U+FF0D 全角连字符、U+2E3A/2E3B 双三 em dash
+		# 排除:ASCII -- (两个 U+002D)与目录树制表符 U+2500-257F(合法)
 		local dash_hits
-		dash_hits=$(perl -CSD -ne 'print "L$.: $_" if /\x{2014}/' "${file}")
+		dash_hits=$(perl -CSD -ne 'print "L$.: $_" if /[\x{2010}-\x{2015}\x{2212}\x{2e3a}\x{2e3b}\x{ff0d}]/' "${file}")
 
 		if [ -n "${dash_hits}" ]; then
-			report "${file} 含中文长破折号(应改用半角 --):"
+			report "${file} 含 Unicode 破折号/横线(应改用半角 --):"
 			echo "${dash_hits}" | sed 's/^/         /'
 		fi
 
@@ -104,17 +106,14 @@ check_file_header() {
 			continue
 		fi
 
-		# 只看文件前 15 行，须同时出现"作用"与"创建日期"两个标记
-		local head_block
-		head_block=$(head -n 15 "${file}")
-
-		if ! echo "${head_block}" | grep -q "作用"; then
-			report "${file} 文件头缺少\"文件作用\"说明"
+		# 扫整个文件找"作用"与"创建日期"两个标记(不限行数);Java/Kotlin 注释在 import 之后的类上方也能命中
+		if ! grep -q "作用" "${file}"; then
+			report "${file} 缺少\"文件作用\"说明(源码注释块)"
 			continue
 		fi
 
-		if ! echo "${head_block}" | grep -q "创建日期"; then
-			report "${file} 文件头缺少\"创建日期\""
+		if ! grep -q "创建日期" "${file}"; then
+			report "${file} 缺少\"创建日期\"(源码注释块)"
 		fi
 
 	done < <(list_files)
@@ -132,16 +131,49 @@ check_required_files() {
 		fi
 	done
 
-	# docs/modules/ 须存在且含至少一个模块文档(README.md 之外的 .md)
+	# docs/modules/ 须存在,且模块文档必须在系统模块子目录下(两级:docs/modules/<系统模块>/<模块>.md)
 	if [ ! -d "docs/modules" ]; then
 		report "缺少模块文档目录：docs/modules/"
 	else
 
+		# 一级违规:直接躺在 docs/modules/ 根的 .md(README.md 除外)
+		local module_flat
+		module_flat=$(find docs/modules -maxdepth 1 -type f -name '*.md' ! -name 'README.md')
+
+		if [ -n "${module_flat}" ]; then
+			report "docs/modules/ 下有一级模块文档(须放进系统模块子目录 docs/modules/<系统模块>/x.md):"
+			echo "${module_flat}" | sed 's/^/         /'
+		fi
+
+		# 至少一个合规的两级模块文档
 		local module_doc_count
-		module_doc_count=$(find docs/modules -type f -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+		module_doc_count=$(find docs/modules -mindepth 2 -type f -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
 
 		if [ "${module_doc_count}" -eq 0 ]; then
-			report "docs/modules/ 下无模块文档(编码前必须先写 <模块>.md)"
+			report "docs/modules/ 下无模块文档(编码前必须先写 docs/modules/<系统模块>/<模块>.md)"
+		fi
+	fi
+
+	# test_cases/ 须存在,且用例必须在两级子目录下(test_cases/<系统模块>/<测试类型>/x.md)
+	if [ ! -d "test_cases" ]; then
+		report "缺少测试用例目录：test_cases/(交付必须附带测试用例)"
+	else
+
+		# 浅层违规:躺在 test_cases/ 根或仅一层子目录里的 .md(README.md 除外)
+		local case_flat
+		case_flat=$(find test_cases -maxdepth 2 -type f -name '*.md' ! -name 'README.md')
+
+		if [ -n "${case_flat}" ]; then
+			report "test_cases/ 下有浅层用例文档(须放进 test_cases/<系统模块>/<类型>/x.md):"
+			echo "${case_flat}" | sed 's/^/         /'
+		fi
+
+		# 至少一个合规的用例文档(位于 <系统模块>/<类型>/ 下)
+		local case_doc_count
+		case_doc_count=$(find test_cases -mindepth 3 -type f -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+
+		if [ "${case_doc_count}" -eq 0 ]; then
+			report "test_cases/ 下无用例文档(交付必须附带 test_cases/<系统模块>/<类型>/x.md)"
 		fi
 	fi
 }
@@ -154,7 +186,7 @@ check_naming() {
 	local file
 	while IFS= read -r file; do
 
-		if [[ ! "${file}" =~ \.(java|kt|ts|tsx)$ ]]; then
+		if [[ ! "${file}" =~ \.(java|kt|ts|tsx|vue)$ ]]; then
 			continue
 		fi
 
@@ -162,10 +194,11 @@ check_naming() {
 			continue
 		fi
 
-		# 匹配 class / interface 定义中以 VO 结尾、但不是 ReqVO / RespVO 的类型名
+		# 匹配 class / interface / type 定义中以 VO 结尾、但不是 ReqVO / RespVO 的类型名
+		# 排除框架基类 BaseVO / AbstractXxxVO / PageXxxVO 等,避免误报
 		local bad_vo
-		bad_vo=$(grep -nE '\b(class|interface)[[:space:]]+[A-Z][A-Za-z0-9]*VO\b' "${file}" \
-			| grep -vE '(Req|Resp)VO\b' || true)
+		bad_vo=$(grep -nE '\b(class|interface|type)[[:space:]]+[A-Z][A-Za-z0-9]*VO\b' "${file}" \
+			| grep -vE '((Req|Resp)VO|(Base|Abstract|Page)[A-Za-z0-9]*VO)\b' || true)
 
 		if [ -n "${bad_vo}" ]; then
 			report "${file} 存在裸 VO 命名(请求应为 XxxReqVO、响应应为 XxxRespVO):"

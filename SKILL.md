@@ -1,7 +1,7 @@
 ---
 name: charles-coding
-description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL — including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.1.0
+description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
+version: 3.2.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -24,7 +24,7 @@ author: Charles <w1400214654@outlook.com>
 | [Vue](reference/vue.md)                     | Vue 3 + Vite + TS          | Prettier + ESLint              | Vitest + Playwright       |
 | [React](reference/react.md)                 | Next.js (App Router) + TS  | Prettier + ESLint（或 Biome）  | Vitest + RTL + Playwright |
 | [Python](reference/python.md)               | FastAPI + uv               | Ruff + mypy                    | pytest（覆盖率 ≥80%）     |
-| [SQL](reference/sql.md)                     | PostgreSQL / MySQL / SQLite | 关键字大写 + 2 空格 + 阿里巴巴规约 | —                         |
+| [SQL](reference/sql.md)                     | PostgreSQL / MySQL / SQLite | 关键字大写 + 2 空格 + 阿里巴巴规约 | --                         |
 
 > **缩进**默认 **Tab**；例外：**Python / Kotlin 4 空格**、**SQL / YAML / JSON 2 空格**。**行尾**统一 **LF**。以上由脚手架里的 `.editorconfig` + `.gitattributes` 强制，不靠自觉。
 
@@ -48,13 +48,19 @@ author: Charles <w1400214654@outlook.com>
 | import 排序 | 由各语言格式化工具（Prettier/gofmt/Ruff 等）自动整理             |
 | 代码格式化 | 强制使用各语言对应的格式化工具（见各分册）自动执行                |
 
+#### 禁用符号（scripts/check.sh 拦截，非纯手动）
+> 以下由脚手架 `scripts/check.sh` 扫描拦截（`make lint` 与 CI 均会 fail），不是纯手动自查。规则句一律用**码点**指代被禁字符，故本文件自身不含被禁字符。
+
+| 类别   | 规范                                                                                     |
+| ------ | ---------------------------------------------------------------------------------------- |
+| 引号   | 严禁 Unicode 弯引号（U+2018/2019/201C/201D）、CJK 角引号（U+300C-300F）、全角引号（U+FF02/FF07）；统一用 ASCII 直引号 `"` / `'` 或不加引号。书名号《》(U+300A/300B) 是正常中文标点，不禁。 |
+| 破折号 | 严禁 Unicode 破折号/横线，含 em dash、en dash 等（U+2010-2015、U+2212、U+FF0D、U+2E3A/2E3B）；统一用半角双连字符 `--`（两个 U+002D）。目录树制表符（U+2500~257F）不禁。 |
+| Emoji  | 严禁在代码、注释、文档、提交信息中出现 Emoji；确需图标用 SVG 或 icon 字体。 |
+
 #### 手动约定类（工具不保证，Agent 须手动遵守并自查）
 | 项目             | 规范                                                              | lint 提示 |
 | ---------------- | ----------------------------------------------------------------- | --------- |
 | 注释语言         | 中文                                                              | 无法配置，纯手动 |
-| 禁用符号         | **严禁**在任何文字表达中使用""这类弯角引号；统一用 `""` / `''` 或直接不加引号                 | 无法配置，纯手动 |
-| 禁用符号         | **严禁**在任何文字表达中使用 ` -- `（中文长破折号）；统一用 `--`（半角双连字符）                    | 无法配置，纯手动 |
-| 禁用 Emoji       | **严禁**在代码、注释、文档、提交信息中使用 Emoji；确需图标时用 SVG 或 icon 字体，不用 Emoji | 无法配置，纯手动 |
 | 大括号前后空行   | 见下方"代码块与大括号规范"                                       | 无法配置，纯手动 |
 | 键值独占一行     | 见下方"代码展开与换行规范"                                       | ESLint `object-curly-newline` |
 | 魔法数字         | 见下方"常量与魔法数字规范"                                       | `no-magic-numbers` |
@@ -144,10 +150,11 @@ author: Charles <w1400214654@outlook.com>
   - **重复即耦合信号**：发现两个模块有"逐字一致"的代码段，说明耦合未抽离 -- 必须提取公共模块，而非各自保留一份
 
 ### 注释规范
-- **所有开发类源代码文件**顶部必须包含注释块，说明：
+- **所有开发类源代码文件**必须包含注释块，说明：
   - 文件作用（**一到两句话**简洁描述本文件职责，句号结尾）
   - 创建日期（格式：`YYYY-MM-DD`）
   - 修改日期（格式：`YYYY-MM-DD`，紧跟在创建日期下方；每次实质性修改时更新为当前日期）
+  - **注释块位置**：有 `package`/`import` 的语言（Java/Kotlin）放在**类型声明上方**（Javadoc/KDoc），类上有注解则放在**注解之上**，而非文件物理第一行；其余语言放文件顶部；Python 的 `# -*- coding: utf-8 -*-` 仍置于最顶
 - 标准化模板（各语言按各自注释语法适配，示例见各分册"文件头模板"章节）：
   ```
   文件作用：应用入口 -- 启动 Spring Boot 并加载全部配置。
@@ -215,10 +222,11 @@ author: Charles <w1400214654@outlook.com>
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
 - **严禁最小 MVP / 敷衍方案**：不许给"先跑起来再说"的残缺 demo、占位空实现、`TODO` 糊弄的代码。要给**完整、可用、有理有据**的方案，把边界情况、错误处理、配置都做全
 - **务必说人话**：解释与文档用直白清楚的中文，讲清"是什么、为什么、怎么做"；**禁止**模棱两可、故弄玄虚、堆砌高深术语而不落地。有取舍就把利弊讲明，给明确推荐
+- **证据驱动，先查证再作答**：凡涉及事实或技术判断的回答，动手前先把相关资料查实 -- 该读的源码、文档、配置、依赖版本、命令输出，按问题分量查到够深为止，禁止凭记忆、假设或"应该是"作答。给结论必须附依据：文件路径:行号、实跑的命令输出、官方文档、可复现结果，不能只甩结论。查不到或不确定，就明说不确定并点出缺口，绝不编造依据或伪造精确。宁可多查一步，不可拍脑袋（简短交互如"继续/看看/你决定"不在此列）
 
 #### 编码前置流程（先问清、再动手）
 - **编码前必须从底层把每个功能问清楚**：进入写代码环节之前，逐个功能向 Charles 确认需求边界、入参出参、异常场景、依赖关系，需求没问清不许开写
-- **模块文档闸门**：**新模块/新功能必写** `docs/modules/<模块名>.md`（如 `docs/modules/orders.md`），文档本身遵循 [reference/readme-md.md](reference/readme-md.md) 的 Markdown 规范；每个功能至少包含**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）；**文档评审通过后再进入编码**，代码实现须与文档一致，文档随功能变更同步更新
+- **模块文档闸门**：**新模块/新功能必写** `docs/modules/<系统模块>/<模块名>.md`（两级组织,如 `docs/modules/backend/orders.md`），文档本身遵循 [reference/readme-md.md](reference/readme-md.md) 的 Markdown 规范；每个功能至少包含**功能描述、入参要求、参数、返回**等小节（详见 [reference/module-doc-template.md](reference/module-doc-template.md)）；**文档评审通过后再进入编码**，代码实现须与文档一致，文档随功能变更同步更新
 - **豁免**：小改/bugfix/重构可不写模块文档，但需在 commit/PR 说明改动内容
 
 #### AGENTS.md（项目级 AI 指令）

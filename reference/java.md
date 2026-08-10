@@ -1,4 +1,4 @@
-# Charles Coding — Java
+# Charles Coding -- Java
 > charles-coding 的 Java 分册。**先遵循 [SKILL.md](../SKILL.md) 的"全局约定"**（缩进=Tab、中文注释、Git 分支、覆盖率策略等），本文件只列 Java 专属规范。
 
 ## 能力范围
@@ -31,7 +31,7 @@
 - 缩进：Tab
 - 格式化工具：强制使用 Checkstyle + Spotless（Maven 插件）
 - 异常处理：全局 `@RestControllerAdvice` 统一捕获，返回规范 `Result` 对象
-- **文件头注释用标准 Javadoc**（类上方），在标准格式基础上补"创建日期 / 修改日期"（见 [SKILL.md](../SKILL.md) 注释规范）：
+- **文件头注释用标准 Javadoc**，放在**类声明上方**（文件物理顶部是 `package`/`import`，不放那里）；**类上有注解时，注释块放在注解之上**。在标准格式基础上补"创建日期 / 修改日期"（见 [SKILL.md](../SKILL.md) 注释规范）：
   ```java
   /**
    * 文件作用：举报表 DO -- 映射 report 表的数据库实体。
@@ -43,6 +43,18 @@
   ```
   （修改日期每次实质性修改时更新为当前日期）
   说明性注释一律 `/** */`，禁止用 `//` 写类/方法/字段文档
+- **带注解的类**：注释块放在**注解上方**（不是注解与类之间），例如：
+  ```java
+  /**
+   * 文件作用：用户管理接口 -- 提供用户增删改查 REST 端点。
+   * 创建日期：2026-08-01
+   * 修改日期：2026-08-10
+   */
+  @RestController
+  @RequestMapping("/users")
+  public class UserController {
+  }
+  ```
 - **判空兜底用 `Optional`**：可能为空的返回值/查询结果用 `Optional` 表达与处理（`Optional.ofNullable(...).map(...).orElse(...)` / `orElseThrow(...)`），**禁止**层层 `if (x != null)` 手写判空堆叠；对外可能返回空的方法优先声明返回 `Optional<T>`
 - **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO ↔ VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
 
