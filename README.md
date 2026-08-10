@@ -121,14 +121,15 @@ cd <上述安装目录> && git pull origin main
 | 大括号 | 控制流/函数体必须用 `{}`，前后留空行 |
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
 | 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名 |
-| 注释 | 中文；文件头只写作用不写实现，1-2 句简洁描述；`/** */` 首行换行 |
-| 禁用符号 | 禁止弯角引号和中文长破折号，统一用半角 `""` / `--` |
+| 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；说明性注释置于被说明对象上方 |
+| 禁用符号 | 禁止各类 Unicode 引号/破折号变体（弯引号 / CJK 角引号 / 全角引号 / em / en dash 等），统一用半角 `""` / `--`；由 `scripts/check.sh` 拦截 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织，每个 func 都要写测试用例 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，编码前先写文档 |
 | 分层架构 | 所有后端项目 Controller → Service → Repository |
 | 解耦 | 非必要不耦合，禁止循环依赖，重复代码必须抽离 |
 | Docker | 强制 compose，`./volumes/` 持久化，东八区 |
-| 测试 | 交付必须附带 `test_cases/`，确保通过 |
+| 测试 | 交付必须附带 `test_cases/`，确保通过；`scripts/test.sh` 零测试判失败（`ALLOW_NO_TESTS=1` 逃生舱） |
+| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint` + 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干 |
 | .gitignore | 必须覆盖 IDE（`.idea/`）、AI 工具（`.claude/` 等）、OS 残留 |
@@ -155,4 +156,4 @@ Skill 靠 description 软触发，为兜底"老项目被忽略/不确认就改"�
 新增后需新开会话或在 Claude Code 打开一次 /hooks 使其加载。
 
 ## 新项目脚手架
-复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/` / `test_cases/` 骨架 / `docs/modules/` 骨架。详细范例见 [`reference/examples/`](reference/examples/)。
+复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/` / `.github/workflows/verify.yml`（CI）/ `test_cases/` 骨架 / `docs/modules/` 骨架。详细范例见 [`reference/examples/`](reference/examples/)。
