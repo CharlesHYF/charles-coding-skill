@@ -57,21 +57,29 @@
   ```python
   # schemas/user.py
   class UserCreate(BaseModel):
-      """创建用户请求"""
+      """
+      创建用户请求
+      """
       username: str
       email: str
 
   class UserUpdate(BaseModel):
-      """更新用户请求"""
+      """
+      更新用户请求
+      """
       username: str | None = None
       email: str | None = None
 
   class UserResponse(BaseModel):
-      """用户信息响应"""
+      """
+      用户信息响应
+      """
       id: int
       username: str
 
   class UserFilter(BaseModel):
-      """用户查询过滤条件"""
+      """
+      用户查询过滤条件
+      """
       username: str | None = None
   ```
