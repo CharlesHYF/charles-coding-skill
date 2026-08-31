@@ -57,7 +57,7 @@
 
 ## 5. 结构与格式硬约束
 - **分层架构**：后端强制 Controller → Service → Repository，禁止跨层(Controller 不直接调 Repository)，禁止把全部逻辑塞进一个文件/函数。
-- **强制大括号**：所有 `if`/`else`/`for`/`while`/函数体，即使只有一行也要 `{}`；代码块前后留空行。
+- **强制大括号**：所有 `if`/`else`/`for`/`while`/函数体，即使只有一行也要 `{}`；完整代码块与相邻同级语句之间留空行(`} else {` 等续接行、块内首末行不要求)。
 - **禁止魔法数字**：裸数字提为文件/类顶部具名常量(`MAX_RETRY_COUNT` 等)。
 - **键值/元素独占一行**：对象字面量每个键值一行带尾逗号；HTML/JSX 每个元素一行；禁止并排。
 - **缩进**：默认 Tab；Python / Kotlin 4 空格、SQL / YAML / JSON 2 空格(见 `.editorconfig`)。行尾统一 LF。

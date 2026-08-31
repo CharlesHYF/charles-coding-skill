@@ -193,9 +193,16 @@ cat > "${GOOD_DIR}/good_style.css" <<'EOF'
 }
 EOF
 
+# 头部合规,正文第 100 行附近含"创建日期: "半角冒号的 UI 字符串 -- 内容检查限定前 80 行后不应误报
+{
+	printf '/**\n * 报表导出服务\n * 创建日期：2026-08-31\n * 修改日期：2026-08-31\n */\npublic class GoodReport {\n'
+	awk 'BEGIN { for (i = 1; i <= 94; i++) { printf "\tprivate int field%d = %d;\n", i, i } }'
+	printf '\tprivate String buildLabel(String date) {\n\t\treturn "创建日期: " + date;\n\t}\n}\n'
+} > "${GOOD_DIR}/GoodReport.java"
+
 run_check "${GOOD_DIR}"
 
-expect_not_contains "${CHECK_OUTPUT}" "[FAIL]" "合规项目无任何 FAIL"
+expect_not_contains "${CHECK_OUTPUT}" "[FAIL]" "合规项目无任何 FAIL(含正文半角冒号 UI 字符串不误报)"
 
 if [ "${CHECK_EXIT}" -eq 0 ]; then
 	pass "合规项目退出码为 0"

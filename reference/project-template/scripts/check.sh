@@ -9,6 +9,9 @@ set -uo pipefail
 # 违规计数：任意一项 > 0 则最终退出码非 0，供 CI / make check 拦截
 VIOLATIONS=0
 
+# 文件头内容检查(半角冒号/前缀标签/单行注释误用)只扫前 80 行:足够覆盖 Java/Kotlin 在 import 后的类注释,又避开正文里 UI 字符串的误报
+HEADER_SCAN_LINES=80
+
 # 源码扩展名白名单：只有这些文件强制校验文件头注释块
 SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh|html|css|scss)$'
 
@@ -109,7 +112,7 @@ check_file_header() {
 
 		# 半角冒号:创建/修改日期必须用中文全角冒号
 		local halfwidth
-		halfwidth=$(grep -nE '(创建日期|修改日期)[[:space:]]*:' "${file}" || true)
+		halfwidth=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -nE '(创建日期|修改日期)[[:space:]]*:' || true)
 
 		if [ -n "${halfwidth}" ]; then
 			report "${file} 日期行用了半角冒号(须改为中文全角冒号):"
@@ -119,7 +122,7 @@ check_file_header() {
 		# 残留前缀标签:文件头首行须是纯描述,不得写标签前缀(如 U+6587 U+4EF6 U+4F5C U+7528 加冒号)
 		# 用 perl \x{} 码点书写规则,确保 check.sh 自身不含该字面量,无需自我排除
 		local legacy_label
-		legacy_label=$(perl -CSD -ne 'print "L$.: $_" if /(\x{6587}\x{4ef6}(\x{4f5c}\x{7528}|\x{7528}\x{9014}|\x{8bf4}\x{660e})|\x{4f5c}\x{7528}\x{63cf}\x{8ff0})[ \t]*[:\x{ff1a}]/' "${file}")
+		legacy_label=$(head -n "${HEADER_SCAN_LINES}" "${file}" | perl -CSD -ne 'print "L$.: $_" if /(\x{6587}\x{4ef6}(\x{4f5c}\x{7528}|\x{7528}\x{9014}|\x{8bf4}\x{660e})|\x{4f5c}\x{7528}\x{63cf}\x{8ff0})[ \t]*[:\x{ff1a}]/')
 
 		if [ -n "${legacy_label}" ]; then
 			report "${file} 文件头带了前缀标签(首行直接写作用描述，不要标签前缀):"
@@ -276,7 +279,7 @@ check_comment_syntax() {
 		# Go 的声明级注释用 // 是标准写法，但文件头仍须 /* */,故一并纳入(只匹配含"创建日期"的行)
 		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
 			local slash_header
-			slash_header=$(grep -nE '^[[:space:]]*//.*创建日期：' "${file}" || true)
+			slash_header=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -nE '^[[:space:]]*//.*创建日期：' || true)
 
 			if [ -n "${slash_header}" ]; then
 				report "${file} 文件头用了 // 单行注释(须改为块注释三段式；Go 用 /* */,其余用 /** */):"
@@ -298,7 +301,7 @@ check_comment_syntax() {
 		# 三、Python：文件头须用 docstring,不得用 # 写(# -*- coding -*- 除外)
 		if [[ "${file}" =~ \.py$ ]]; then
 			local hash_header
-			hash_header=$(grep -nE '^[[:space:]]*#.*创建日期：' "${file}" || true)
+			hash_header=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -nE '^[[:space:]]*#.*创建日期：' || true)
 
 			if [ -n "${hash_header}" ]; then
 				report "${file} 文件头用了 # 单行注释(须改为 \"\"\" docstring 三段式):"

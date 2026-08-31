@@ -100,6 +100,7 @@ HEADER_FILES=(
 	"reference/react.md"
 	"reference/vue.md"
 	"reference/sql.md"
+	"reference/comments.md"
 )
 
 for header_file in "${HEADER_FILES[@]}"; do

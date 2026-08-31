@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.5.0
+version: 3.6.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -61,21 +61,27 @@ author: Charles <w1400214654@outlook.com>
 | 项目             | 规范                                                              | lint 提示 |
 | ---------------- | ----------------------------------------------------------------- | --------- |
 | 注释语言         | 中文                                                              | 无法配置，纯手动 |
-| 大括号前后空行   | 见下方"代码块与大括号规范"                                       | 无法配置，纯手动 |
+| 代码块间空行     | 见下方"代码块与大括号规范"                                       | 无法配置，纯手动 |
 | 键值独占一行     | 见下方"代码展开与换行规范"                                       | ESLint `object-curly-newline` |
 | 魔法数字         | 见下方"常量与魔法数字规范"                                       | `no-magic-numbers` |
 | 命名见名知义     | 见下方"变量与函数命名规范"                                       | 无法配置，纯手动 |
 
 ### 代码块与大括号规范
 - **强制使用大括号**：`if`、`else`、`for`、`while`、`function` 等所有控制流/函数体语句，**无论内部只有一行还是多行，都必须使用大括号 `{}`**，禁止省略
-- **大括号前后留空行**：代码块（`{}`）与上方相邻代码之间留一个空行，与下方相邻代码之间也留一个空行，让代码块的起止边界清晰可辨
-- 示例：
+- **代码块与相邻同级语句之间留空行**：一个完整代码块（`if/else` 整体、`for`、`while`、`try/catch` 整体、函数）与其上下相邻的**同级语句**之间各留一个空行，让块的起止边界清晰可辨。判定边界：
+  - **不要求空行**的位置：`} else {`、`} catch {`、`} finally {` 等续接行（它们属于同一个块）；块内第一行与 `{` 之间、最后一行与 `}` 之间；文件/函数的第一条与最后一条语句外侧
+  - 连续多个块之间留一个空行即可，不叠加
+- 示例（`if/else` 整体作为一个块，与前后语句之间各空一行）：
   ```java
-  if (a > 10) {
-      doSomething();
+  int total = calcTotal();
+
+  if (total > MAX_LIMIT) {
+      reject(total);
   } else {
-      doOther();
+      accept(total);
   }
+
+  notifyUser();
   ```
 
 ### 代码展开与换行规范（严禁并排）
@@ -181,28 +187,8 @@ author: Charles <w1400214654@outlook.com>
 | SQL                                      | `/* ... */`（文件头亦可整块用 `--`，见 [sql.md](reference/sql.md)） | `--`     |
 | Shell / YAML / Dockerfile / .properties  | `#`（这些语言无块注释语法，属唯一例外）   | `#`      |
 
-- **块注释三段式**：`/** */` / `/* */` 首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
-  ```java
-  /**
-   * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
-   * phase 缺省 1，向后兼容
-   */
-  ```
-- **Python docstring 同样三段式**：`"""` 独占首行、**正文一律从第二行开始**、`"""` 独占末行（单行内容同理）；docstring 只作模块/类/函数体内的第一个语句。统一用双引号 `"""`，**禁止** `'''`（PEP 257 标准，Ruff D300 会报错）
-  ```python
-  # 错误：正文跟 """ 挤在同一行
-  def resolve(...):
-      """把 material_refs 分类为远程链接、已复制本地素材和不可用引用三类。
-
-      uploads_dir 是 ...
-      """
-
-  # 正确：""" 独占首行，正文第二行起
-  def resolve(...):
-      """
-      把 material_refs 分类为远程链接、已复制本地素材、不可用引用三类
-      """
-  ```
+- **块注释三段式**：`/** */` / `/* */` 首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例见 [reference/comments.md](reference/comments.md)
+- **Python docstring 同样三段式**：`"""` 独占首行、**正文一律从第二行开始**、`"""` 独占末行（单行内容同理）；docstring 只作模块/类/函数体内的第一个语句。统一用双引号 `"""`，**禁止** `'''`（PEP 257；Ruff 配置见 [python.md](reference/python.md)）。正反示例见 [reference/comments.md](reference/comments.md)
 - **单行说明禁止用字符串字面量**：一句话的说明性注释一律用 `//` 或 `#`，**禁止**写成 `"""xxx"""` / `'''xxx'''`。Python 里那是一条 no-op 表达式语句而非注释，既不绑定对象、也不被 `help()` / IDE 识别
 - **说明性注释置于被说明对象上方**：变量/常量/字段的说明写在其上一行（Python 用 `#`），**禁止**写在下方或用悬空 `"""..."""` 充当变量文档
 - **`//` / `#` 的合法用途仅两类**：① 函数体内部的单行说明；② Shell / YAML / Dockerfile 等无块注释语法的语言。除此之外的类、方法、字段、文件头说明，一律用上表的块/文档注释
@@ -210,24 +196,7 @@ author: Charles <w1400214654@outlook.com>
 - **所有函数/方法**必须注释其功能，复杂逻辑需额外说明设计意图
 - **注释篇幅硬上限：正文默认 1-2 行，任何注释块正文不得超过 3 行**（`scripts/check.sh` 会拦截，`@param` / `@return` 等标签行不计入）。注释是给读代码的人一句话点明"做什么、为什么"，**不是设计文档**
   - **禁止**在注释里写：背景推演、方案权衡、为什么不选另一种做法、运行时环境分析、故障复盘、待办计划。这些属于 `docs/modules/<系统模块>/<模块>.md` 或 git commit message
-  - 判据：如果一段注释删掉后，读代码的人**仍能看懂这个函数做什么**，那它就该删或压缩
-  - 错误示例（正文 5 行，讲了进程模型、失败原因、为何不自动重试 -- 全属于模块文档的内容）：
-    ```java
-    /**
-     * 把滞留在"处理中"的学习内容标记为失败
-     *
-     * 异步同步任务活在 JVM 进程里,进程一停任务就没了,而内容状态还留在"处理中":
-     * 管理端看不出问题、课程的自动发布判定也会一直等下去。这里给出明确原因,
-     * 由管理员重新保存课程触发重试 -- 不自动重试是因为妙记要以"当时的操作人"身份下载,
-     * 而操作人身份没有随内容落库,重启后无从还原。
-     */
-    ```
-  - 正确写法（1 行说清做什么，"为什么不自动重试"留给模块文档）：
-    ```java
-    /**
-     * 把超过 STALE_MINUTES 仍滞留"处理中"的内容标记为失败，等管理员重新保存课程触发重试
-     */
-    ```
+  - 判据：如果一段注释删掉后，读代码的人**仍能看懂这个函数做什么**，那它就该删或压缩。正反示例见 [reference/comments.md](reference/comments.md)
 - **注释简洁扼要**：说明"做什么、为什么"，不重复代码本身已表达的信息，不把 git commit message 的内容复制到注释里
 - **禁止用注释声明跨文件重复**：注释中**禁止**出现"与 xxx.py 逐字一致""同 xxx.java 的实现"等声明。如果两处逻辑确实相同，应抽取为公共模块（import 复用）而非用注释标记重复 -- 注释引用另一个文件意味着存在应消除的耦合
 - **Python 文件额外要求**：文件首行声明 `# -*- coding: utf-8 -*-`，置于文件头注释块之前
