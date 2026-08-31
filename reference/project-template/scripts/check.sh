@@ -131,12 +131,12 @@ check_file_header() {
 		create_line=$(grep -nE '创建日期：' "${file}" | head -1 | cut -d: -f1)
 
 		if [ -z "${create_line}" ]; then
-			report "${file} 缺少\"创建日期：\"(源码文件头注释块)"
+			report "${file} 缺少\"创建日期：\"(源码文件头注释块;若已写请确认冒号为中文全角)"
 			continue
 		fi
 
 		if ! grep -qE '修改日期：' "${file}"; then
-			report "${file} 缺少\"修改日期：\"(源码文件头注释块)"
+			report "${file} 缺少\"修改日期：\"(源码文件头注释块;若已写请确认冒号为中文全角)"
 		fi
 
 		# 作用描述行:从"创建日期"往上回溯,跳过空行与 @author 等标签行,首个有实质内容的行即描述行
