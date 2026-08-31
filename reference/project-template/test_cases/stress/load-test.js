@@ -1,11 +1,12 @@
 /**
  * 基础 HTTP 接口压力测试脚本 -- 验证系统在递增并发下的性能表现
  * 创建日期：2026-07-29
- * 修改日期：2026-08-03
+ * 修改日期：2026-08-31
  */
 
 import http from 'k6/http';
-import { check, Counter, Trend } from 'k6';
+import { check } from 'k6';
+import { Counter, Trend } from 'k6/metrics';
 
 // 自定义指标
 const tps = new Counter('tps');
@@ -22,7 +23,7 @@ export const options = {
 	],
 	// 性能阈值
 	thresholds: {
-		'http_req_failed': ['<0.01'],		// 错误率 < 1%
+		'http_req_failed': ['rate<0.01'],	// 错误率 < 1%
 		'http_req_duration': ['p(95)<300', 'p(99)<500'],	// P95<300ms, P99<500ms
 		'http_reqs': ['rate>100'],			// QPS > 100
 	},

@@ -1,0 +1,26 @@
+# 本仓自测闸门 -- push 或 PR 时跑 check.sh 回归测试与多处同源规则一致性自检，规范仓自己吃自己的狗粮
+# 创建日期：2026-08-31
+# 修改日期：2026-08-31
+name: test
+
+on:
+  push:
+    branches:
+      - main
+      - 'agents/feature/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: check.sh 回归测试
+        run: bash tests/run_tests.sh
+
+      - name: 规则一致性自检
+        run: bash tests/check_consistency.sh

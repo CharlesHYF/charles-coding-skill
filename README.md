@@ -1,7 +1,7 @@
 <h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.4.1-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-3.5.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
@@ -93,6 +93,7 @@ cd <上述安装目录> && git pull origin main
 .
 ├── SKILL.md                      # Skill 主入口：全局约定 + 速查索引
 ├── example.html                  # 完整前端范例（展会落地页，含网格布局/自定义下拉/Toast）
+├── tests/                        # 本仓自测：check.sh 回归测试 + 规则一致性自检（CI 强制）
 └── reference/
     ├── java.md                   # Java / Spring Boot
     ├── kotlin-android.md         # Kotlin / Android
@@ -113,6 +114,21 @@ cd <上述安装目录> && git pull origin main
     └── project-template/         # 新项目脚手架骨架
 ```
 
+## 仓库自测（本仓 CI 强制）
+规范仓自己也吃狗粮：`.github/workflows/test.yml` 在 push / PR 时强制跑以下两项，任一失败即红。
+
+```bash
+bash tests/run_tests.sh
+```
+
+`check.sh` 回归测试：用固定 fixture 断言六项检查该报的都报（23 项断言）、合规文件零误报，防止规则改动静默退化。
+
+```bash
+bash tests/check_consistency.sh
+```
+
+多处同源规则一致性自检：版本号（SKILL.md vs README badge）、注释篇幅上限、lint 范围串、检查项编号、各分册文件头模板、仓库自身禁用字符，共 20 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
+
 ## 核心约定（速览）
 | 项目 | 规范 |
 |------|------|
@@ -132,7 +148,7 @@ cd <上述安装目录> && git pull origin main
 | 解耦 | 非必要不耦合，禁止循环依赖，重复代码必须抽离 |
 | Docker | 强制 compose，`./volumes/` 持久化，东八区 |
 | 测试 | 交付必须附带 `test_cases/`，确保通过；`scripts/test.sh` 零测试判失败（`ALLOW_NO_TESTS=1` 逃生舱） |
-| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint` + 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
+| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint`（禁用字符/文件头/注释语法/注释篇幅/必需文件/命名）+ 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干 |
 | .gitignore | 必须覆盖 IDE（`.idea/`）、AI 工具（`.claude/` 等）、OS 残留 |

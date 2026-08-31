@@ -1,0 +1,21 @@
+# Python 工具链配置模板 -- Ruff(lint + import 排序 + docstring 规则)与 mypy 严格模式，非 Python 项目删除本文件即可
+# 创建日期：2026-08-31
+# 修改日期：2026-08-31
+
+[project]
+name = "project-name"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+# I    -> import 排序(替代 isort)
+# D300 -> docstring 统一三双引号,禁止 '''
+# D213 -> 多行 docstring 摘要从第二行开始(对应 charles-coding 的"三段式")
+# 禁止启用 D200 / D212:两者要求摘要与引号收拢同行,与三段式直接冲突
+extend-select = ["I", "D300", "D213"]
+
+[tool.mypy]
+strict = true
