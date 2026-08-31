@@ -61,7 +61,7 @@ class UserProfileViewModel @Inject constructor(
 KDoc 放在**类声明上方**（文件顶部是 `package`/`import`）；**类上有注解(如 `@HiltViewModel`)时，注释块放在注解之上**。
 ```kotlin
 /**
- * 文件作用：用户信息 ViewModel -- 管理用户详情页的 UI 状态与数据加载。
+ * 用户信息 ViewModel -- 管理用户详情页的 UI 状态与数据加载
  * 创建日期：2026-07-29
  * 修改日期：2026-08-01
  */

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 文件作用：规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉。
+# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉
 # 创建日期：2026-08-03
 # 修改日期：2026-08-31
 
@@ -45,7 +45,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/5] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/6] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -91,9 +91,10 @@ check_forbidden_chars() {
 	done < <(list_files)
 }
 
-# 检查二：源码文件头注释块(须含"作用"与"创建日期"两个标记)
+# 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
+# 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
-	echo "[2/5] 检查源码文件头注释块..."
+	echo "[2/6] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
@@ -106,14 +107,65 @@ check_file_header() {
 			continue
 		fi
 
-		# 扫整个文件找"作用"与"创建日期"两个标记(不限行数);Java/Kotlin 注释在 import 之后的类上方也能命中
-		if ! grep -q "作用" "${file}"; then
-			report "${file} 缺少\"文件作用\"说明(源码注释块)"
+		# 半角冒号:创建/修改日期必须用中文全角冒号
+		local halfwidth
+		halfwidth=$(grep -nE '(创建日期|修改日期)[[:space:]]*:' "${file}" || true)
+
+		if [ -n "${halfwidth}" ]; then
+			report "${file} 日期行用了半角冒号(须改为中文全角冒号):"
+			echo "${halfwidth}" | sed 's/^/         /'
+		fi
+
+		# 残留前缀标签:文件头首行须是纯描述,不得写标签前缀(如 U+6587 U+4EF6 U+4F5C U+7528 加冒号)
+		# 用 perl \x{} 码点书写规则,确保 check.sh 自身不含该字面量,无需自我排除
+		local legacy_label
+		legacy_label=$(perl -CSD -ne 'print "L$.: $_" if /(\x{6587}\x{4ef6}(\x{4f5c}\x{7528}|\x{7528}\x{9014}|\x{8bf4}\x{660e})|\x{4f5c}\x{7528}\x{63cf}\x{8ff0})[ \t]*[:\x{ff1a}]/' "${file}")
+
+		if [ -n "${legacy_label}" ]; then
+			report "${file} 文件头带了前缀标签(首行直接写作用描述，不要标签前缀):"
+			echo "${legacy_label}" | sed 's/^/         /'
+		fi
+
+		# 锚点:创建日期(全角冒号)必须存在
+		local create_line
+		create_line=$(grep -nE '创建日期：' "${file}" | head -1 | cut -d: -f1)
+
+		if [ -z "${create_line}" ]; then
+			report "${file} 缺少\"创建日期：\"(源码文件头注释块)"
 			continue
 		fi
 
-		if ! grep -q "创建日期" "${file}"; then
-			report "${file} 缺少\"创建日期\"(源码注释块)"
+		if ! grep -qE '修改日期：' "${file}"; then
+			report "${file} 缺少\"修改日期：\"(源码文件头注释块)"
+		fi
+
+		# 作用描述行:从"创建日期"往上回溯,跳过空行与 @author 等标签行,首个有实质内容的行即描述行
+		local probe desc_raw desc_text
+		probe=$((create_line - 1))
+		desc_text=""
+
+		while [ "${probe}" -ge 1 ]; do
+			desc_raw=$(sed -n "${probe}p" "${file}")
+			# 剥掉行首注释符号(空白 / * // # -- <!-- 三引号)与行尾收尾符号后看剩余内容
+			desc_text=$(printf '%s' "${desc_raw}" | sed -E 's@^[[:space:]]*(/\*+|\*+/?|//+|#+|--+|<!--+|""")?[[:space:]]*@@' | sed -E 's@[[:space:]]*(\*/|-->)?[[:space:]]*$@@')
+
+			# 空行、标签行(@author 等)、注释块起始符、shebang 都不算描述,继续往上找
+			if [ -n "${desc_text}" ] && [[ ! "${desc_text}" =~ ^@ ]] && [[ ! "${desc_text}" =~ ^!/ ]]; then
+				break
+			fi
+
+			desc_text=""
+			probe=$((probe - 1))
+		done
+
+		if [ -z "${desc_text}" ]; then
+			report "${file} 缺少文件头作用描述行(\"创建日期：\"上方应有一到两句话的作用描述)"
+			continue
+		fi
+
+		# 描述行句尾不加句号
+		if printf '%s' "${desc_text}" | grep -qE '[。.]$'; then
+			report "${file} 文件头作用描述行结尾带了句号(须去掉): ${desc_text}"
 		fi
 
 	done < <(list_files)
@@ -121,7 +173,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/5] 检查项目必需文件..."
+	echo "[3/6] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -181,7 +233,7 @@ check_required_files() {
 # 检查四：数据传输命名(Java / Kotlin / TS 的响应/请求类)
 # 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规
 check_naming() {
-	echo "[4/5] 检查数据传输命名(XxxReqVO / XxxRespVO)..."
+	echo "[4/6] 检查数据传输命名(XxxReqVO / XxxRespVO)..."
 
 	local file
 	while IFS= read -r file; do
@@ -211,7 +263,7 @@ check_naming() {
 # 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
 # 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
 check_comment_syntax() {
-	echo "[5/5] 检查注释语法(块注释 / docstring)..."
+	echo "[5/6] 检查注释语法(块注释 / docstring)..."
 
 	local file
 	while IFS= read -r file; do
@@ -221,10 +273,10 @@ check_comment_syntax() {
 		fi
 
 		# 一、C 系语言(含 Go/Vue/CSS)：文件头不得用 // 起头，必须用块注释
-		# Go 的声明级注释用 // 是标准写法，但文件头仍须 /* */,故一并纳入(只匹配含"文件作用"的行)
+		# Go 的声明级注释用 // 是标准写法，但文件头仍须 /* */,故一并纳入(只匹配含"创建日期"的行)
 		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
 			local slash_header
-			slash_header=$(grep -nE '^[[:space:]]*//.*文件作用' "${file}" || true)
+			slash_header=$(grep -nE '^[[:space:]]*//.*创建日期：' "${file}" || true)
 
 			if [ -n "${slash_header}" ]; then
 				report "${file} 文件头用了 // 单行注释(须改为块注释三段式；Go 用 /* */,其余用 /** */):"
@@ -243,10 +295,10 @@ check_comment_syntax() {
 			fi
 		fi
 
-		# 三、Python：文件头须用 docstring,不得用 # 写文件作用(# -*- coding -*- 除外)
+		# 三、Python：文件头须用 docstring,不得用 # 写(# -*- coding -*- 除外)
 		if [[ "${file}" =~ \.py$ ]]; then
 			local hash_header
-			hash_header=$(grep -nE '^[[:space:]]*#.*文件作用' "${file}" || true)
+			hash_header=$(grep -nE '^[[:space:]]*#.*创建日期：' "${file}" || true)
 
 			if [ -n "${hash_header}" ]; then
 				report "${file} 文件头用了 # 单行注释(须改为 \"\"\" docstring 三段式):"
@@ -275,6 +327,77 @@ check_comment_syntax() {
 	done < <(list_files)
 }
 
+# 注释块正文行数上限：超过即视为"长篇大论"，背景推演/方案权衡应写进 docs/modules/
+MAX_COMMENT_BODY_LINES=3
+
+# 检查六：注释篇幅(正文默认 1-2 行,硬上限 MAX_COMMENT_BODY_LINES 行)
+# 标签行(@param / @return / :param 等)不计入正文,避免多参数 Javadoc 误报
+check_comment_length() {
+	echo "[6/6] 检查注释篇幅(正文不超过 ${MAX_COMMENT_BODY_LINES} 行)..."
+
+	local file
+	while IFS= read -r file; do
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		# C 系语言:/* */ 块注释,以及连续 // 注释行(Go doc 用 // 是标准,其余语言本就不该用 // 拼多行)
+		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
+			local long_block
+			long_block=$(awk -v max="${MAX_COMMENT_BODY_LINES}" '
+				function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+				{
+					line = trim($0)
+					if (inblk) {
+						if (line ~ /\*\//) { inblk = 0; if (n > max) { print start "\t" n }; next }
+						body = line; sub(/^\*+[ \t]*/, "", body); body = trim(body)
+						if (body != "" && body !~ /^@/) { n++ }
+						next
+					}
+					if (line ~ /^\/\*/ && line !~ /\*\//) { inblk = 1; n = 0; start = NR; next }
+					if (line ~ /^\/\//) {
+						if (!inrun) { inrun = 1; rn = 0; rstart = NR }
+						body = line; sub(/^\/\/+[ \t]*/, "", body); body = trim(body)
+						if (body != "" && body !~ /^@/) { rn++ }
+						next
+					}
+					if (inrun) { if (rn > max) { print rstart "\t" rn }; inrun = 0 }
+				}
+				END { if (inrun && rn > max) { print rstart "\t" rn } }
+			' "${file}")
+
+			if [ -n "${long_block}" ]; then
+				report "${file} 注释块正文超过 ${MAX_COMMENT_BODY_LINES} 行(行号:正文行数;背景推演/方案权衡请写进 docs/modules/):"
+				echo "${long_block}" | awk '{ print "         L" $1 ": " $2 " 行正文" }'
+			fi
+		fi
+
+		# Python:三段式 docstring(""" 独占一行开头);非三段式的由检查五单独拦截
+		if [[ "${file}" =~ \.py$ ]]; then
+			local long_doc
+			long_doc=$(awk -v max="${MAX_COMMENT_BODY_LINES}" '
+				function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+				{
+					line = trim($0)
+					if (indoc) {
+						if (line ~ /"""/) { indoc = 0; if (n > max) { print start "\t" n }; next }
+						if (line != "" && line !~ /^(@|:param|:return|:raise)/) { n++ }
+						next
+					}
+					if (line == "\"\"\"") { indoc = 1; n = 0; start = NR }
+				}
+			' "${file}")
+
+			if [ -n "${long_doc}" ]; then
+				report "${file} docstring 正文超过 ${MAX_COMMENT_BODY_LINES} 行(行号:正文行数;背景推演/方案权衡请写进 docs/modules/):"
+				echo "${long_doc}" | awk '{ print "         L" $1 ": " $2 " 行正文" }'
+			fi
+		fi
+
+	done < <(list_files)
+}
+
 echo "=== charles-coding 规范校验 ==="
 
 check_forbidden_chars
@@ -282,6 +405,7 @@ check_file_header
 check_required_files
 check_naming
 check_comment_syntax
+check_comment_length
 
 echo "==============================="
 

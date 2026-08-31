@@ -194,7 +194,7 @@
   ```
 - migration / 数据变动脚本文件头：
   ```sql
-  -- 文件作用：将历史订单表中已完成订单迁移至归档表。
+  -- 将历史订单表中已完成订单迁移至归档表
   -- 创建日期：2026-07-29
   -- 修改日期：2026-08-01
   INSERT INTO order_archive SELECT * FROM order_2024 WHERE status = 3;

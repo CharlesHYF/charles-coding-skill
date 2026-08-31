@@ -1,4 +1,4 @@
-# 文件作用：CI 交付闸门 -- push 到 agents/feature/** 或 PR 到 main 时,云端强制 make verify 并扫描提交信息,不依赖本地自觉。
+# CI 交付闸门 -- push 到 agents/feature/** 或 PR 到 main 时,云端强制 make verify 并扫描提交信息,不依赖本地自觉
 # 创建日期：2026-08-10
 # 修改日期：2026-08-10
 name: verify
