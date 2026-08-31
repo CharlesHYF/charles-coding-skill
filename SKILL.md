@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.2.0
+version: 3.3.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -163,16 +163,31 @@ author: Charles <w1400214654@outlook.com>
   ```
 - 文件的**详细修改历史由 git 记录**，文件头只维护上述最近一次的修改日期，不逐条罗列变更
   - **文件头只写作用，不写实现**：文件头注释仅用 1-2 句话概括本文件职责，**禁止**在文件头写入实现细节、设计推演、查证结论、环境差异分析 -- 这些内容属于函数注释或 git commit message
-- **优先使用语言标准的块/文档注释**：类、方法、字段的说明性注释优先用 `/** */`（文档注释）或 `/* */`，而**不是** `//`。`//` 只用于函数体内部的临时/单行说明。凡语言有文档注释标准（Javadoc / JSDoc / TSDoc / Go doc / docstring 等）的，一律按标准写
-- **多行块注释首行换行**：`/** */` / `/* */` 等多行块注释，首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
+#### 注释语法对照表（先查表，再动手写）
+> **多行注释一律用块/文档注释语法，禁止用连续多行 `//` 或 `#` 拼出多行注释。** 单行注释才用 `//` / `#`。
+
+| 语言                                    | 多行 / 文档注释（文件头、类、方法、字段） | 单行注释 |
+| --------------------------------------- | ----------------------------------------- | -------- |
+| Java / Kotlin                           | `/** ... */`（Javadoc / KDoc）            | `//`     |
+| JS / TS / JSX / TSX / CSS / SCSS / k6    | `/** ... */`（JSDoc / TSDoc）；CSS 用 `/* */` | `//`（CSS 无单行注释，仍用 `/* */`） |
+| Go                                       | 见下方 **Go 例外**                        | `//`     |
+| Python                                   | `"""` docstring（三段式）                 | `#`      |
+| Vue SFC / HTML                           | `<!-- ... -->`                            | `<!-- ... -->` |
+| SQL                                      | `/* ... */`（文件头亦可整块用 `--`，见 [sql.md](reference/sql.md)） | `--`     |
+| Shell / YAML / Dockerfile / .properties  | `#`（这些语言无块注释语法，属唯一例外）   | `#`      |
+
+- **块注释三段式**：`/** */` / `/* */` 首行仅写 `/**`（其后立即换行），正文每行以 ` * ` 开头，末行仅写 ` */`；**禁止** `/**` 与第一行正文挤在同一行。示例：
   ```java
   /**
    * 拉阶段产物 → GET /api/tasks/{taskId}/artifact?phase=
    * phase 缺省 1，向后兼容
    */
   ```
-- **Python docstring 同样三段式**：`"""` 独占首行、正文从第二行顶格、`"""` 独占末行（单行内容同理）；docstring 只作模块/类/函数体内的第一个语句，不写成 `"""摘要..."""` 单行
-- **说明性注释置于被说明对象上方**：变量/常量/字段的说明写在其上一行（Python 用 `#`），**禁止**写在下方或用悬空 `"""..."""` 充当变量文档（Python 里那不是 docstring、不绑定变量、运行时 no-op）
+- **Python docstring 同样三段式**：`"""` 独占首行、正文从第二行顶格、`"""` 独占末行（单行内容同理）；docstring 只作模块/类/函数体内的第一个语句，**禁止**写成 `"""摘要..."""` 单行。统一用双引号 `"""`，**禁止** `'''`（PEP 257 标准，Ruff D300 会报错）
+- **单行说明禁止用字符串字面量**：一句话的说明性注释一律用 `//` 或 `#`，**禁止**写成 `"""xxx"""` / `'''xxx'''`。Python 里那是一条 no-op 表达式语句而非注释，既不绑定对象、也不被 `help()` / IDE 识别
+- **说明性注释置于被说明对象上方**：变量/常量/字段的说明写在其上一行（Python 用 `#`），**禁止**写在下方或用悬空 `"""..."""` 充当变量文档
+- **`//` / `#` 的合法用途仅两类**：① 函数体内部的单行说明；② Shell / YAML / Dockerfile 等无块注释语法的语言。除此之外的类、方法、字段、文件头说明，一律用上表的块/文档注释
+- **Go 例外**：Go 的官方文档注释标准就是 `//`（`go doc` / pkg.go.dev 只识别这种形式，且要求以标识符名开头），因此 Go 的**声明级注释一律用 `//`**，即使多行也用连续 `//`，**不要**改成 `/* */`。仅**文件头注释块**用 `/* */`（见 [go.md](reference/go.md)）
 - **所有函数/方法**必须注释其功能，复杂逻辑需额外说明设计意图
 - **注释简洁扼要**：说明"做什么、为什么"，不重复代码本身已表达的信息，不把 git commit message 的内容复制到注释里
 - **禁止用注释声明跨文件重复**：注释中**禁止**出现"与 xxx.py 逐字一致""同 xxx.java 的实现"等声明。如果两处逻辑确实相同，应抽取为公共模块（import 复用）而非用注释标记重复 -- 注释引用另一个文件意味着存在应消除的耦合

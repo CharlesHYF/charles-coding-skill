@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# 文件作用：规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉。
+# 文件作用：规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉。
 # 创建日期：2026-08-03
-# 修改日期：2026-08-03
+# 修改日期：2026-08-31
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
@@ -45,7 +45,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/4] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/5] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -93,7 +93,7 @@ check_forbidden_chars() {
 
 # 检查二：源码文件头注释块(须含"作用"与"创建日期"两个标记)
 check_file_header() {
-	echo "[2/4] 检查源码文件头注释块..."
+	echo "[2/5] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
@@ -121,7 +121,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/4] 检查项目必需文件..."
+	echo "[3/5] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -181,7 +181,7 @@ check_required_files() {
 # 检查四：数据传输命名(Java / Kotlin / TS 的响应/请求类)
 # 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规
 check_naming() {
-	echo "[4/4] 检查数据传输命名(XxxReqVO / XxxRespVO)..."
+	echo "[4/5] 检查数据传输命名(XxxReqVO / XxxRespVO)..."
 
 	local file
 	while IFS= read -r file; do
@@ -208,12 +208,80 @@ check_naming() {
 	done < <(list_files)
 }
 
+# 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
+# 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
+check_comment_syntax() {
+	echo "[5/5] 检查注释语法(块注释 / docstring)..."
+
+	local file
+	while IFS= read -r file; do
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		# 一、C 系语言(含 Go/Vue/CSS)：文件头不得用 // 起头，必须用块注释
+		# Go 的声明级注释用 // 是标准写法，但文件头仍须 /* */,故一并纳入(只匹配含"文件作用"的行)
+		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
+			local slash_header
+			slash_header=$(grep -nE '^[[:space:]]*//.*文件作用' "${file}" || true)
+
+			if [ -n "${slash_header}" ]; then
+				report "${file} 文件头用了 // 单行注释(须改为块注释三段式；Go 用 /* */,其余用 /** */):"
+				echo "${slash_header}" | sed 's/^/         /'
+			fi
+		fi
+
+		# 二、C 系语言 + Go：/** 与正文挤在同一行(块注释须三段式：/** 独占首行、* 正文、*/ 独占末行)
+		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
+			local inline_block
+			inline_block=$(grep -nE '/\*\*[^*/].*\*/' "${file}" || true)
+
+			if [ -n "${inline_block}" ]; then
+				report "${file} 块注释挤在一行(/** 须独占首行，*/ 须独占末行):"
+				echo "${inline_block}" | sed 's/^/         /'
+			fi
+		fi
+
+		# 三、Python：文件头须用 docstring,不得用 # 写文件作用(# -*- coding -*- 除外)
+		if [[ "${file}" =~ \.py$ ]]; then
+			local hash_header
+			hash_header=$(grep -nE '^[[:space:]]*#.*文件作用' "${file}" || true)
+
+			if [ -n "${hash_header}" ]; then
+				report "${file} 文件头用了 # 单行注释(须改为 \"\"\" docstring 三段式):"
+				echo "${hash_header}" | sed 's/^/         /'
+			fi
+
+			# 四、Python：docstring 起始行不得带正文(含单行 \"\"\"摘要\"\"\" 与悬空字符串)
+			local inline_doc
+			inline_doc=$(grep -nE '^[[:space:]]*"""..*' "${file}" || true)
+
+			if [ -n "${inline_doc}" ]; then
+				report "${file} docstring 未三段式(\"\"\" 须独占首行、正文另起一行顶格、\"\"\" 独占末行):"
+				echo "${inline_doc}" | sed 's/^/         /'
+			fi
+
+			# 五、Python：docstring 统一双引号,禁止单引号三引号(PEP 257 / Ruff D300)
+			local single_doc
+			single_doc=$(grep -nE "^[[:space:]]*'''" "${file}" || true)
+
+			if [ -n "${single_doc}" ]; then
+				report "${file} 用了单引号三引号 docstring(须统一为 \"\"\"):"
+				echo "${single_doc}" | sed 's/^/         /'
+			fi
+		fi
+
+	done < <(list_files)
+}
+
 echo "=== charles-coding 规范校验 ==="
 
 check_forbidden_chars
 check_file_header
 check_required_files
 check_naming
+check_comment_syntax
 
 echo "==============================="
 

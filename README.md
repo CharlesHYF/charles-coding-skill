@@ -1,7 +1,7 @@
 <h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.2.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-3.3.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
@@ -121,7 +121,8 @@ cd <上述安装目录> && git pull origin main
 | 大括号 | 控制流/函数体必须用 `{}`，前后留空行 |
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
 | 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名 |
-| 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；说明性注释置于被说明对象上方 |
+| 注释语法 | **多行注释一律用块/文档注释**（Java/Kotlin/JS/TS `/** */`、Python `"""` docstring、Vue/HTML `<!-- -->`、SQL `/* */`），禁止连续多行 `//` / `#` 拼多行；单行说明才用 `//` / `#`。例外：Go 声明级注释按 Go doc 标准用 `//`；Shell/YAML/Dockerfile 无块注释语法只能用 `#`。由 `scripts/check.sh` 拦截 |
+| 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；Python docstring 统一双引号 `"""`，禁止单引号三引号，禁止把单行说明写成三引号字符串；说明性注释置于被说明对象上方 |
 | 禁用符号 | 禁止各类 Unicode 引号/破折号变体（弯引号 / CJK 角引号 / 全角引号 / em / en dash 等），统一用半角 `""` / `--`；由 `scripts/check.sh` 拦截 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织，每个 func 都要写测试用例 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，编码前先写文档 |

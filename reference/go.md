@@ -40,6 +40,12 @@
   - **禁止**用 `panic` 做正常的错误处理流程；只在程序无法继续（如初始化失败）时使用
   - 每个 goroutine 内部若可能 panic，必须 `defer recover()` 兜底并记录日志，避免一个 goroutine panic 拖垮整个进程
 
+## 注释规范（Go 是全局"块注释优先"规则的例外）
+- **声明级注释一律用 `//`，即使多行也用连续 `//`**：Go 的官方文档注释标准就是 `//`，`go doc` / pkg.go.dev / `golint` 只识别这种形式，写成 `/* */` 不被当作 doc comment。这是 [SKILL.md](../SKILL.md) "多行注释用块注释"规则的明确例外
+- **doc comment 以标识符名开头**：注释首个词必须是被注释的标识符名，如 `// GetUser 按 ID 查询用户，未命中返回 ErrUserNotFound。`
+- **仅文件头注释块用 `/* */`**：放在 `package` 声明之上，见下方模板
+- 函数体内部的临时说明同样用 `//`
+
 ## 文件头模板
 ```go
 /*
@@ -48,6 +54,10 @@
  * 修改日期：2026-08-01
  */
 package service
+
+// GetUser 按 ID 查询用户，未命中返回 ErrUserNotFound。
+// 调用方需自行处理 ctx 取消，本函数不吞 context 错误。
+func GetUser(ctx context.Context, id int64) (*model.User, error) {
 ```
 
 ## 测试

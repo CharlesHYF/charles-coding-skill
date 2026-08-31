@@ -24,7 +24,9 @@
 
 ## 分层示例（Compose + ViewModel）
 ```kotlin
-// UI 层：只做展示与用户交互转发，不写业务逻辑
+/**
+ * UI 层：只做展示与用户交互转发，不写业务逻辑
+ */
 @Composable
 fun UserProfileScreen(viewModel: UserProfileViewModel = hiltViewModel()) {
 	val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -35,7 +37,9 @@ fun UserProfileScreen(viewModel: UserProfileViewModel = hiltViewModel()) {
 	}
 }
 
-// ViewModel 层：持有 UI 状态，调用 Repository/UseCase，不持有 Context/View 引用
+/**
+ * ViewModel 层：持有 UI 状态，调用 Repository/UseCase，不持有 Context/View 引用
+ */
 @HiltViewModel
 class UserProfileViewModel @Inject constructor(
 	private val userRepository: UserRepository,
