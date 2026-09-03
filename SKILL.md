@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.6.0
+version: 3.7.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -132,6 +132,13 @@ author: Charles <w1400214654@outlook.com>
   for (Order o : orders) { process(o); }
   String n = order.getCustomerName();
   ```
+- **函数名 = 动词 + 名词，动词与注释里的动作词一一对应**：获取 `get`、读取 `read`/`load`、查询 `query`/`find`、创建 `create`、更新 `update`、删除 `delete`、校验 `validate`、核验 `verify`、检查 `check`、过滤 `filter`、转换 `convert`/`transform`、组装 `build`、解析 `parse`、保存 `save`、限制 `limit`、截取 `truncate`、降级 `fallback`、跳过 `skip`、计算 `calculate`、汇总 `summarize`、对比 `compare`、收集 `collect`、记录 `record`
+  - **同一动作全项目只用一个动词**：定了 `get` 就不要在别处写 `fetch` / `obtain` / `acquire`（把远程调用统一叫 `fetch` 也可以，但只能选一套）
+  - **命名与注释的中文说法对齐**：`buildVerifyResult` 对应注释"组装核验结果"，不要代码叫 build、注释写"拼装"
+- **禁止隐喻 / 口语命名**（与注释同一套要求）：`envelope`、`box`、`bag`、`stuff`、`thing`、`magic`、`doIt`、`doSomething`、`handleStuff` 一律不许；编号凑数名 `data1` / `item2` / `res3` 同样禁止。`scripts/check.sh` 检查四会拦截 `tmp` / `obj` / `foo` / `stuff` / `doIt` 这类占位名与编号名
+- **布尔用 `is` / `has` / `can` / `should` 前缀**（`isEnabled`、`hasPermission`），集合用复数（`orders`、`userIds`）；禁止 `flag`、`status1` 这类含糊名
+- **禁止拼音或拼音混拼**：`shangpinList`、`getYonghu`、`fapiaoNo` 一律改成英文业务词（`productList`、`getUser`、`invoiceNo`）
+- **同一概念全项目同名**：同一个东西不要 A 处 `productId`、B 处 `goodsId`、C 处 `itemId`
 
 ### 分层架构规范
 > 无论语言，所有后端项目**强制**遵循三层架构，Agent 不得把所有逻辑写在一个文件/一个函数里。
@@ -160,6 +167,8 @@ author: Charles <w1400214654@outlook.com>
   - **第一行：作用描述**。**一到两句话**说明本文件职责。**禁止加"文件作用："之类的前缀标签**，直接写描述；**句尾不加句号**
   - **第二行：创建日期**，格式 `创建日期：YYYY-MM-DD`
   - **第三行：修改日期**，格式 `修改日期：YYYY-MM-DD`，每次实质性修改更新为当前日期
+  - **创建日期只在新建文件时写入**，此后任何重构（含成批改注释/文案）都不得改动；已有文件缺创建日期时，能从 git 历史可靠确定就补，确定不了则留空并在交付说明里列出，**禁止编造日期**
+  - **修改日期只在本次真改了文件时更新**（只改注释/文案也算改），仅扫描未改动的文件不得更新，避免无意义 diff
   - **冒号必须是中文全角 `：`**，禁止半角 `:`（`scripts/check.sh` 会拦截）
   - **注释块位置**：有 `package`/`import` 的语言（Java/Kotlin）放在**类型声明上方**（Javadoc/KDoc），类上有注解则放在**注解之上**，而非文件物理第一行；其余语言放文件顶部；Python 的 `# -*- coding: utf-8 -*-` 仍置于最顶
 - 标准化模板（各语言按各自注释语法适配，示例见各分册"文件头模板"章节）：
@@ -201,6 +210,18 @@ author: Charles <w1400214654@outlook.com>
 - **禁止用注释声明跨文件重复**：注释中**禁止**出现"与 xxx.py 逐字一致""同 xxx.java 的实现"等声明。如果两处逻辑确实相同，应抽取为公共模块（import 复用）而非用注释标记重复 -- 注释引用另一个文件意味着存在应消除的耦合
 - **Python 文件额外要求**：文件首行声明 `# -*- coding: utf-8 -*-`，置于文件头注释块之前
 - **SQL 文件**：复杂查询或迁移脚本须在文件顶部注释目的及影响范围
+
+#### 注释措辞（用词与句式，所有语言通用；`scripts/check.sh` 检查七拦截）
+> 适用对象不止注释：**文件头、类/函数注释与 docstring、日志文案、异常消息、用户可见提示 / 状态 / 降级文案**，同一套措辞要求。目标是"第一次接触项目的中国开发者直接看懂"，不是写得生动。
+
+- **句式固定为"动作 + 对象 + 必要条件/目的"**，一句话说清做什么；禁止讲故事、拟人、比喻、口语化表达
+- **动作词全项目统一**：get 获取、read/load 读取、search/find 查询、create 创建/新增、update 修改/更新、delete 删除、validate 校验、verify 核验、check 检查、filter 过滤、map/transform 转换、build 组装、parse 解析、save 保存、limit 限制、truncate 截取、fallback/degrade 降级、skip 跳过、calculate 计算、summarize 汇总、compare 对比、collect 收集、record 记录。同一种行为只用同一个说法 -- `build payload` 一律写"组装结果"，不得在别处写成"拼装""打包"
+- **禁止隐喻黑话**：信封、盒子、塞进、塞给、拆出、压成、翻表、翻对账表、喂给、吐出、搬运、拿出来、留给下游、实抓终值、拼起来、灌进去、形状不符、收口、打平、摊平 -- 出现在源码注释里由 `scripts/check.sh` 直接 fail（词表与脚本同源）
+  - **人工复查词**（含义依项目而定，不机器拦截）：落盘、口径、兜底、水位、通道、打包、搬到 -- 非项目正式术语时须改写
+  - 例外：确属项目正式定义的业务术语（如物流项目的"包裹"）可保留原词
+- **禁止零信息注释**：只复述代码本身的注释（`// 获取 service`、`# 返回结果`）一律删除。该留下的是"为什么" -- 为何降级、为何限制数量、为何覆盖某字段、为何过滤某类数据，以及不直观的业务约束
+- **不做无谓中英混杂**：`正在 live 核验价格` 改为 `正在核验价格`；ASIN / MCP / BSR / Listing / payload 等技术名词保留原文即可
+- 正反示例与完整动作词对照表见 [reference/comments.md](reference/comments.md)
 
 ### Git 规范
 | 项目       | 规范                                      |

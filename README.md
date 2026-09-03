@@ -1,7 +1,7 @@
 <h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.6.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-3.7.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
@@ -122,13 +122,13 @@ cd <上述安装目录> && git pull origin main
 bash tests/run_tests.sh
 ```
 
-`check.sh` 回归测试：用固定 fixture 断言六项检查该报的都报（23 项断言）、合规文件零误报，防止规则改动静默退化。
+`check.sh` 回归测试：用固定 fixture 断言七项检查该报的都报（27 项断言）、合规文件零误报，防止规则改动静默退化。
 
 ```bash
 bash tests/check_consistency.sh
 ```
 
-多处同源规则一致性自检：版本号（SKILL.md vs README badge）、注释篇幅上限、lint 范围串、检查项编号、各分册文件头模板、仓库自身禁用字符，共 20 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
+多处同源规则一致性自检：版本号（SKILL.md vs README badge）、注释篇幅上限、lint 范围串、检查项编号、各分册文件头模板、注释黑话词表、仓库自身禁用字符，共 22 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
 
 ## 核心约定（速览）
 | 项目 | 规范 |
@@ -137,10 +137,11 @@ bash tests/check_consistency.sh
 | 行尾 | 统一 LF |
 | 大括号 | 控制流/函数体必须用 `{}`，前后留空行 |
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
-| 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名 |
+| 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名；函数名 = 动词 + 名词，动词与注释动作词一一对应且全项目统一；禁止隐喻/口语命名（`stuff`/`doIt`）、编号凑数名（`data1`）、拼音混拼（`getYonghu`）；由 `scripts/check.sh` 拦截 |
 | 文件头 | 三行：**第一行直接写作用描述**（一到两句话，**无前缀标签、句尾不加句号**），第二三行 `创建日期：` / `修改日期：`，**冒号必须中文全角**；由 `scripts/check.sh` 拦截 |
 | 注释篇幅 | 正文默认 1-2 行，**硬上限 3 行**（`@param` 等标签行不计入）；背景推演、方案权衡、故障复盘写进 `docs/modules/` 而非注释；由 `scripts/check.sh` 拦截 |
 | 注释语法 | **多行注释一律用块/文档注释**（Java/Kotlin/JS/TS `/** */`、Python `"""` docstring、Vue/HTML `<!-- -->`、SQL `/* */`），禁止连续多行 `//` / `#` 拼多行；单行说明才用 `//` / `#`。例外：Go 声明级注释按 Go doc 标准用 `//`；Shell/YAML/Dockerfile 无块注释语法只能用 `#`。由 `scripts/check.sh` 拦截 |
+| 注释措辞 | **动作 + 对象 + 必要条件**一句话说清；动作词全项目统一（获取/查询/校验/组装/降级 等）；**禁止隐喻黑话**（信封/盒子/塞进/压成/留给下游 等，`scripts/check.sh` 拦截）；删掉只复述代码的零信息注释；日志与用户可见文案同一套要求 |
 | 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；Python docstring 统一双引号 `"""`，禁止单引号三引号，禁止把单行说明写成三引号字符串；说明性注释置于被说明对象上方 |
 | 禁用符号 | 禁止各类 Unicode 引号/破折号变体（弯引号 / CJK 角引号 / 全角引号 / em / en dash 等），统一用半角 `""` / `--`；由 `scripts/check.sh` 拦截 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织，每个 func 都要写测试用例 |
@@ -149,7 +150,7 @@ bash tests/check_consistency.sh
 | 解耦 | 非必要不耦合，禁止循环依赖，重复代码必须抽离 |
 | Docker | 强制 compose，`./volumes/` 持久化，东八区 |
 | 测试 | 交付必须附带 `test_cases/`，确保通过；`scripts/test.sh` 零测试判失败（`ALLOW_NO_TESTS=1` 逃生舱） |
-| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint`（禁用字符/文件头/注释语法/注释篇幅/必需文件/命名）+ 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
+| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint`（禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名）+ 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干 |
 | .gitignore | 必须覆盖 IDE（`.idea/`）、AI 工具（`.claude/` 等）、OS 残留 |

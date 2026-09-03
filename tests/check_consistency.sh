@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 多处同源规则一致性自检 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，本脚本断言关键取值互相咬合，防止改一处漏三处
 # 创建日期：2026-08-31
-# 修改日期：2026-08-31
+# 修改日期：2026-09-03
 
 set -uo pipefail
 
@@ -64,7 +64,7 @@ else
 fi
 
 # 三、lint 范围描述串：四处必须逐字一致
-LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/必需文件/命名"
+LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名"
 
 expect_in_file "${CHECK_SH}" "${LINT_SCOPE}" "lint 范围串在 check.sh"
 expect_in_file "${AGENTS}" "${LINT_SCOPE}" "lint 范围串在 AGENTS.md"
@@ -106,6 +106,30 @@ HEADER_FILES=(
 for header_file in "${HEADER_FILES[@]}"; do
 	expect_in_file "${header_file}" "创建日期：" "文件头模板(全角冒号)在 ${header_file}"
 done
+
+# 七、注释黑话词表：check.sh 里的词表(码点书写)必须逐词出现在 comments.md 的禁用词清单里
+JARGON_WORDS=$(grep -m1 '^FORBIDDEN_JARGON_PATTERN=' "${CHECK_SH}" | cut -d"'" -f2 \
+	| perl -CSD -pe 's/\\x\{([0-9a-f]+)\}/chr(hex($1))/ge' | tr '|' '\n')
+JARGON_COUNT=$(printf '%s\n' "${JARGON_WORDS}" | grep -c . | tr -d ' ')
+JARGON_MISS=""
+
+while IFS= read -r jargon_word; do
+
+	if [ -z "${jargon_word}" ]; then
+		continue
+	fi
+
+	if ! grep -qF -- "${jargon_word}" "reference/comments.md"; then
+		JARGON_MISS="${JARGON_MISS} ${jargon_word}"
+	fi
+
+done <<< "${JARGON_WORDS}"
+
+if [ "${JARGON_COUNT}" -gt 0 ] && [ -z "${JARGON_MISS}" ]; then
+	pass "注释黑话词表与 comments.md 同源(${JARGON_COUNT} 词)"
+else
+	fail "注释黑话词表与 comments.md 不同源，缺失:${JARGON_MISS}"
+fi
 
 # 六、仓库自身不得含被禁字符(与 check.sh 检查一同源的三条 perl 规则)
 FORBIDDEN_HITS=$(git ls-files | grep -vE '\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tar|jar|woff2?|ttf|eot|lock)$' | while IFS= read -r tracked_file; do

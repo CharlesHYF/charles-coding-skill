@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉
+# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉
 # 创建日期：2026-08-03
-# 修改日期：2026-08-31
+# 修改日期：2026-09-03
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
@@ -17,6 +17,15 @@ SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh|html|css|scss)$'
 
 # 文本扫描排除的二进制/资源扩展名(禁用字符检查跳过这些)
 BINARY_EXT_REGEX='\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tar|jar|class|woff2?|ttf|eot|mp[34]|mov|lock)$'
+
+# 无意义 / 口语变量名(占位名)，见 SKILL.md "变量与函数命名规范"
+MEANINGLESS_NAMES='tmp|obj|foo|baz|stuff|thing'
+
+# 编号凑数命名(data1 / item2 之类)
+NUMBERED_NAMES='(data|val|str|num|item|list|arr|res|req)[0-9]+'
+
+# 口语函数名(说了等于没说)
+PLACEHOLDER_FUNCS='doIt|doSomething|doStuff|handleStuff|processStuff|handleThing|do_it|do_something|do_stuff|handle_stuff|process_stuff'
 
 # 必需的项目级文件清单
 REQUIRED_FILES=(
@@ -48,7 +57,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/6] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/7] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -97,7 +106,7 @@ check_forbidden_chars() {
 # 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
 # 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
-	echo "[2/6] 检查源码文件头注释块..."
+	echo "[2/7] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
@@ -176,7 +185,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/6] 检查项目必需文件..."
+	echo "[3/7] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -233,10 +242,10 @@ check_required_files() {
 	fi
 }
 
-# 检查四：数据传输命名(Java / Kotlin / TS 的响应/请求类)
-# 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规
+# 检查四：命名(数据传输类命名 + 变量/函数的无意义命名)
+# 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规；tmp / obj / doIt 之类占位名一律拦截
 check_naming() {
-	echo "[4/6] 检查数据传输命名(XxxReqVO / XxxRespVO)..."
+	echo "[4/7] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
 
 	local file
 	while IFS= read -r file; do
@@ -261,12 +270,34 @@ check_naming() {
 		fi
 
 	done < <(list_files)
+
+	# 无意义 / 口语命名：声明处的占位变量名、编号凑数名、口语函数名
+	# 只匹配声明与赋值形态(let/const/var/val 声明、:= 、= 赋值、函数定义)，避免匹配到正常业务标识符的子串
+	while IFS= read -r file; do
+
+		if [[ ! "${file}" =~ ${SOURCE_EXT_REGEX} ]]; then
+			continue
+		fi
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		local bad_name
+		bad_name=$(grep -nE "(\b(let|const|var|val)[[:space:]]+(${MEANINGLESS_NAMES}|${NUMBERED_NAMES})\b)|(\b(${MEANINGLESS_NAMES}|${NUMBERED_NAMES})[[:space:]]*(:=|=[^=]))|(\b(func|function|def|fun)[[:space:]]+(${PLACEHOLDER_FUNCS})\b)|(\b(${PLACEHOLDER_FUNCS})[[:space:]]*\()" "${file}" || true)
+
+		if [ -n "${bad_name}" ]; then
+			report "${file} 存在无意义/口语命名(改成见名知义的业务命名，动词按 SKILL.md 动作词表统一):"
+			echo "${bad_name}" | sed 's/^/         /'
+		fi
+
+	done < <(list_files)
 }
 
 # 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
 # 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
 check_comment_syntax() {
-	echo "[5/6] 检查注释语法(块注释 / docstring)..."
+	echo "[5/7] 检查注释语法(块注释 / docstring)..."
 
 	local file
 	while IFS= read -r file; do
@@ -336,7 +367,7 @@ MAX_COMMENT_BODY_LINES=3
 # 检查六：注释篇幅(正文默认 1-2 行,硬上限 MAX_COMMENT_BODY_LINES 行)
 # 标签行(@param / @return / :param 等)不计入正文,避免多参数 Javadoc 误报
 check_comment_length() {
-	echo "[6/6] 检查注释篇幅(正文不超过 ${MAX_COMMENT_BODY_LINES} 行)..."
+	echo "[6/7] 检查注释篇幅(正文不超过 ${MAX_COMMENT_BODY_LINES} 行)..."
 
 	local file
 	while IFS= read -r file; do
@@ -401,6 +432,58 @@ check_comment_length() {
 	done < <(list_files)
 }
 
+# 注释黑话词表：AI 味隐喻/口语表达，一律改写为工程动作词(获取 / 组装 / 校验 / 降级 等)
+# 用 perl \x{} 码点书写规则，确保本脚本自身不含这些字面量，无需自我排除；词表与 reference/comments.md 同源
+FORBIDDEN_JARGON_PATTERN='\x{4fe1}\x{5c01}|\x{76d2}\x{5b50}|\x{585e}\x{8fdb}|\x{585e}\x{7ed9}|\x{62c6}\x{51fa}|\x{538b}\x{6210}|\x{7ffb}\x{8868}|\x{7ffb}\x{5bf9}\x{8d26}\x{8868}|\x{5582}\x{7ed9}|\x{5410}\x{51fa}|\x{642c}\x{8fd0}|\x{62ff}\x{51fa}\x{6765}|\x{7559}\x{7ed9}\x{4e0b}\x{6e38}|\x{5b9e}\x{6293}\x{7ec8}\x{503c}|\x{62fc}\x{8d77}\x{6765}|\x{704c}\x{8fdb}\x{53bb}|\x{5f62}\x{72b6}\x{4e0d}\x{7b26}|\x{6536}\x{53e3}|\x{6253}\x{5e73}|\x{644a}\x{5e73}'
+
+# 抽取文件里的注释行(块注释 / docstring / 行注释 / 行尾 // 注释)，输出 "行号<TAB>原文"
+# 只取注释，避免把业务字符串(如商品名里的正常词)误判为黑话
+extract_comment_lines() {
+	local file="$1"
+
+	awk '
+		function trim(s) { gsub(/^[ \t]+|[ \t]+$/, "", s); return s }
+		{
+			line = trim($0)
+
+			if (inblk) { print NR "\t" $0; if (line ~ /\*\//) { inblk = 0 }; next }
+			if (inhtml) { print NR "\t" $0; if (line ~ /-->/) { inhtml = 0 }; next }
+			if (indoc) { if (line ~ /"""/) { indoc = 0; next } print NR "\t" $0; next }
+			if (line ~ /^\/\*/) { print NR "\t" $0; if (line !~ /\*\//) { inblk = 1 }; next }
+			if (line ~ /^<!--/) { print NR "\t" $0; if (line !~ /-->/) { inhtml = 1 }; next }
+			if (line == "\"\"\"") { indoc = 1; next }
+			if (line ~ /^(\/\/|#|--)/) { print NR "\t" $0; next }
+			if (line ~ /\/\//) { print NR "\t" $0; next }
+		}
+	' "${file}"
+}
+
+# 检查七：注释黑话(隐喻 / 口语表达)，词表见上方 FORBIDDEN_JARGON_PATTERN，一律改写为工程动作词
+check_comment_jargon() {
+	echo "[7/7] 检查注释黑话(隐喻 / 口语表达)..."
+
+	local file
+	while IFS= read -r file; do
+
+		if [[ ! "${file}" =~ ${SOURCE_EXT_REGEX} ]]; then
+			continue
+		fi
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		local hits
+		hits=$(extract_comment_lines "${file}" | JARGON="${FORBIDDEN_JARGON_PATTERN}" perl -CSD -ne 'BEGIN { $re = qr/$ENV{JARGON}/ } if (/$re/) { s/^(\d+)\t/L$1: /; print }')
+
+		if [ -n "${hits}" ]; then
+			report "${file} 注释含隐喻/口语表达(改用工程动作词：获取 / 组装 / 校验 / 降级 等，词表见 comments.md):"
+			echo "${hits}" | sed 's/^/         /'
+		fi
+
+	done < <(list_files)
+}
+
 echo "=== charles-coding 规范校验 ==="
 
 check_forbidden_chars
@@ -409,6 +492,7 @@ check_required_files
 check_naming
 check_comment_syntax
 check_comment_length
+check_comment_jargon
 
 echo "==============================="
 

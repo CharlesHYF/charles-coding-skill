@@ -47,7 +47,7 @@ docker-down-v: ## 按 ENV 停止容器并删除数据卷（默认 dev，可 ENV=
 docker-clean: ## 按 ENV 彻底清理（停容器+删卷+删本地镜像+清孤儿容器，仅本项目，不影响其它项目）
 	$(COMPOSE) down -v --rmi local --remove-orphans
 
-lint: ## 规范校验（禁用字符/文件头/注释语法/注释篇幅/必需文件/命名，会 fail）
+lint: ## 规范校验（禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名，会 fail）
 	bash scripts/check.sh
 
 check: ## 运行所有测试

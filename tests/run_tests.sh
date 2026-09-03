@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# check.sh 回归测试 -- 用固定 fixture 断言六项检查该报的都报、不该报的不报，防止规则改动静默退化
+# check.sh 回归测试 -- 用固定 fixture 断言七项检查该报的都报、不该报的不报，防止规则改动静默退化
 # 创建日期：2026-08-31
-# 修改日期：2026-08-31
+# 修改日期：2026-09-03
 
 set -uo pipefail
 
@@ -119,6 +119,10 @@ export interface OrderSaveReqVO {
 export interface OrderRespVO {
 	orderId: number;
 }
+
+export const barChartHeight = 10;
+export const orderList: OrderRespVO[] = [];
+export const response1 = "ok";
 EOF
 
 cat > "${GOOD_DIR}/good_service.py" <<'EOF'
@@ -385,6 +389,69 @@ def recover() -> None:
     return None
 EOF
 
+cat > "${BAD_DIR}/BadName.ts" <<'EOF'
+/**
+ * 命名反例 -- 占位名与口语函数名
+ * 创建日期：2026-09-03
+ * 修改日期：2026-09-03
+ */
+const tmp = 1;
+let item1 = 2;
+
+export function doIt(): number {
+	return tmp + item1;
+}
+EOF
+
+cat > "${BAD_DIR}/bad_name.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+命名反例 -- 占位变量与口语函数名
+创建日期：2026-09-03
+修改日期：2026-09-03
+"""
+
+obj = {}
+
+
+def do_something() -> None:
+    return None
+EOF
+
+cat > "${BAD_DIR}/Jargon.java" <<'EOF'
+/**
+ * 订单服务 -- 承载下单逻辑
+ * 创建日期：2026-09-03
+ * 修改日期：2026-09-03
+ */
+public class Jargon {
+
+	private int count = 1; // 把核验结果压成下游要的一行
+
+	/**
+	 * 从 MCP 信封里拆出商品数据
+	 */
+	private void run() {
+	}
+}
+EOF
+
+cat > "${BAD_DIR}/jargon.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+订单服务 -- 承载下单逻辑
+创建日期：2026-09-03
+修改日期：2026-09-03
+"""
+
+
+def run() -> None:
+    """
+    把上游数据灌进去，形状不符时丢弃
+    """
+    return None
+EOF
+
 cat > "${BAD_DIR}/BadVO.ts" <<'EOF'
 /**
  * 裸 VO 命名的类型定义
@@ -415,6 +482,10 @@ expect_contains "${CHECK_OUTPUT}" "LongDoc.java 注释块正文超过" "检查�
 expect_contains "${CHECK_OUTPUT}" "longrun.go 注释块正文超过" "检查六:连续单行注释超长"
 expect_contains "${CHECK_OUTPUT}" "longdoc.py docstring 正文超过" "检查六:docstring超长"
 expect_contains "${CHECK_OUTPUT}" "BadVO.ts 存在裸 VO 命名" "检查四:裸VO"
+expect_contains "${CHECK_OUTPUT}" "BadName.ts 存在无意义/口语命名" "检查四:TS 占位名与口语函数名"
+expect_contains "${CHECK_OUTPUT}" "bad_name.py 存在无意义/口语命名" "检查四:Python 占位名与口语函数名"
+expect_contains "${CHECK_OUTPUT}" "Jargon.java 注释含隐喻/口语表达" "检查七:Java 注释黑话(块注释 + 行尾注释)"
+expect_contains "${CHECK_OUTPUT}" "jargon.py 注释含隐喻/口语表达" "检查七:Python docstring 黑话"
 
 if [ "${CHECK_EXIT}" -ne 0 ]; then
 	pass "违规项目退出码非 0"
