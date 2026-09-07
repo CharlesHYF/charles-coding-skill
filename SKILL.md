@@ -1,7 +1,7 @@
 ---
 name: charles-coding
 description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.7.0
+version: 3.8.0
 author: Charles <w1400214654@outlook.com>
 ---
 
@@ -206,6 +206,11 @@ author: Charles <w1400214654@outlook.com>
 - **注释篇幅硬上限：正文默认 1-2 行，任何注释块正文不得超过 3 行**（`scripts/check.sh` 会拦截，`@param` / `@return` 等标签行不计入）。注释是给读代码的人一句话点明"做什么、为什么"，**不是设计文档**
   - **禁止**在注释里写：背景推演、方案权衡、为什么不选另一种做法、运行时环境分析、故障复盘、待办计划。这些属于 `docs/modules/<系统模块>/<模块>.md` 或 git commit message
   - 判据：如果一段注释删掉后，读代码的人**仍能看懂这个函数做什么**，那它就该删或压缩。正反示例见 [reference/comments.md](reference/comments.md)
+- **一条注释一行写完，禁止把一句话折断换行**：换行只能发生在**一句话说完之后**，行尾出现逗号、顿号、分号即说明这句话没写完就折了行（`scripts/check.sh` 检查六拦截）
+  - 写不下不是折行的理由 -- 那说明这条注释太长，该删减，或改成"每行一句、各自完整"
+  - 多行注释的每一行都必须自成完整语义，读者读到行尾不需要接着下一行才明白
+  - 错误：正文首行以顿号收尾，把字段清单折到第二行 `... 本次追问请求、目标阶段 workspace、` + `会话句柄，以及该阶段已确认 artifact 的 id`
+  - 正确：`三个意图 Handler 共用的只读上下文`，字段清单写在各字段上一行。示例见 [reference/comments.md](reference/comments.md)
 - **注释简洁扼要**：说明"做什么、为什么"，不重复代码本身已表达的信息，不把 git commit message 的内容复制到注释里
 - **禁止用注释声明跨文件重复**：注释中**禁止**出现"与 xxx.py 逐字一致""同 xxx.java 的实现"等声明。如果两处逻辑确实相同，应抽取为公共模块（import 复用）而非用注释标记重复 -- 注释引用另一个文件意味着存在应消除的耦合
 - **Python 文件额外要求**：文件首行声明 `# -*- coding: utf-8 -*-`，置于文件头注释块之前

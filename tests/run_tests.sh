@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check.sh 回归测试 -- 用固定 fixture 断言七项检查该报的都报、不该报的不报，防止规则改动静默退化
 # 创建日期：2026-08-31
-# 修改日期：2026-09-03
+# 修改日期：2026-09-07
 
 set -uo pipefail
 
@@ -123,6 +123,12 @@ export interface OrderRespVO {
 export const barChartHeight = 10;
 export const orderList: OrderRespVO[] = [];
 export const response1 = "ok";
+
+// 图片地址表 -- URL 里的双斜杠不得被当成注释,行尾逗号也不算句子折断
+export const orderImages = {
+	hero: "https://example.com/hero.png",
+	detail: "https://example.com/detail.png",
+};
 EOF
 
 cat > "${GOOD_DIR}/good_service.py" <<'EOF'
@@ -192,6 +198,11 @@ cat > "${GOOD_DIR}/good_style.css" <<'EOF'
  * 创建日期：2026-08-31
  * 修改日期：2026-08-31
  */
+:root {
+	--order-bg: #ffffff;
+	--order-line: #d2d2d7;
+}
+
 .order-list {
 	color: red;
 }
@@ -389,6 +400,39 @@ def recover() -> None:
     return None
 EOF
 
+cat > "${BAD_DIR}/BrokenLine.java" <<'EOF'
+/**
+ * 追问上下文校验
+ * 创建日期：2026-09-07
+ * 修改日期：2026-09-07
+ */
+public class BrokenLine {
+
+	/**
+	 * 校验追问请求的阶段号与会话状态，
+	 * 不合法时抛 IllegalStateException
+	 */
+	private void verify() {
+	}
+}
+EOF
+
+cat > "${BAD_DIR}/broken_line.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+追问上下文定义
+创建日期：2026-09-07
+修改日期：2026-09-07
+"""
+
+
+class FollowUpContext:
+    """
+    三个意图 Handler 共用的只读上下文: 本次追问请求、目标阶段 workspace、
+    会话句柄, 以及该阶段已确认 artifact 的 id
+    """
+EOF
+
 cat > "${BAD_DIR}/BadName.ts" <<'EOF'
 /**
  * 命名反例 -- 占位名与口语函数名
@@ -481,6 +525,8 @@ expect_contains "${CHECK_OUTPUT}" "single_quote.py 用了单引号三引号" "�
 expect_contains "${CHECK_OUTPUT}" "LongDoc.java 注释块正文超过" "检查六:Javadoc超长"
 expect_contains "${CHECK_OUTPUT}" "longrun.go 注释块正文超过" "检查六:连续单行注释超长"
 expect_contains "${CHECK_OUTPUT}" "longdoc.py docstring 正文超过" "检查六:docstring超长"
+expect_contains "${CHECK_OUTPUT}" "BrokenLine.java 注释正文句子被折断" "检查六:Javadoc 句子折断"
+expect_contains "${CHECK_OUTPUT}" "broken_line.py 注释正文句子被折断" "检查六:docstring 句子折断"
 expect_contains "${CHECK_OUTPUT}" "BadVO.ts 存在裸 VO 命名" "检查四:裸VO"
 expect_contains "${CHECK_OUTPUT}" "BadName.ts 存在无意义/口语命名" "检查四:TS 占位名与口语函数名"
 expect_contains "${CHECK_OUTPUT}" "bad_name.py 存在无意义/口语命名" "检查四:Python 占位名与口语函数名"
