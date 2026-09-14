@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 多处同源规则一致性自检 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，本脚本断言关键取值互相咬合，防止改一处漏三处
 # 创建日期：2026-08-31
-# 修改日期：2026-09-03
+# 修改日期：2026-09-14
 
 set -uo pipefail
 
@@ -13,6 +13,9 @@ README="README.md"
 AGENTS="reference/project-template/AGENTS.md"
 MAKEFILE="reference/project-template/Makefile"
 CHECK_SH="reference/project-template/scripts/check.sh"
+CODE_ORGANIZATION="reference/code-organization.md"
+CHINESE_DEVELOPER="reference/chinese-developer.md"
+VUE="reference/vue.md"
 
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -42,8 +45,8 @@ expect_in_file() {
 
 echo "=== 一致性自检 ==="
 
-# 一、版本号：SKILL.md frontmatter 与 README badge 必须一致
-SKILL_VERSION=$(grep -m1 '^version:' "${SKILL}" | awk '{print $2}')
+# 一、版本号：SKILL.md metadata 与 README badge 必须一致
+SKILL_VERSION=$(grep -m1 '^[[:space:]]*version:' "${SKILL}" | awk '{print $2}' | tr -d '"')
 README_VERSION=$(grep -oE 'version-[0-9.]+-blue' "${README}" | head -1 | sed 's/version-//;s/-blue//')
 
 if [ -n "${SKILL_VERSION}" ] && [ "${SKILL_VERSION}" = "${README_VERSION}" ]; then
@@ -71,7 +74,16 @@ expect_in_file "${AGENTS}" "${LINT_SCOPE}" "lint 范围串在 AGENTS.md"
 expect_in_file "${MAKEFILE}" "${LINT_SCOPE}" "lint 范围串在 Makefile"
 expect_in_file "${README}" "${LINT_SCOPE}" "lint 范围串在 README.md"
 
-# 四、检查项编号：check.sh 里 [k/N] 的 N 必须统一，且 k 覆盖 1..N 不重不漏
+# 四、专项规范必须可发现，项目模板必须内联关键边界
+expect_in_file "${SKILL}" "reference/code-organization.md" "代码编写与组织分册已接入 SKILL.md"
+expect_in_file "${SKILL}" "reference/chinese-developer.md" "开发交流分册已接入 SKILL.md"
+expect_in_file "${CODE_ORGANIZATION}" "所有新写和修改的源码都必须遵守本规范" "代码编写与组织规范默认适用"
+expect_in_file "${AGENTS}" "## 6. 代码编写与组织规范" "AGENTS.md 已内联代码编写与组织规则"
+expect_in_file "${CHINESE_DEVELOPER}" "keep-coding-instructions: true" "Output Style 保留编码指令"
+expect_in_file "${CHINESE_DEVELOPER}" "一等公民" "开发交流分册包含抽象表达改写"
+expect_in_file "${VUE}" '### `<script setup>` 内部顺序' "Vue 分册包含脚本排列顺序"
+
+# 五、检查项编号：check.sh 里 [k/N] 的 N 必须统一，且 k 覆盖 1..N 不重不漏
 LABEL_TOTALS=$(grep -oE '\[[0-9]+/[0-9]+\]' "${CHECK_SH}" | cut -d/ -f2 | tr -d ']' | sort -u)
 LABEL_TOTAL_COUNT=$(echo "${LABEL_TOTALS}" | wc -l | tr -d ' ')
 
@@ -88,7 +100,7 @@ else
 	fi
 fi
 
-# 五、文件头模板：SKILL.md / AGENTS.md 与各语言分册都必须含全角冒号的日期模板
+# 六、文件头模板：SKILL.md / AGENTS.md 与各语言分册都必须含全角冒号的日期模板
 HEADER_FILES=(
 	"${SKILL}"
 	"${AGENTS}"
@@ -101,6 +113,8 @@ HEADER_FILES=(
 	"reference/vue.md"
 	"reference/sql.md"
 	"reference/comments.md"
+	"${CODE_ORGANIZATION}"
+	"${CHINESE_DEVELOPER}"
 )
 
 for header_file in "${HEADER_FILES[@]}"; do
@@ -131,7 +145,7 @@ else
 	fail "注释黑话词表与 comments.md 不同源，缺失:${JARGON_MISS}"
 fi
 
-# 六、仓库自身不得含被禁字符(与 check.sh 检查一同源的三条 perl 规则)
+# 八、仓库自身不得含被禁字符(与 check.sh 检查一同源的三条 perl 规则)
 FORBIDDEN_HITS=$(git ls-files | grep -vE '\.(png|jpe?g|gif|webp|ico|svg|pdf|zip|gz|tar|jar|woff2?|ttf|eot|lock)$' | while IFS= read -r tracked_file; do
 	perl -CSD -ne 'print "'"${tracked_file}"' L$.: $_" if /[\x{2018}\x{2019}\x{201c}\x{201d}\x{300c}-\x{300f}\x{ff02}\x{ff07}\x{2010}-\x{2015}\x{2212}\x{2e3a}\x{2e3b}\x{ff0d}\x{1F300}-\x{1FAFF}\x{1F1E6}-\x{1F1FF}\x{FE0F}]/' "${tracked_file}" 2>/dev/null
 done)

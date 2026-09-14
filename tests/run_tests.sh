@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check.sh 回归测试 -- 用固定 fixture 断言七项检查该报的都报、不该报的不报，防止规则改动静默退化
 # 创建日期：2026-08-31
-# 修改日期：2026-09-07
+# 修改日期：2026-09-14
 
 set -uo pipefail
 
@@ -80,7 +80,7 @@ run_check() {
 }
 
 # ============================================================
-# 场景一：全部合规文件，六项检查应零违规、退出码 0
+# 场景一：全部合规文件，七项检查应零违规、退出码 0
 # ============================================================
 echo "=== 场景一：合规项目应全绿 ==="
 GOOD_DIR="$(mktemp -d)"
@@ -208,6 +208,16 @@ cat > "${GOOD_DIR}/good_style.css" <<'EOF'
 }
 EOF
 
+cat > "${GOOD_DIR}/UnknownCreateDate.java" <<'EOF'
+/**
+ * 无法从历史确认创建日期的兼容示例
+ * 创建日期：
+ * 修改日期：2026-09-14
+ */
+public class UnknownCreateDate {
+}
+EOF
+
 # 头部合规,正文第 100 行附近含"创建日期: "半角冒号的 UI 字符串 -- 内容检查限定前 80 行后不应误报
 {
 	printf '/**\n * 报表导出服务\n * 创建日期：2026-08-31\n * 修改日期：2026-08-31\n */\npublic class GoodReport {\n'
@@ -286,6 +296,16 @@ cat > "${BAD_DIR}/NoModified.java" <<'EOF'
  * 创建日期：2026-08-31
  */
 public class NoModified {
+}
+EOF
+
+cat > "${BAD_DIR}/BadDate.java" <<'EOF'
+/**
+ * 日期格式错误的文件
+ * 创建日期：2026/08/31
+ * 修改日期：2026-13-40
+ */
+public class BadDate {
 }
 EOF
 
@@ -517,6 +537,8 @@ expect_contains "${CHECK_OUTPUT}" "Legacy.java 文件头带了前缀标签" "检
 expect_contains "${CHECK_OUTPUT}" "Period.java 文件头作用描述行结尾带了句号" "检查二:描述句号"
 expect_contains "${CHECK_OUTPUT}" "NoDesc.java 缺少文件头作用描述行" "检查二:缺描述行"
 expect_contains "${CHECK_OUTPUT}" 'NoModified.java 缺少"修改日期："' "检查二:缺修改日期"
+expect_contains "${CHECK_OUTPUT}" "BadDate.java 创建日期格式错误" "检查二:创建日期格式"
+expect_contains "${CHECK_OUTPUT}" "BadDate.java 修改日期格式错误" "检查二:修改日期格式"
 expect_contains "${CHECK_OUTPUT}" "SlashHeader.ts 文件头用了 // 单行注释" "检查五:C系文件头用单行注释"
 expect_contains "${CHECK_OUTPUT}" "InlineBlock.java 块注释挤在一行" "检查五:块注释挤行"
 expect_contains "${CHECK_OUTPUT}" "hash_header.py 文件头用了 # 单行注释" "检查五:Python文件头用井号"

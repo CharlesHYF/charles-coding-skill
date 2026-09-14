@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名)变成会 fail 的检查，交付前由 make check 强制执行，不依赖 Agent 自觉
 # 创建日期：2026-08-03
-# 修改日期：2026-09-07
+# 修改日期：2026-09-14
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
@@ -11,6 +11,9 @@ VIOLATIONS=0
 
 # 文件头内容检查(半角冒号/前缀标签/单行注释误用)只扫前 80 行:足够覆盖 Java/Kotlin 在 import 后的类注释,又避开正文里 UI 字符串的误报
 HEADER_SCAN_LINES=80
+
+# 已知日期必须使用 YYYY-MM-DD，并限制月份与日期的基本范围
+HEADER_DATE_REGEX='[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])'
 
 # 源码扩展名白名单：只有这些文件强制校验文件头注释块
 SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh|html|css|scss)$'
@@ -103,6 +106,13 @@ check_forbidden_chars() {
 	done < <(list_files)
 }
 
+# 剥离文件头日期行两侧的注释符号
+normalize_header_content() {
+	local content="$1"
+
+	printf '%s' "${content}" | sed -E 's@^[[:space:]]*(/\*+|\*+/?|//+|#+|--+|<!--+|""")?[[:space:]]*@@' | sed -E 's@[[:space:]]*(\*/|-->|""")?[[:space:]]*$@@'
+}
+
 # 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
 # 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
@@ -139,16 +149,33 @@ check_file_header() {
 		fi
 
 		# 锚点:创建日期(全角冒号)必须存在
-		local create_line
-		create_line=$(grep -nE '创建日期：' "${file}" | head -1 | cut -d: -f1)
+		local create_line create_raw create_text
+		create_line=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -nE '创建日期：' | head -1 | cut -d: -f1)
 
 		if [ -z "${create_line}" ]; then
 			report "${file} 缺少\"创建日期：\"(源码文件头注释块;若已写请确认冒号为中文全角)"
 			continue
 		fi
 
-		if ! grep -qE '修改日期：' "${file}"; then
+		create_raw=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -m1 '创建日期：')
+		create_text=$(normalize_header_content "${create_raw}")
+
+		# 历史文件无法可靠确认创建日期时允许留空；已有值必须严格符合格式
+		if [ "${create_text}" != "创建日期：" ] && ! printf '%s' "${create_text}" | grep -qE "^创建日期：${HEADER_DATE_REGEX}$"; then
+			report "${file} 创建日期格式错误(已知日期须为 YYYY-MM-DD): ${create_text}"
+		fi
+
+		local modified_raw modified_text
+		modified_raw=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -m1 '修改日期：' || true)
+
+		if [ -z "${modified_raw}" ]; then
 			report "${file} 缺少\"修改日期：\"(源码文件头注释块;若已写请确认冒号为中文全角)"
+		else
+			modified_text=$(normalize_header_content "${modified_raw}")
+
+			if ! printf '%s' "${modified_text}" | grep -qE "^修改日期：${HEADER_DATE_REGEX}$"; then
+				report "${file} 修改日期格式错误(须为 YYYY-MM-DD): ${modified_text}"
+			fi
 		fi
 
 		# 作用描述行:从"创建日期"往上回溯,跳过空行与 @author 等标签行,首个有实质内容的行即描述行
@@ -159,7 +186,7 @@ check_file_header() {
 		while [ "${probe}" -ge 1 ]; do
 			desc_raw=$(sed -n "${probe}p" "${file}")
 			# 剥掉行首注释符号(空白 / * // # -- <!-- 三引号)与行尾收尾符号后看剩余内容
-			desc_text=$(printf '%s' "${desc_raw}" | sed -E 's@^[[:space:]]*(/\*+|\*+/?|//+|#+|--+|<!--+|""")?[[:space:]]*@@' | sed -E 's@[[:space:]]*(\*/|-->)?[[:space:]]*$@@')
+			desc_text=$(normalize_header_content "${desc_raw}")
 
 			# 空行、标签行(@author 等)、注释块起始符、shebang 都不算描述,继续往上找
 			if [ -n "${desc_text}" ] && [[ ! "${desc_text}" =~ ^@ ]] && [[ ! "${desc_text}" =~ ^!/ ]]; then

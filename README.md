@@ -1,13 +1,13 @@
 <h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.8.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+![Version](https://img.shields.io/badge/version-3.9.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
 Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
 
-覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：分层架构、解耦原则、代码块规范、命名约定、常量管理、格式化工具链、Docker 规范、测试要求、Git 分支与提交规范、注释规范。
+覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：分层架构、解耦原则、代码块规范、命名约定、常量管理、格式化工具链、Docker 规范、测试要求、Git 分支与提交规范、注释规范、代码编写与组织规范和 Chinese Developer 输出风格。
 
 ## 安装
 ### Claude Code
@@ -94,6 +94,7 @@ cd <上述安装目录> && git pull origin main
 ├── SKILL.md                      # Skill 主入口：全局约定 + 速查索引
 ├── example.html                  # 完整前端范例（展会落地页，含网格布局/自定义下拉/Toast）
 ├── tests/                        # 本仓自测：check.sh 回归测试 + 规则一致性自检（CI 强制）
+├── docs/modules/skill/           # Skill 正式模块文档
 └── reference/
     ├── java.md                   # Java / Spring Boot
     ├── kotlin-android.md         # Kotlin / Android
@@ -103,6 +104,8 @@ cd <上述安装目录> && git pull origin main
     ├── python.md                 # Python / FastAPI
     ├── sql.md                    # SQL (PostgreSQL / MySQL / SQLite)
     ├── comments.md               # 注释规范示例集（正反示例）
+    ├── code-organization.md      # 源码编写顺序、注释位置与已有代码修改边界
+    ├── chinese-developer.md      # 自然、直接、具体的中文开发交流规范
     ├── module-doc-template.md    # 模块文档模板
     ├── readme-md.md              # 文档与 Markdown 规范
     ├── devops.md                 # DevOps 与部署安全
@@ -122,13 +125,13 @@ cd <上述安装目录> && git pull origin main
 bash tests/run_tests.sh
 ```
 
-`check.sh` 回归测试：用固定 fixture 断言七项检查该报的都报（29 项断言）、合规文件零误报，防止规则改动静默退化。
+`check.sh` 回归测试：用固定 fixture 断言七项检查该报的都报（31 项断言）、合规文件零误报，防止规则改动静默退化。
 
 ```bash
 bash tests/check_consistency.sh
 ```
 
-多处同源规则一致性自检：版本号（SKILL.md vs README badge）、注释篇幅上限、lint 范围串、检查项编号、各分册文件头模板、注释黑话词表、仓库自身禁用字符，共 22 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
+多处同源规则一致性自检：版本号（SKILL.md metadata vs README badge）、注释篇幅上限、lint 范围串、专项分册入口、检查项编号、各分册文件头模板、注释黑话词表、仓库自身禁用字符，共 31 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
 
 ## 核心约定（速览）
 | 项目 | 规范 |
@@ -138,11 +141,13 @@ bash tests/check_consistency.sh
 | 大括号 | 控制流/函数体必须用 `{}`，前后留空行 |
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
 | 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名；函数名 = 动词 + 名词，动词与注释动作词一一对应且全项目统一；禁止隐喻/口语命名（`stuff`/`doIt`）、编号凑数名（`data1`）、拼音混拼（`getYonghu`）；由 `scripts/check.sh` 拦截 |
-| 文件头 | 三行：**第一行直接写作用描述**（一到两句话，**无前缀标签、句尾不加句号**），第二三行 `创建日期：` / `修改日期：`，**冒号必须中文全角**；由 `scripts/check.sh` 拦截 |
+| 文件头 | 三行：**第一行直接写具体职责**（一到两句自然中文，**无前缀标签、句尾不加句号**），不得使用宽泛名词、罗列全部功能或记录实现与修改过程；第二三行 `创建日期：` / `修改日期：`，**冒号必须中文全角**；已知日期严格使用 `YYYY-MM-DD`，无法可靠确认的创建日期允许留空并在交付说明中列出；由 `scripts/check.sh` 拦截 |
 | 注释篇幅 | 正文默认 1-2 行，**硬上限 3 行**（`@param` 等标签行不计入）；**一条注释一行写完，禁止把一句话折断换行**（行尾逗号/顿号/分号即违规）；背景推演、方案权衡、故障复盘写进 `docs/modules/` 而非注释；由 `scripts/check.sh` 拦截 |
 | 注释语法 | **多行注释一律用块/文档注释**（Java/Kotlin/JS/TS `/** */`、Python `"""` docstring、Vue/HTML `<!-- -->`、SQL `/* */`），禁止连续多行 `//` / `#` 拼多行；单行说明才用 `//` / `#`。例外：Go 声明级注释按 Go doc 标准用 `//`；Shell/YAML/Dockerfile 无块注释语法只能用 `#`。由 `scripts/check.sh` 拦截 |
 | 注释措辞 | **动作 + 对象 + 必要条件**一句话说清；动作词全项目统一（获取/查询/校验/组装/降级 等）；**禁止隐喻黑话**（信封/盒子/塞进/压成/留给下游 等，`scripts/check.sh` 拦截）；删掉只复述代码的零信息注释；日志与用户可见文案同一套要求 |
 | 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；Python docstring 统一双引号 `"""`，禁止单引号三引号，禁止把单行说明写成三引号字符串；说明性注释置于被说明对象上方 |
+| 代码组织 | 默认约束所有新写和修改的源码：静态 import、类型、常量、状态、生命周期和业务方法按统一阅读顺序组织；Vue 方法按页面与业务流程排列；调整已有代码时必须保持行为 |
+| 开发交流 | 默认使用自然、直接、具体的简体中文；先说结果，不重复结论和执行过程；抽象表达改写为具体职责、输入、输出和行为影响 |
 | 禁用符号 | 禁止各类 Unicode 引号/破折号变体（弯引号 / CJK 角引号 / 全角引号 / em / en dash 等），统一用半角 `""` / `--`；由 `scripts/check.sh` 拦截 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织，每个 func 都要写测试用例 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，编码前先写文档 |

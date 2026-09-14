@@ -1,8 +1,9 @@
 ---
 name: charles-coding
-description: Use when writing, reviewing, refactoring, debugging, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL -- including backend services, microservices, frontend apps, CLI tools, data processing, and AI/ML work. Applies Charles's full-stack conventions: tab indentation, Chinese comments, file-header blocks, naming, per-language formatters and toolchains, testing requirements, and the agents/feature/* git branch workflow.
-version: 3.8.0
-author: Charles <w1400214654@outlook.com>
+description: Use when writing, reviewing, refactoring, debugging, organizing, or scaffolding code in Java/Kotlin/Spring Boot, Go/Gin, Python/FastAPI, Vue 3, React/Next.js, Android, or SQL. Applies Charles's full-stack conventions, code writing and organization rules, direct Chinese developer communication, testing requirements, and the agents/feature/* git branch workflow.
+metadata:
+  version: "3.9.0"
+  author: Charles <w1400214654@outlook.com>
 ---
 
 # Charles Coding
@@ -30,6 +31,8 @@ author: Charles <w1400214654@outlook.com>
 
 ## 专项规范
 - [文档与Markdown](reference/readme-md.md)
+- [代码编写与组织](reference/code-organization.md) -- 新写、修改或整理源码时必读
+- [Chinese Developer输出风格](reference/chinese-developer.md) -- 需要详细说明、复杂交付或用户指出表达抽象时必读
 - [DevOps与部署安全](reference/devops.md)
 - [测试与压测](reference/testing.md)
 - [日志](reference/logging.md)
@@ -102,6 +105,15 @@ author: Charles <w1400214654@outlook.com>
   ```
 - 完整可参考的范例文件：[`example.html`](example.html)；测试用例范例见 [`reference/examples/test_cases/`](reference/examples/test_cases/)；模块文档范例见 [`reference/examples/docs/modules/`](reference/examples/docs/modules/)
 
+### 代码编写与组织规范
+- **默认适用**：新写、修改或整理任何源码前，必须阅读 [reference/code-organization.md](reference/code-organization.md)，这不是仅在用户提出"整理代码"时才启用的任务模式
+- **文件结构**：按文件头、package/静态 import、类型、常量与配置、组件或类定义、状态、派生状态、初始化与生命周期、业务方法、最终提交或保存操作的顺序组织
+- **import**：静态 import 放在语言允许的顶部区域；动态 `import()` 属于运行逻辑，保留在实际加载位置
+- **定义集中**：同类类型、常量、状态和配置集中定义，避免定义与函数无规则穿插；存在初始化依赖、顶层副作用或注册顺序要求时保留原位置
+- **方法顺序**：按页面展示顺序或业务执行流程排列，`submit`、`save`、`launch` 等最终操作放在相关流程之后
+- **注释位置**：函数参数用对应语言的文档标签说明；函数参数列表、调用参数、对象字面量、数组字面量和返回对象内部不得插入大段解释性注释；常量、类型和字段只在名称无法表达约束时注释
+- **已有代码边界**：调整已有代码顺序前必须证明行为等价；无法确认时保留原位置。若任务仅要求整理或统一注释，不得借机修改业务逻辑、接口、数据结构、命名和组件交互
+
 ### 常量与魔法数字规范
 - **禁止魔法数字**：代码中**严禁**直接出现裸数字（如 `if (count > 100)`、`Thread.sleep(5000)`），所有有语义的数字必须定义为具名常量，置于文件/类顶部
 - **常量命名**：全大写下划线 `MAX_RETRY_COUNT`、`DEFAULT_TIMEOUT_MS`，见名知义
@@ -164,19 +176,63 @@ author: Charles <w1400214654@outlook.com>
 
 ### 注释规范
 - **所有开发类源代码文件**必须包含注释块，三行，顺序固定：
-  - **第一行：作用描述**。**一到两句话**说明本文件职责。**禁止加"文件作用："之类的前缀标签**，直接写描述；**句尾不加句号**
+  - **第一行：作用描述**。使用**一到两句自然、具体的中文**说明本文件的核心职责，读者只看这一行就能判断文件负责什么；**禁止加"文件作用："、"文件职责："、"作用："等前缀标签**，句尾不加句号
+  - **描述粒度**：不得只写"品牌"、"工具类"、"公共组件"等宽泛名词；不得罗列分页、创建、更新、删除、上传等全部功能；不得写架构角色、实现步骤、设计原因、修改历史、Bug 排查过程或本次变更内容
   - **第二行：创建日期**，格式 `创建日期：YYYY-MM-DD`
   - **第三行：修改日期**，格式 `修改日期：YYYY-MM-DD`，每次实质性修改更新为当前日期
   - **创建日期只在新建文件时写入**，此后任何重构（含成批改注释/文案）都不得改动；已有文件缺创建日期时，能从 git 历史可靠确定就补，确定不了则留空并在交付说明里列出，**禁止编造日期**
   - **修改日期只在本次真改了文件时更新**（只改注释/文案也算改），仅扫描未改动的文件不得更新，避免无意义 diff
   - **冒号必须是中文全角 `：`**，禁止半角 `:`（`scripts/check.sh` 会拦截）
   - **注释块位置**：有 `package`/`import` 的语言（Java/Kotlin）放在**类型声明上方**（Javadoc/KDoc），类上有注解则放在**注解之上**，而非文件物理第一行；其余语言放文件顶部；Python 的 `# -*- coding: utf-8 -*-` 仍置于最顶
-- 标准化模板（各语言按各自注释语法适配，示例见各分册"文件头模板"章节）：
+- **Java / Kotlin / JS / TS / JSX / TSX 文件头模板**：Java / Kotlin 放在类型声明或其注解上方，JS / TS 放在文件顶部
+  ```java
+  /**
+   * 管理当前会话的消息与对话操作
+   * 创建日期：2026-07-15
+   * 修改日期：2026-09-14
+   */
   ```
-  应用入口 -- 启动 Spring Boot 并加载全部配置
+- **CSS / SCSS / SQL 文件头模板**：SQL 也可按对应分册使用连续 `--`
+  ```css
+  /*
+   * 定义后台品牌管理页面的布局与视觉样式
+   * 创建日期：2026-07-15
+   * 修改日期：2026-09-14
+   */
+  ```
+- **Vue SFC / HTML 文件头模板**：放在文件最顶部
+  ```html
+  <!--
+  管理当前会话的消息与对话操作
   创建日期：2026-07-15
-  修改日期：2026-08-01
+  修改日期：2026-09-14
+  -->
   ```
+- **Python 文件头模板**：编码声明位于模块 docstring 之前
+  ```python
+  # -*- coding: utf-8 -*-
+  """
+  管理当前会话的消息与对话操作
+  创建日期：2026-07-15
+  修改日期：2026-09-14
+  """
+  ```
+- **Go 文件头模板**：文件头块位于 `package` 之前，声明级注释仍使用 Go doc 的 `//`
+  ```go
+  /*
+   * 管理当前会话的消息与对话操作
+   * 创建日期：2026-07-15
+   * 修改日期：2026-09-14
+   */
+  package conversation
+  ```
+- **Shell / YAML / Dockerfile / .properties 文件头模板**：这些语言没有块注释语法，允许连续 `#`
+  ```sh
+  # 构建并校验项目交付产物
+  # 创建日期：2026-07-15
+  # 修改日期：2026-09-14
+  ```
+- **描述正反例**：`后台品牌管理 API`可以准确判断职责；`品牌`过于宽泛；`后台品牌管理 API，覆盖品牌分页、创建、更新、逻辑删除与 Logo/附件关联替换`罗列了实现能力，应压缩为核心职责
   ```
   错误写法：文件作用：应用入口 -- 启动 Spring Boot 并加载全部配置。   <- 多了前缀标签、多了句号
   错误写法：创建日期: 2026-07-15                                      <- 半角冒号
@@ -222,7 +278,7 @@ author: Charles <w1400214654@outlook.com>
 - **句式固定为"动作 + 对象 + 必要条件/目的"**，一句话说清做什么；禁止讲故事、拟人、比喻、口语化表达
 - **动作词全项目统一**：get 获取、read/load 读取、search/find 查询、create 创建/新增、update 修改/更新、delete 删除、validate 校验、verify 核验、check 检查、filter 过滤、map/transform 转换、build 组装、parse 解析、save 保存、limit 限制、truncate 截取、fallback/degrade 降级、skip 跳过、calculate 计算、summarize 汇总、compare 对比、collect 收集、record 记录。同一种行为只用同一个说法 -- `build payload` 一律写"组装结果"，不得在别处写成"拼装""打包"
 - **禁止隐喻黑话**：信封、盒子、塞进、塞给、拆出、压成、翻表、翻对账表、喂给、吐出、搬运、拿出来、留给下游、实抓终值、拼起来、灌进去、形状不符、收口、打平、摊平 -- 出现在源码注释里由 `scripts/check.sh` 直接 fail（词表与脚本同源）
-  - **人工复查词**（含义依项目而定，不机器拦截）：落盘、口径、兜底、水位、通道、打包、搬到 -- 非项目正式术语时须改写
+  - **人工复查词**（含义依项目而定，不机器拦截）：落盘、口径、兜底、水位、通道、打包、搬到、落一条、拍快照、种入、一路事件、人话字段、就地打进去、空转、吃一个报错、一等公民、哨兵、守门员、胶水层、承载器、分发器、魔法、仪式、管家、搬运工、护城河、交通警察 -- 非项目正式术语时须改写
   - 例外：确属项目正式定义的业务术语（如物流项目的"包裹"）可保留原词
 - **禁止零信息注释**：只复述代码本身的注释（`// 获取 service`、`# 返回结果`）一律删除。该留下的是"为什么" -- 为何降级、为何限制数量、为何覆盖某字段、为何过滤某类数据，以及不直观的业务约束
 - **不做无谓中英混杂**：`正在 live 核验价格` 改为 `正在核验价格`；ASIN / MCP / BSR / Listing / payload 等技术名词保留原文即可
@@ -269,11 +325,15 @@ author: Charles <w1400214654@outlook.com>
 
 ### AI 协作模式
 - **一律用简体中文回答 Charles**：所有对话回复、解释、方案说明统一使用简体中文（代码内注释同样中文），禁止用英文或繁体作答
-- 先给出方案确认，再生成具体代码（参照 superpowers skills 理念）
+- **确认只用于真实取舍**：存在产品、架构、兼容性或不可逆取舍时先给方案确认；需求明确、修改可逆且边界清楚时直接执行，不重复询问是否继续
 - AI 的所有代码产出均提交至 `agents/` 命名空间下的分支，由 Charles 最终决策和集成
 - **严禁最小 MVP / 敷衍方案**：不许给"先跑起来再说"的残缺 demo、占位空实现、`TODO` 糊弄的代码。要给**完整、可用、有理有据**的方案，把边界情况、错误处理、配置都做全
-- **务必说人话**：解释与文档用直白清楚的中文，讲清"是什么、为什么、怎么做"；**禁止**模棱两可、故弄玄虚、堆砌高深术语而不落地。有取舍就把利弊讲明，给明确推荐
+- **先结果后依据**：先说明结果，再提供必要原因、证据和影响；同一个结论只说一次，不复述用户需求和内部执行过程
+- **务必说人话**：解释与文档用直白清楚的中文，讲清"是什么、为什么、怎么做"；禁止用"一等公民""守门员""胶水层"等抽象或比喻表达代替具体职责。有取舍就把利弊讲明，给明确推荐
+- **减少过程播报**：只在任务持续时间较长、遇到阻塞或平台要求时发送有实际信息的简短进度；不展示工具名、执行器标签、内部状态和推理过程
+- **交付回复保持必要信息**：代码修改完成后默认只说明改了什么、验证结果和确实存在的风险；用户明确要求报告或详细分析时再展开
 - **证据驱动，先查证再作答**：凡涉及事实或技术判断的回答，动手前先把相关资料查实 -- 该读的源码、文档、配置、依赖版本、命令输出，按问题分量查到够深为止，禁止凭记忆、假设或"应该是"作答。给结论必须附依据：文件路径:行号、实跑的命令输出、官方文档、可复现结果，不能只甩结论。查不到或不确定，就明说不确定并点出缺口，绝不编造依据或伪造精确。宁可多查一步，不可拍脑袋（简短交互如"继续/看看/你决定"不在此列）
+- 详细表达边界和正反示例见 [reference/chinese-developer.md](reference/chinese-developer.md)
 
 #### 编码前置流程（先问清、再动手）
 - **编码前必须从底层把每个功能问清楚**：进入写代码环节之前，逐个功能向 Charles 确认需求边界、入参出参、异常场景、依赖关系，需求没问清不许开写
@@ -283,16 +343,17 @@ author: Charles <w1400214654@outlook.com>
 #### AGENTS.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENTS.md`**（复数，跨工具事实标准，Claude Code / Codex / Cursor 等均优先读取），作为 AI 工具进入项目时首先读取的指令文件
 - **AGENTS.md 必须自足**：把命名、文件头、禁用字符、分层、模块文档闸门等**硬约束原文内联进去**，而非只写一句"请遵循 charles-coding Skill"。原因见下方"子 Agent 编排契约" -- 子 agent 是隔离上下文，只认它直接读到的文件，指针式引用会在转述中丢失
-- 内容至少包含：交付红线（`make verify` 全绿）、内联硬约束清单、`agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、常用命令（启动/构建/测试）
+- 内容至少包含：交付红线（`make verify` 全绿）、内联硬约束清单、代码编写与组织规则、已有代码修改边界、开发交流要求、`agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、常用命令（启动/构建/测试）
 - 完整模板见 [reference/project-template/AGENTS.md](reference/project-template/AGENTS.md)
 
 #### 子 Agent 编排契约（subagent-driven development 专用）
 > **背景**：用 subagent-driven development 派活时，每个子 agent 是**全新、隔离的上下文** -- 它读不到主 agent 的对话历史、读不到 SessionStart hook 注入、也不会主动去加载本 Skill。主 agent"知道"规范，不等于子 agent"收到"规范；中间隔着一次有损转述。规范遵守是全局约束，而 subagent 把活拆给隔离上下文，两者天然冲突，必须靠下述契约弥合。
 
-- **派发前置**：orchestrator 向任一子 agent 派发实现类 Task 前，**必须**在 Task brief 里做到以下三件，缺一不可：
+- **派发前置**：orchestrator 向任一子 agent 派发实现类 Task 前，**必须**在 Task brief 里做到以下四件，缺一不可：
   1. **内联硬约束**：把该 Task 涉及语言的硬清单（命名 / 文件头模板 / 禁用字符 / 分层）**原文写进 brief**，不许只写"遵循 charles-coding"。可直接摘抄目标项目 `AGENTS.md` 的对应小节
   2. **强制读取指令**：brief 里明确写"开工前先 `cat AGENTS.md` 全文，并读 `docs/modules/<本模块>.md`"
   3. **声明交付闸门**：brief 里写死"交付前必须 `make verify` 全绿，否则本 Task 不算完成"
+  4. **声明代码组织要求与任务边界**：所有实现类 Task 都必须内联文件结构、定义区、方法顺序和注释位置要求；整理已有代码的 Task 还必须写明允许修改项、禁止修改项和行为保持要求
 - **依赖机器兜底，不依赖转述**：确定性规则（禁用字符 / 文件头 / 命名 / 必需文件）由 `scripts/check.sh` 校验，子 agent 写歪了 `make verify` 会 fail，返工循环自动触发 -- 不靠主 agent 肉眼审。脚手架的 `make verify` = `scripts/check.sh`（规范）+ `scripts/test.sh`（测试）
 - **review 阶段核对**：主 agent 收到子 agent 产物做 review 时，第一步先跑 `make verify` 看是否全绿，再看业务实现；规范类 finding 以脚本结论为准，不逐条肉眼找
 

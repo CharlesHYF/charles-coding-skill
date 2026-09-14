@@ -32,6 +32,25 @@
 - **命名**：组件文件夹/组件名 `PascalCase`（如 `LoginForm`）；组合式函数（composables）文件与函数名一律 `useXxx` 前缀（如 `useAuth`、`useRequest`），放在 `src/composables/`（全局复用）或页面目录下（页面私有，与私有组件同级）
 - **导入路径用别名 `@/`**：一律用 `@/xxx/xxx`（`@` 指向 `src`），**禁止**用 `../../xxx` 这类多级相对路径。在 `vite.config.ts` 的 `resolve.alias` 与 `tsconfig.json` 的 `paths` 中配置 `@` → `src`
 
+### `<script setup>` 内部顺序
+编写、修改或整理 Vue 代码时，先读 [code-organization.md](code-organization.md)。在不改变初始化顺序、副作用和组件行为的前提下，按照以下顺序排列：
+
+1. 静态 import
+2. type 和 interface
+3. 常量、配置、正则、Set 和 Map
+4. defineOptions、defineProps、defineEmits 和 defineExpose
+5. composable 返回值、ref 和 reactive 状态
+6. computed 派生状态
+7. 自定义 directive 等属性定义
+8. onMounted、onUnmounted 等生命周期注册
+9. 初始化相关方法
+10. 按页面展示顺序和业务流程排列的方法
+11. submit、save、launch 等最终操作
+
+静态 import 必须位于脚本顶部；动态 `import()` 按运行条件保留在对应函数或分支中。不要为了集中定义而移动存在初始化依赖、顶层副作用或注册顺序要求的语句。
+
+业务流程为步骤 1、步骤 2、提交时，相关方法也优先按照步骤 1、步骤 2、提交排列。页面顺序无法明确判断或调整可能改变行为时保留现状。
+
 ## 目录结构
 - **页面目录用 `views`，禁止用 `pages`**
 - **一切皆 `index`**：每个页面/组件独立一个文件夹，入口文件统一命名 `index.vue`（`index.ts`、`index.css` 同理），即 `xxx/xxxx/index.xx` 结构
