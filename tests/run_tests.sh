@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check.sh 回归测试 -- 用固定 fixture 断言七项检查该报的都报、不该报的不报，防止规则改动静默退化
+# check.sh 回归测试
 # 创建日期：2026-08-31
 # 修改日期：2026-09-21
 
@@ -61,7 +61,7 @@ expect_not_contains() {
 make_skeleton() {
 	local dir="$1"
 
-	mkdir -p "${dir}/docs/modules/backend" "${dir}/test_cases/backend/unit"
+	mkdir -p "${dir}/docs/modules/backend" "${dir}/test_cases/backend/unit" "${dir}/test_cases/stress"
 	echo "# AGENTS" > "${dir}/AGENTS.md"
 	echo "# README" > "${dir}/README.md"
 	echo ".DS_Store" > "${dir}/.gitignore"
@@ -69,6 +69,7 @@ make_skeleton() {
 	echo "* text eol=lf" > "${dir}/.gitattributes"
 	echo "# demo 模块" > "${dir}/docs/modules/backend/demo.md"
 	echo "# demo 用例" > "${dir}/test_cases/backend/unit/demo.md"
+	printf '/**\n * 接口压力测试脚本\n * 创建日期：2026-09-21\n * 修改日期：2026-09-21\n */\nexport default function () {}\n' > "${dir}/test_cases/stress/load-test.js"
 }
 
 # 在指定目录里跑 check.sh，输出与退出码分别存入全局变量
@@ -88,7 +89,7 @@ make_skeleton "${GOOD_DIR}"
 
 cat > "${GOOD_DIR}/GoodService.java" <<'EOF'
 /**
- * 订单服务 -- 承载下单与退款的业务逻辑
+ * 订单服务
  * 创建日期：2026-08-31
  * 修改日期：2026-08-31
  */
@@ -216,7 +217,7 @@ EOF
 cat > "${GOOD_DIR}/good_service.py" <<'EOF'
 # -*- coding: utf-8 -*-
 """
-订单服务 -- 承载下单与退款的业务逻辑
+订单服务
 创建日期：2026-08-31
 修改日期：2026-08-31
 """
@@ -234,7 +235,7 @@ EOF
 
 cat > "${GOOD_DIR}/good_service.go" <<'EOF'
 /*
- * 订单服务 -- 承载下单与退款的业务逻辑
+ * 订单服务
  * 创建日期：2026-08-31
  * 修改日期：2026-08-31
  */
@@ -250,7 +251,7 @@ EOF
 
 cat > "${GOOD_DIR}/GoodPage.vue" <<'EOF'
 <!--
-	订单列表页 -- 分页展示与筛选
+	订单列表页
 	创建日期：2026-08-31
 	修改日期：2026-08-31
 -->
@@ -268,7 +269,7 @@ EOF
 
 cat > "${GOOD_DIR}/good_tool.sh" <<'EOF'
 #!/usr/bin/env bash
-# 本地开发辅助脚本 -- 打印环境信息
+# 本地开发辅助脚本
 # 创建日期：2026-08-31
 # 修改日期：2026-08-31
 echo "ok"
@@ -921,6 +922,62 @@ expect_contains "${CHECK_OUTPUT}" "Bad.vue 样式里写了注释" "检查九:sty
 expect_contains "${CHECK_OUTPUT}" "bad-order.ts import 排版错误" "检查十:type import 排在值 import 之前被拦"
 
 rm -rf "${STYLE_DIR}"
+
+
+# ============================================================
+# 场景九：文件头描述、测试位置与压测
+# ============================================================
+echo "=== 场景九：描述粒度、测试位置与压测 ==="
+DELIVERY_DIR="$(mktemp -d)"
+make_skeleton "${DELIVERY_DIR}"
+mkdir -p "${DELIVERY_DIR}/src/utils" "${DELIVERY_DIR}/tests/utils"
+
+# 违规：文件头描述用 -- 追加功能罗列
+cat > "${DELIVERY_DIR}/LoginPage.vue" <<'EOF'
+<!--
+用户登录页 -- 用户名密码输入、前端校验与提交
+创建日期：2026-01-01
+修改日期：2026-01-02
+-->
+<template>
+	<div
+		class="login"
+	>
+	</div>
+</template>
+EOF
+
+# 违规：测试代码散落在源码目录旁
+cat > "${DELIVERY_DIR}/src/utils/format.test.ts" <<'EOF'
+/**
+ * 格式化工具测试
+ * 创建日期：2026-01-01
+ * 修改日期：2026-01-02
+ */
+export const noop = 1;
+EOF
+
+# 合规：测试集中放 tests/
+cat > "${DELIVERY_DIR}/tests/utils/parse.test.ts" <<'EOF'
+/**
+ * 解析工具测试
+ * 创建日期：2026-01-01
+ * 修改日期：2026-01-02
+ */
+export const noop = 1;
+EOF
+
+run_check "${DELIVERY_DIR}"
+expect_contains "${CHECK_OUTPUT}" "LoginPage.vue 文件头描述用 -- 追加了功能说明" "检查二:描述行 -- 追加说明被拦"
+expect_contains "${CHECK_OUTPUT}" "format.test.ts 测试代码散落在源码目录" "检查十一:散落的测试文件被拦"
+expect_not_contains "${CHECK_OUTPUT}" "parse.test.ts 测试代码散落" "检查十一:集中在 tests/ 的测试放行"
+
+# 压测目录被清空后必须报缺失
+rm -rf "${DELIVERY_DIR}/test_cases/stress"
+run_check "${DELIVERY_DIR}"
+expect_contains "${CHECK_OUTPUT}" "缺少压测目录" "检查十二:缺压测目录被拦"
+
+rm -rf "${DELIVERY_DIR}"
 
 # ============================================================
 # 汇总

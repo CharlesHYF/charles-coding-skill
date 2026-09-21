@@ -1,6 +1,6 @@
 # Charles Coding -- 流程规范
 <!--
-开发流程规范 -- 按变更类型划分交付闸门,约束编码前置、模块文档与子 Agent 派发
+开发流程规范
 创建日期：2026-09-21
 修改日期：2026-09-21
 -->
@@ -23,6 +23,8 @@
 - **模块文档闸门**：必写 `docs/modules/<系统模块>/<模块名>.md`（两级组织，如 `docs/modules/backend/orders.md`），每个功能至少包含功能描述、入参要求、参数、返回等小节；文档本身遵循 [Markdown 规范](../domains/docs-markdown.md)，结构见 [模块文档模板](../../../templates/module-doc.md)
 - 文档评审通过后再进入编码，代码实现须与文档一致
 - 交付前补齐 `test_cases/<系统模块>/<类型>/x.md` 并实跑
+- **必须提供压测脚本**放 `test_cases/stress/`，覆盖四类接口：写操作、列表与分页查询、批量与导入导出、被其它模块依赖的核心读接口。阈值写进脚本由 k6 自动判定，细则见 [testing.md](../domains/testing.md)
+- **测试代码集中放 `tests/`**（前端为 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外
 
 ### 需求变更
 - 先确认变更影响到哪些既有功能、哪些调用方，再动手

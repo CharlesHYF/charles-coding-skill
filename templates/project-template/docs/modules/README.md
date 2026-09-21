@@ -1,5 +1,5 @@
 <!--
-	模块文档目录说明  --  新项目按此结构组织模块文档
+	模块文档目录说明
 	创建日期：2026-08-01
 	说明：详细范例见 charles-coding skill 的 templates/examples/docs/modules/，正式项目需为每个模块编写文档
 -->

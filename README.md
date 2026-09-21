@@ -132,7 +132,7 @@ cd <安装目录> && git pull origin main
 
 ## 规范校验器
 
-`tools/check.sh` 把确定性规则变成会 fail 的检查，共十项：
+`tools/check.sh` 把确定性规则变成会 fail 的检查，共十二项：
 
 ```bash
 bash tools/check.sh --all        # 全量扫描
@@ -151,6 +151,8 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 | 八 | 模块访问边界（单一入口，读项目根 `.import-boundaries`） |
 | 九 | 样式注释（`.css` / `.scss` 与 Vue `<style>` 块内禁止任何注释） |
 | 十 | import 排版（`import type` 不得排在值 import 之前） |
+| 十一 | 测试代码位置（前端集中放 `frontend/tests/`，不散落在源码目录旁） |
+| 十二 | 压测脚本（`test_cases/stress/` 为空即视为未完成） |
 
 两级豁免：文件级写进 `.checkignore`，行级在注释里加 `check-ignore` 标记。文档反例与测试 fixture 用它放行。
 
@@ -195,12 +197,17 @@ bash tools/check.sh --all        # 规范仓自身的规范校验
 | 样式注释 | `.css` / `.scss` 文件与 Vue `<style>` 块内不写任何注释，含文件头；意图由 class 名与自定义属性命名表达 |
 | import 排版 | 顺序为第三方值 import、项目内值 import、全部 type import、常量，组间空一行；type 一律用 `import type` |
 | 元素排版 | 属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现；数组相邻元素之间空一行，对象内键值对不空行 |
+| 文件头描述 | 只写核心职责，禁止用 `--` 追加功能罗列；功能会变，描述跟着过期 |
+| 测试位置 | 测试代码集中放 `tests/`（前端 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外 |
+| 压测 | 新功能必须提供压测脚本，覆盖写操作、列表分页、批量导入导出、核心读接口四类 |
+| 提交粒度 | 一个任务、一个需求、一个问题对应一个 commit；重构与功能修改分开提交 |
+| 前端结构 | `types` / `store` / `constants` 一律 `index.ts` 再导出、实体放 `modules/`；`permission` 放 `src/` 下；全局组件在 `main.ts` 注册 |
 | 变更闸门 | 动手前先判定变更类型（新功能 / 需求变更 / Bug 修复 / 重构 / 依赖升级），按对应档执行文档与测试要求 |
 | Bug 修复 | 先定位根因，**先写复现测试并确认它失败**，再改实现，测试保留进 `regression/` |
 | 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，新功能编码前先写文档并评审 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
-| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版，外加提交信息扫描 |
+| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测，外加提交信息扫描 |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止任何 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干、不发起 PR |
 

@@ -1,7 +1,8 @@
 # Charles Coding -- DevOps 与部署安全
 <!--
-作用：Docker / 环境配置 / 云端部署安全基线分册，从 SKILL.md 下沉迁移
+Docker 与环境配置的部署安全基线
 创建日期：2026-07-29
+修改日期：2026-09-21
 -->
 > charles-coding 部署与运维规范分册。先遵循 [SKILL.md](../SKILL.md)。
 

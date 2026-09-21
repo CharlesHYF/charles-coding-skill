@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版)变成会 fail 的检查，交付前由 make verify 强制执行，不依赖 Agent 自觉
+# 规范校验器
 # 创建日期：2026-08-03
 # 修改日期：2026-09-21
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
+
+# 校验范围,与 Makefile / AGENTS.md / README 同源,改这里要同步改那三处
+LINT_SCOPE='禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测'
 
 # 违规计数：任意一项 > 0 则最终退出码非 0，供 CI / make check 拦截
 VIOLATIONS=0
@@ -176,7 +179,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/10] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/12] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -232,7 +235,7 @@ normalize_header_content() {
 # 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
 # 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
-	echo "[2/10] 检查源码文件头注释块..."
+	echo "[2/12] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
@@ -340,8 +343,14 @@ check_file_header() {
 		fi
 
 		# 描述行句尾不加句号
-		if printf '%s' "${desc_text}" | grep -qE '[。.]$'; then
+		# 判定走 perl -CSD:句号是多字节,grep 在非 UTF-8 locale 下按字节比对会把"检"等字尾误判为句号
+		if printf '%s' "${desc_text}" | perl -CSD -ne 'exit 0 if /[\x{3002}\x{002e}]$/; exit 1'; then
 			report "${file} 文件头作用描述行结尾带了句号(须去掉): ${desc_text}"
+		fi
+
+		# 描述行禁止用 -- 追加功能说明:后面跟的几乎都是功能罗列,功能一变描述就过期
+		if printf '%s' "${desc_text}" | grep -qE ' -- '; then
+			report "${file} 文件头描述用 -- 追加了功能说明(只保留核心职责): ${desc_text}"
 		fi
 
 	done < <(list_files)
@@ -349,7 +358,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/10] 检查项目必需文件..."
+	echo "[3/12] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -409,7 +418,7 @@ check_required_files() {
 # 检查四：命名(数据传输类命名 + 变量/函数的无意义命名)
 # 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规；tmp / obj / doIt 之类占位名一律拦截
 check_naming() {
-	echo "[4/10] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
+	echo "[4/12] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
 
 	local file
 	while IFS= read -r file; do
@@ -461,7 +470,7 @@ check_naming() {
 # 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
 # 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
 check_comment_syntax() {
-	echo "[5/10] 检查注释语法(块注释 / docstring)..."
+	echo "[5/12] 检查注释语法(块注释 / docstring)..."
 
 	local file
 	while IFS= read -r file; do
@@ -579,7 +588,7 @@ MAX_COMMENT_BODY_LINES=3
 # 标签行(@param / @return / :param 等)不计入正文,避免多参数 Javadoc 误报
 # 折断判定走 perl -CSD:中文标点是多字节,awk 在非 UTF-8 locale 下按字节比对会误命中
 check_comment_length() {
-	echo "[6/10] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
+	echo "[6/12] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
 
 	local file
 	while IFS= read -r file; do
@@ -659,7 +668,7 @@ FORBIDDEN_JARGON_PATTERN='\x{4fe1}\x{5c01}|\x{76d2}\x{5b50}|\x{585e}\x{8fdb}|\x{
 
 # 检查七：注释黑话(隐喻 / 口语表达)，词表见上方 FORBIDDEN_JARGON_PATTERN，一律改写为工程动作词
 check_comment_jargon() {
-	echo "[7/10] 检查注释黑话(隐喻 / 口语表达)..."
+	echo "[7/12] 检查注释黑话(隐喻 / 口语表达)..."
 
 	local file
 	while IFS= read -r file; do
@@ -689,7 +698,7 @@ IMPORT_BOUNDARY_FILE='.import-boundaries'
 # 检查八：模块访问边界(单一入口原则,禁止绕过入口直接引用底层实现)
 # 受保护片段里的 / 同时按 . 匹配,以覆盖 Java 的 import com.xx.dal.mapper 这类写法
 check_import_boundaries() {
-	echo "[8/10] 检查模块访问边界(单一入口)..."
+	echo "[8/12] 检查模块访问边界(单一入口)..."
 
 	if [ ! -f "${IMPORT_BOUNDARY_FILE}" ]; then
 		echo "  [SKIP] 未配置 ${IMPORT_BOUNDARY_FILE}，跳过。"
@@ -774,7 +783,7 @@ check_import_boundaries() {
 # 检查九：样式里不写注释(CSS / SCSS 文件与 Vue SFC 的 style 块)
 # 样式意图由 class 名与自定义属性命名表达，设计决策写进模块文档
 check_style_comments() {
-	echo "[9/10] 检查样式注释(CSS 与 style 块不写注释)..."
+	echo "[9/12] 检查样式注释(CSS 与 style 块不写注释)..."
 
 	local file
 	while IFS= read -r file; do
@@ -810,7 +819,7 @@ check_style_comments() {
 # 检查十：import 排版(type import 不得出现在值 import 之前)
 # 顺序固定为值 import -> type import -> 常量,便于一眼看清依赖来源
 check_import_order() {
-	echo "[10/10] 检查 import 排版(type 在值 import 之后)..."
+	echo "[10/12] 检查 import 排版(type 在值 import 之后)..."
 
 	local file
 	while IFS= read -r file; do
@@ -840,7 +849,71 @@ check_import_order() {
 	done < <(list_files)
 }
 
+# 压测脚本可识别的扩展名
+STRESS_SCRIPT_REGEX='\.(js|ts|jmx|lua|py)$'
+
+# 检查十一：测试代码位置(构建工具不强制的语言,测试一律集中到 tests/)
+# Go 与 Java/Kotlin 由构建工具强制放在特定位置,属于例外
+check_test_location() {
+	echo "[11/12] 检查测试代码位置(集中放 tests/)..."
+
+	local file
+	while IFS= read -r file; do
+
+		# Go 工具链要求测试与源码同包同目录
+		case "${file}" in
+			*_test.go)
+				continue
+				;;
+		esac
+
+		# Maven / Gradle 固定读 src/test
+		if [[ "${file}" =~ (^|/)src/test/ ]]; then
+			continue
+		fi
+
+		# 已集中在 tests/ 下即合规
+		if [[ "${file}" =~ (^|/)tests?/ ]]; then
+			continue
+		fi
+
+		if [[ "${file}" =~ \.(test|spec)\.(ts|tsx|js|jsx|vue)$ ]]; then
+			report "${file} 测试代码散落在源码目录(前端测试集中放 frontend/tests/)"
+			continue
+		fi
+
+		if [[ "${file}" =~ (^|/)test_[^/]*\.py$ ]] || [[ "${file}" =~ _test\.py$ ]]; then
+			report "${file} 测试代码散落在源码目录(Python 测试集中放 tests/)"
+		fi
+
+	done < <(list_files)
+}
+
+# 检查十二：压测脚本(有接口层的项目必须提供,空目录视为未完成)
+check_stress_tests() {
+	echo "[12/12] 检查压测脚本..."
+
+	# 没有 backend/frontend 用例目录说明不是服务类项目,不强制压测
+	if [ ! -d "test_cases/backend" ] && [ ! -d "test_cases/frontend" ]; then
+		echo "  [SKIP] 未发现 backend/frontend 用例目录，跳过压测检查。"
+		return
+	fi
+
+	if [ ! -d "test_cases/stress" ]; then
+		report "缺少压测目录：test_cases/stress/(有接口层的项目必须提供压测脚本)"
+		return
+	fi
+
+	local script_count
+	script_count=$(find test_cases/stress -type f | grep -cE "${STRESS_SCRIPT_REGEX}" || true)
+
+	if [ "${script_count}" -eq 0 ]; then
+		report "test_cases/stress/ 下没有压测脚本(必测四类接口:写操作、分页查询、批量导入导出、核心读接口)"
+	fi
+}
+
 echo "=== charles-coding 规范校验 ==="
+echo "校验范围：${LINT_SCOPE}"
 
 check_forbidden_chars
 check_file_header
@@ -852,6 +925,8 @@ check_comment_jargon
 check_import_boundaries
 check_style_comments
 check_import_order
+check_test_location
+check_stress_tests
 
 echo "==============================="
 

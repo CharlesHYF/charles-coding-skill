@@ -1,7 +1,8 @@
 # Charles Coding -- 文档与 Markdown 规范
 <!--
-作用：README / 徽章 / Markdown 规范分册，从 SKILL.md 下沉迁移
+README 与 Markdown 文档规范
 创建日期：2026-07-29
+修改日期：2026-09-21
 -->
 > charles-coding 文档规范分册。先遵循 [SKILL.md](../SKILL.md)。
 

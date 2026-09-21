@@ -1,4 +1,4 @@
-# Python 工具链配置模板 -- Ruff(lint + import 排序 + docstring 规则)与 mypy 严格模式，非 Python 项目删除本文件即可
+# Python 工具链配置模板
 # 创建日期：2026-08-31
 # 修改日期：2026-08-31
 

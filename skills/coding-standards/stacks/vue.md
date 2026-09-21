@@ -20,7 +20,7 @@
 - **文件头注释块**：SFC 只在**文件最开头**（`<template>` 上方）用一个 HTML 注释块 `<!-- ... -->` 写一次（含作用描述、创建日期、修改日期，见 [SKILL.md](../SKILL.md) 注释规范）。**禁止**在 `<script setup>` 内重复书写，避免一份文件头出现两处。文件头模板：
   ```html
   <!--
-    用户登录页 -- 用户名密码输入、前端校验与提交
+    用户登录页
     创建日期：2026-07-29
     修改日期：2026-08-01
   -->
@@ -131,24 +131,115 @@
 - **页面目录用 `views`，禁止用 `pages`**
 - **一切皆 `index`**：每个页面/组件独立一个文件夹，入口文件统一命名 `index.vue`（`index.ts`、`index.css` 同理），即 `xxx/xxxx/index.xx` 结构
 - **页面私有组件就近放置**：只在某个页面用到、非全局的组件，放在该页面目录下的 `components/`；全局复用组件才放到顶层 `src/components/`
-- 示例（以 Login 为例）：
+- **`types` / `store` / `constants` 一律 index 化**：入口 `index.ts` 只做再导出，实体按业务域放 `modules/` 下
+- **`permission` 放在 `src/` 下**，不放进 `router/` 或 `utils/`，它是应用级的路由守卫入口
+- **测试代码放 `frontend/tests/`**，不与源码混放，见 [testing.md](../domains/testing.md)
+- 示例：
   ```
-  src/
-  ├── views/
-  │   └── Login/
-  │       ├── index.vue                  # 页面入口
-  │       └── components/
-  │           ├── LoginForm/index.vue    # 该页面私有组件
-  │           └── QrCode/index.vue
-  ├── components/                        # 全局复用组件（同样 xxx/index.vue）
-  ├── types/                             # 前后端数据传输类型（见下）
-  └── style/
-      └── index.css                      # 全局样式
+  frontend/
+  ├── src/
+  │   ├── main.ts                        # 应用入口，全局组件在这里注册
+  │   ├── permission.ts                  # 路由守卫与权限控制
+  │   ├── views/
+  │   │   └── Login/
+  │   │       ├── index.vue              # 页面入口
+  │   │       └── components/
+  │   │           ├── LoginForm/index.vue
+  │   │           └── QrCode/index.vue
+  │   ├── components/                    # 全局复用组件，全部在 main.ts 注册
+  │   │   └── EChart/index.vue
+  │   ├── types/
+  │   │   ├── index.ts                   # 只做再导出
+  │   │   └── modules/
+  │   │       ├── auth.ts
+  │   │       └── order.ts
+  │   ├── store/
+  │   │   ├── index.ts
+  │   │   └── modules/
+  │   │       ├── user.ts
+  │   │       └── permission.ts
+  │   ├── constants/
+  │   │   ├── index.ts
+  │   │   └── modules/
+  │   │       ├── agent.ts
+  │   │       └── order.ts
+  │   ├── api/
+  │   └── style/
+  │       └── index.css
+  └── tests/                             # 测试代码，不放进 src
   ```
 
 ## 类型（types）
-- **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
-- 命名约定：请求 `XxxReqVO`、响应 `XxxRespVO`。示例：登录接口的 `LoginReqVO` / `LoginRespVO` 放在 `src/types/auth.d.ts`（数据传输命名总规约见 [SKILL.md](../SKILL.md)）
+- **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/`，按业务域拆进 `modules/`，由 `index.ts` 统一导出
+- 命名约定：请求 `XxxReqVO`、响应 `XxxRespVO`。登录接口的 `LoginReqVO` / `LoginRespVO` 放 `src/types/modules/auth.ts`（数据传输命名总规约见 [naming.md](../rules/naming.md)）
+- **`index.ts` 只写再导出，不写类型定义**：
+  ```ts
+  export * from "./modules/auth";
+  export * from "./modules/order";
+  ```
+- 引用方一律从 `@/types` 导入，**不直接导入 `@/types/modules/xxx`**，这样改文件名不会波及调用方
+
+## 状态（store）
+- 结构与 types 一致：`store/index.ts` 做再导出与实例注册，各 store 放 `store/modules/`
+- 一个业务域一个 store 文件，不把无关状态塞进同一个 store
+
+## 常量（constants）
+> 与数据库设计对齐的枚举、下拉选项统一放这里，**禁止在组件里硬编码枚举值**。
+
+- 结构：`constants/index.ts` 做再导出，实体放 `constants/modules/`，按业务域分文件
+- **OPTIONS 数组用 `as const`**，元素之间空一行，元素内部键值对不空行
+- **MAP 由 OPTIONS 派生，不手写第二份**：手写两份必然出现改一处漏一处
+- 每个选项固定三个字段：`label`（展示文案）、`tag`（样式或语义标识）、`value`（与数据库一致的取值）
+
+```ts
+/**
+ * Agent 运行时配置常量
+ * 创建日期：2026-09-18
+ * 修改日期：2026-09-18
+ */
+
+export const AGENT_CREDENTIAL_TYPE_OPTIONS = [
+	{
+		label: "API Key",
+		tag: "api-key",
+		value: 1,
+	},
+
+	{
+		label: "CLI 环境变量",
+		tag: "cli-environment",
+		value: 2,
+	},
+
+	{
+		label: "MCP 环境变量",
+		tag: "mcp-environment",
+		value: 3,
+	},
+
+	{
+		label: "MCP Header",
+		tag: "mcp-header",
+		value: 4,
+	},
+] as const;
+
+export const AGENT_CREDENTIAL_TYPE_MAP = AGENT_CREDENTIAL_TYPE_OPTIONS.reduce(
+	(acc, option) => ({
+		...acc,
+		[option.value]: option.label,
+	}),
+	{} as Record<number, string>,
+);
+```
+
+- `value` 的取值必须与数据库字段一致，改动时同步迁移脚本
+- **注释只写约束，不写对应关系**：写"取值与数据库 agent_credential_type 一致，改动需同步迁移脚本"，不写"对齐后端枚举"
+
+## 全局组件注册
+- **`src/components` 下的组件全部在 `main.ts` 注册**，使用时不需要在各页面重复 import
+- 页面私有组件不注册，就近放在该页面目录的 `components/` 下按需 import
+- 注册与按需 import 两种方式不混用：一个组件要么全局注册，要么始终局部引入
 
 ## 开发体验（dev）
 - **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../../../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）
@@ -180,5 +271,7 @@
 - 优先 Tailwind CSS，`<style scoped>` 仅作补充
 
 ## 测试
+- **测试代码集中放 `frontend/tests/`**，禁止散落在 `src/` 里与源码同目录，见 [testing.md](../domains/testing.md)
+- 测试文件与被测文件对应命名，如 `tests/utils/format.test.ts` 对应 `src/utils/format.ts`
 - 单元测试：Vitest + Vue Test Utils（关键路径与公共组件必测）
 - E2E 测试：Playwright

@@ -23,7 +23,7 @@
 - **文件头注释块**：每个 `.tsx` / `.ts` 文件最开头用块注释写一次作用描述与日期（见 [SKILL.md](../SKILL.md) 注释规范），模板：
   ```tsx
   /**
-   * 登录表单组件 -- 用户名密码输入与提交
+   * 登录表单组件
    * 创建日期：2026-07-29
    * 修改日期：2026-08-01
    */
@@ -39,24 +39,38 @@
 - **路由页面**：Next.js App Router 强制以 `app/` 为路由目录，路由入口文件为框架约定的 `page.tsx` / `layout.tsx`（此处不改名为 `index`，遵循框架要求）
 - **一切皆 `index`（非路由文件）**：每个组件独立一个文件夹，入口文件统一命名 `index.tsx`（`index.ts`、`index.css` 同理），即 `xxx/xxxx/index.tsx` 结构
 - **页面私有组件就近放置**：只在某个路由页面用到、非全局的组件，放在该路由目录下的 `components/`（App Router 中前缀下划线 `_components/` 可避免被识别为路由段）；全局复用组件放到顶层 `src/components/`
-- 示例（以 Login 为例）：
+- **`types` / `store` / `constants` 一律 index 化**：入口 `index.ts` 只做再导出，实体按业务域放 `modules/` 下，与 [vue.md](vue.md) 同一套结构
+- **测试代码放 `frontend/tests/`**，不与源码混放，见 [testing.md](../domains/testing.md)
+- 示例：
   ```
-  src/
-  ├── app/
-  │   └── login/
-  │       ├── page.tsx                   # 路由入口（框架约定）
-  │       └── _components/
-  │           ├── LoginForm/index.tsx    # 该页面私有组件
-  │           └── QrCode/index.tsx
-  ├── components/                        # 全局复用组件（xxx/index.tsx）
-  ├── types/                             # 前后端数据传输类型（见下）
-  └── style/
-      └── index.css                      # 全局样式
+  frontend/
+  ├── src/
+  │   ├── app/
+  │   │   └── login/
+  │   │       ├── page.tsx               # 路由入口（框架约定）
+  │   │       └── _components/
+  │   │           ├── LoginForm/index.tsx
+  │   │           └── QrCode/index.tsx
+  │   ├── components/                    # 全局复用组件（xxx/index.tsx）
+  │   ├── types/
+  │   │   ├── index.ts                   # 只做再导出
+  │   │   └── modules/
+  │   ├── store/
+  │   │   ├── index.ts
+  │   │   └── modules/
+  │   ├── constants/
+  │   │   ├── index.ts
+  │   │   └── modules/
+  │   ├── api/
+  │   └── style/
+  │       └── index.css
+  └── tests/                             # 测试代码，不放进 src
   ```
 
-## 类型（types）
-- **所有前后端数据传输的类型**（请求体、响应体等）统一放在 `src/types/` 下，按业务域分文件，命名 `xxx.d.ts`
-- 命名约定：请求 `XxxReqVO`、响应 `XxxRespVO`。示例：登录接口的 `LoginReqVO` / `LoginRespVO` 放在 `src/types/auth.d.ts`（数据传输命名总规约见 [SKILL.md](../SKILL.md)）
+## 类型、状态与常量
+- 结构与命名和 [vue.md](vue.md) 完全一致：`types` / `store` / `constants` 各自 `index.ts` 做再导出，实体放 `modules/` 下
+- 引用方从 `@/types`、`@/constants` 导入，**不直接导入 `modules/` 里的文件**
+- 常量的 OPTIONS 数组与派生 MAP 的写法见 [vue.md 的常量小节](vue.md)
 
 ## 开发体验（dev）
 - **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../../../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）

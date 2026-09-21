@@ -10,15 +10,23 @@
 - 格式化与检查：Prettier + ESLint + Stylelint
 
 ## 目录结构
+`types` / `store` / `constants` 一律 index 化，入口只做再导出，实体放 `modules/`；测试代码不进 `src`。
+
 ```
-src/
-	pages/          页面级组件，与路由一一对应
-	components/     可复用组件，不含页面级业务编排
-	composables/    可复用逻辑（React 项目为 hooks/）
-	api/            接口请求封装，按业务域分文件
-	types/          跨模块共享类型
-	assets/         静态资源
-	styles/         全局样式与 CSS 变量定义
+frontend/
+	src/
+		main.ts         应用入口，全局组件在这里注册
+		permission.ts   路由守卫与权限控制
+		pages/          页面级组件，与路由一一对应
+		components/     全局复用组件，全部在 main.ts 注册
+		composables/    可复用逻辑（React 项目为 hooks/）
+		api/            接口请求封装，按业务域分文件
+		types/          index.ts 再导出，实体放 modules/
+		store/          index.ts 再导出，实体放 modules/
+		constants/      index.ts 再导出，实体放 modules/
+		assets/         静态资源
+		styles/         全局样式与 CSS 变量定义
+	tests/            测试代码，不放进 src
 ```
 
 ## 兼容性基线

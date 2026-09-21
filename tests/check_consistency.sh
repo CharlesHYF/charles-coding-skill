@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 多处同源规则一致性自检 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，本脚本断言关键取值互相咬合，防止改一处漏三处
+# 多处同源规则一致性自检
 # 创建日期：2026-08-31
 # 修改日期：2026-09-21
 
@@ -70,7 +70,7 @@ else
 fi
 
 # 三、lint 范围描述串：四处必须逐字一致
-LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版"
+LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测"
 
 expect_in_file "${CHECK_SH}" "${LINT_SCOPE}" "lint 范围串在 check.sh"
 expect_in_file "${AGENTS}" "${LINT_SCOPE}" "lint 范围串在 AGENTS.md"
@@ -110,6 +110,29 @@ expect_in_file "${AGENTS}" "样式不写注释" "CSS 禁注释已内联进 AGENT
 expect_in_file "skills/coding-standards/languages/javascript-typescript.md" "## import 排版" "import 排版已写入分册"
 expect_in_file "${AGENTS}" "import 排版" "import 排版已内联进 AGENTS.md"
 expect_in_file "skills/coding-standards/rules/common.md" "## 元素与空行排版" "元素排版规则已写入通用模块"
+
+# 四之三之三、本轮规则必须同时活在分册与项目模板里
+expect_in_file "skills/coding-standards/domains/testing.md" "## 测试代码位置" "测试代码位置已写入测试分册"
+expect_in_file "${AGENTS}" "测试代码集中放" "测试代码位置已内联进 AGENTS.md"
+expect_in_file "skills/coding-standards/domains/testing.md" "必测的四类接口" "压测四类覆盖已写入测试分册"
+expect_in_file "${AGENTS}" "压测必须有" "压测要求已内联进 AGENTS.md"
+expect_in_file "${PROCESS}" "压测脚本" "压测已进入变更闸门表"
+expect_in_file "skills/coding-standards/rules/git.md" "## 提交粒度" "提交粒度已写入 Git 模块"
+expect_in_file "${AGENTS}" "提交粒度" "提交粒度已内联进 AGENTS.md"
+expect_in_file "${TEXT}" "禁止用 \`--\` 追加功能说明" "文件头描述粒度已写入文本模块"
+expect_in_file "${AGENTS}" "禁止用 \`--\` 追加功能说明" "文件头描述粒度已内联进 AGENTS.md"
+expect_in_file "skills/coding-standards/stacks/vue.md" "## 常量（constants）" "常量规范已写入 Vue 分册"
+expect_in_file "skills/coding-standards/stacks/vue.md" "## 全局组件注册" "全局组件注册已写入 Vue 分册"
+expect_in_file "${COLLABORATION}" "## 分析输出格式" "分析输出格式已写入协作模块"
+
+# 四之三之四、规范分册的文件头不得带前缀标签(md 不进 check.sh 扫描范围,靠这条兜底)
+LABEL_HITS=$(grep -rlE '^(作用|文件作用|文件用途|文件说明)[:：]' skills/ templates/ 2>/dev/null || true)
+
+if [ -z "${LABEL_HITS}" ]; then
+	pass "分册文件头无前缀标签"
+else
+	fail "分册文件头带了前缀标签: $(printf '%s' "${LABEL_HITS}" | tr '\n' ' ')"
+fi
 
 # 四之四、check.sh 与模板里的副本必须逐字一致
 if diff -q "${CHECK_SH}" "${CHECK_SH_TEMPLATE}" >/dev/null 2>&1; then
