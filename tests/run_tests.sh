@@ -107,11 +107,6 @@ public class GoodService {
 EOF
 
 cat > "${GOOD_DIR}/good-style.css" <<'EOF'
-/*
- * 定义订单列表页的配色与栅格
- * 创建日期：2026-09-21
- * 修改日期：2026-09-21
- */
 :root {
 	--bg-primary: #ffffff;
 	--text-main: #1f2a44;
@@ -162,6 +157,19 @@ export const sumParcelWeight = (weights: number[]): number => weights.reduce((a,
 
 // 这里保留隐喻说法作为反例演示 -- 搬运 check-ignore
 export const legacyNote = 1;
+EOF
+
+cat > "${GOOD_DIR}/good-import.ts" <<'EOF'
+/**
+ * 装配仪表盘展示数据
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+import { getDashboard } from "@/api/dashboard";
+
+import type { EChartsOption } from "echarts";
+
+export const chartOption: EChartsOption = {};
 EOF
 
 cat > "${GOOD_DIR}/deploy.yml" <<'EOF'
@@ -267,11 +275,6 @@ echo "ok"
 EOF
 
 cat > "${GOOD_DIR}/good_style.css" <<'EOF'
-/*
- * 订单列表页样式
- * 创建日期：2026-08-31
- * 修改日期：2026-08-31
- */
 :root {
 	--order-bg: #ffffff;
 	--order-line: #d2d2d7;
@@ -838,6 +841,86 @@ expect_not_contains "${CHECK_OUTPUT}" "useAuth.ts 绕过入口" "检查八:白�
 expect_not_contains "${CHECK_OUTPUT}" "auth.ts 绕过入口直接引用" "检查八:受保护模块自身放行"
 
 rm -rf "${BOUNDARY_DIR}"
+
+
+# ============================================================
+# 场景八：样式注释与 import 排版
+# ============================================================
+echo "=== 场景八：样式注释与 import 排版 ==="
+STYLE_DIR="$(mktemp -d)"
+make_skeleton "${STYLE_DIR}"
+
+# 违规：CSS 文件写了注释(含文件头)
+cat > "${STYLE_DIR}/bad.css" <<'EOF'
+/*
+ * 定义页面布局
+ * 创建日期：2026-01-01
+ * 修改日期：2026-01-02
+ */
+.hero {
+	color: red;
+}
+EOF
+
+# 合规：CSS 无注释也无文件头
+cat > "${STYLE_DIR}/good.css" <<'EOF'
+:root {
+	--bg-primary: #ffffff;
+}
+
+.order-list {
+	background: var(--bg-primary);
+}
+EOF
+
+# 违规：style 块内有注释；模板与脚本的注释必须放行
+cat > "${STYLE_DIR}/Bad.vue" <<'EOF'
+<!--
+展示订单列表
+创建日期：2026-01-01
+修改日期：2026-01-02
+-->
+<template>
+	<!-- 模板注释允许存在 -->
+	<div
+		class="order"
+	>
+	</div>
+</template>
+
+<script setup lang="ts">
+// 脚本注释允许存在
+const orderTotal = 1;
+</script>
+
+<style scoped>
+/* 这条注释违规 */
+.order {
+	color: red;
+}
+</style>
+EOF
+
+# 违规：type import 排在值 import 之前
+cat > "${STYLE_DIR}/bad-order.ts" <<'EOF'
+/**
+ * 装配仪表盘数据
+ * 创建日期：2026-01-01
+ * 修改日期：2026-01-02
+ */
+import type { EChartsOption } from "echarts";
+import { getDashboard } from "@/api/dashboard";
+
+export const chartOption: EChartsOption = {};
+EOF
+
+run_check "${STYLE_DIR}"
+expect_contains "${CHECK_OUTPUT}" "bad.css 样式里写了注释" "检查九:CSS 文件头注释被拦"
+expect_not_contains "${CHECK_OUTPUT}" "good.css" "检查九:无注释的 CSS 放行且不要求文件头"
+expect_contains "${CHECK_OUTPUT}" "Bad.vue 样式里写了注释" "检查九:style 块注释被拦"
+expect_contains "${CHECK_OUTPUT}" "bad-order.ts import 排版错误" "检查十:type import 排在值 import 之前被拦"
+
+rm -rf "${STYLE_DIR}"
 
 # ============================================================
 # 汇总

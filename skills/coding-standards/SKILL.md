@@ -28,7 +28,7 @@ metadata:
 | 代码审查 | [review](../review/SKILL.md) |
 
 ## 交付红线
-> 这十条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
+> 这十二条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
 
 1. **注释用中文**，所有源码文件带文件头三行：作用描述、`创建日期：YYYY-MM-DD`、`修改日期：YYYY-MM-DD`，冒号是全角
 2. **缩进默认 Tab**；Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格；行尾统一 LF
@@ -40,6 +40,8 @@ metadata:
 8. **AI 代码只提交到 `agents/feature/*`**，禁止任何 AI 联合署名，禁止直接推主干或发起 PR
 9. **交付前 `make verify` 全绿**（规范校验 + 测试），未实跑不得声称通过
 10. **动手前先判定变更类型**，按 [流程规范](rules/process.md) 的闸门表执行对应要求
+11. **样式里不写任何注释**（`.css` / `.scss` 与 Vue `<style>` 块，含文件头）；**import 顺序**为值 import 在前、`import type` 在后
+12. **元素多行书写**：属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现
 
 ## 规范模块
 

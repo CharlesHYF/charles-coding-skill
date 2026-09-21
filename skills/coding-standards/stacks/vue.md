@@ -51,6 +51,82 @@
 
 业务流程为步骤 1、步骤 2、提交时，相关方法也优先按照步骤 1、步骤 2、提交排列。页面顺序无法明确判断或调整可能改变行为时保留现状。
 
+## 模板排版
+> 通用原则见 [common.md](../rules/common.md)，这里是 Vue 模板的具体形态。排版只改格式，不动逻辑。
+
+- 每个属性独占一行，**即使标签很短、属性只有两个也一样**
+- 文本内容单独占一行
+- 结束的 `>` 或 `/>` 单独占一行
+- 同一父元素下的相邻子元素之间空一行
+- 只有组件用自闭合形式，原生 HTML 标签永远成对出现
+
+```vue
+<div
+	class="preview__image-toolbar"
+>
+	<button
+		type="button"
+		aria-label="缩小"
+		@click="zoomOut"
+	>
+		<MorphIcon
+			:icon="ZoomOut"
+			:size="16"
+			:stroke-width="1.8"
+		/>
+	</button>
+
+	<span>
+		{{ Math.round(zoom * PERCENTAGE_MULTIPLIER) }}%
+	</span>
+
+	<button
+		type="button"
+		aria-label="适应预览区域"
+		@click="fit"
+	>
+		<MorphIcon
+			:icon="Maximize2"
+			:size="16"
+			:stroke-width="1.8"
+		/>
+		<span>
+			适应
+		</span>
+	</button>
+</div>
+
+<iframe
+	v-if="kind === 'pdf'"
+	class="preview__pdf"
+	:src="file.url"
+	title="PDF 预览"
+>
+</iframe>
+
+<button
+	v-for="(sheet, index) in excelSheets"
+	:key="sheet.name"
+	type="button"
+	role="tab"
+	:class="{ 'is-active': index === activeExcelSheetIndex }"
+	:aria-selected="index === activeExcelSheetIndex"
+	@click="activeExcelSheetIndex = index"
+>
+	{{ sheet.name }}
+</button>
+```
+
+禁止写成 `<button type="button" aria-label="缩小" @click="zoomOut">` 这种多属性挤一行，也禁止 `<span>文本</span>` 这种单行闭合。
+
+由 Prettier 的 `singleAttributePerLine`、`htmlWhitespaceSensitivity: "ignore"` 与 `bracketSameLine: false` 兜底；同级元素间的空行 Prettier 不会主动插入，但会保留，需要手写。
+
+## `<style>` 块不写注释
+> **`<style>` 块内禁止出现任何注释**，与 `.css` / `.scss` 文件同一套要求，细则见 [html-css.md](../languages/html-css.md)。
+
+由 `scripts/check.sh` 检查九强制执行。
+
+
 ## 目录结构
 - **页面目录用 `views`，禁止用 `pages`**
 - **一切皆 `index`**：每个页面/组件独立一个文件夹，入口文件统一命名 `index.vue`（`index.ts`、`index.css` 同理），即 `xxx/xxxx/index.xx` 结构

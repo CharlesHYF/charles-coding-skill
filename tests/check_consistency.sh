@@ -70,7 +70,7 @@ else
 fi
 
 # 三、lint 范围描述串：四处必须逐字一致
-LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界"
+LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版"
 
 expect_in_file "${CHECK_SH}" "${LINT_SCOPE}" "lint 范围串在 check.sh"
 expect_in_file "${AGENTS}" "${LINT_SCOPE}" "lint 范围串在 AGENTS.md"
@@ -102,6 +102,14 @@ expect_in_file "${AGENTS}" "先写复现测试并确认它失败" "Bug 修复要
 expect_in_file "${ARCHITECTURE}" "## 单一入口原则" "单一入口原则已写入架构模块"
 expect_in_file "${AGENTS}" "单一入口" "单一入口原则已内联进 AGENTS.md"
 expect_in_file "templates/project-template/.import-boundaries" "受保护模块路径片段" "模块边界配置示例存在"
+
+# 四之三之二、样式禁注释与 import 排版必须同时活在分册与项目模板里
+expect_in_file "skills/coding-standards/languages/html-css.md" "## CSS 里不写注释" "CSS 禁注释已写入分册"
+expect_in_file "skills/coding-standards/stacks/vue.md" "块不写注释" "style 块禁注释已写入 Vue 分册"
+expect_in_file "${AGENTS}" "样式不写注释" "CSS 禁注释已内联进 AGENTS.md"
+expect_in_file "skills/coding-standards/languages/javascript-typescript.md" "## import 排版" "import 排版已写入分册"
+expect_in_file "${AGENTS}" "import 排版" "import 排版已内联进 AGENTS.md"
+expect_in_file "skills/coding-standards/rules/common.md" "## 元素与空行排版" "元素排版规则已写入通用模块"
 
 # 四之四、check.sh 与模板里的副本必须逐字一致
 if diff -q "${CHECK_SH}" "${CHECK_SH_TEMPLATE}" >/dev/null 2>&1; then

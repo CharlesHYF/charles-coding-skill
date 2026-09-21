@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner-light.png" alt="charles-coding" width="880">
+<img src="assets/banner.png" alt="charles-coding" width="880">
 
 ![Version](https://img.shields.io/badge/version-4.0.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Python%20%7C%20Go%20%7C%20TypeScript%20%7C%20Vue%20%7C%20React-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
@@ -27,15 +27,49 @@ Charles 专用的全栈编码规范，适用于主流 AI 编程工具。
 ## 安装
 
 ### Claude Code
-```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.claude/plugins/charles-coding
-```
-在 `~/.claude/settings.json` 里把它加入 marketplace，或直接把 `skills/` 下各目录软链到 `~/.claude/skills/`。
+本仓自带 `.claude-plugin/marketplace.json`，作为本地 marketplace 安装：
 
-### Codex CLI
 ```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.agents/plugins/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
 ```
+
+然后在 Claude Code 里执行：
+
+```
+/plugin marketplace add ~/charles-coding-skill
+/plugin install charles-coding@charles-coding
+```
+
+也可以跳过 clone，直接从 GitHub 添加：`/plugin marketplace add CharlesHYF/charles-coding-skill`。更新用 `/plugin marketplace update`。
+
+### Codex CLI / Qoder
+两者都按 `.agents/skills/` 这个跨工具事实标准加载，把七个 skill 软链过去：
+
+```bash
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
+mkdir -p ~/.agents/skills
+ln -s ~/charles-coding-skill/skills/* ~/.agents/skills/
+```
+
+项目级放 `<项目>/.agents/skills/`，同名时项目级优先。
+
+### Trae
+Trae 同时支持 `.trae/skills/` 与 `.agents/skills/`，同名时前者优先：
+
+```bash
+mkdir -p ~/.trae/skills
+ln -s ~/charles-coding-skill/skills/* ~/.trae/skills/
+```
+
+Trae 对第三方 SKILL.md 生态的识别仍在变化，如果 `.trae/skills/` 不生效，改用上面的 `.agents/skills/` 路径。
+
+### Rovo Dev CLI
+```bash
+mkdir -p ~/.rovodev/skills
+ln -s ~/charles-coding-skill/skills/* ~/.rovodev/skills/
+```
+
+项目级放 `<项目>/.rovodev/skills/`。
 
 ### Cursor
 ```bash
@@ -46,12 +80,11 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/plugins/cha
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.gemini/extensions/charles-coding
 ```
+
 扩展清单为仓库根的 `gemini-extension.json`，上下文文件为 `AGENTS.md`。
 
-### 其它工具（OpenCode / Trae / Qoder / Rovo Dev / Copilot）
-这些工具按 skill 目录加载，把 `skills/` 下需要的目录复制或软链到对应位置：
+### 其它按 skill 目录加载的工具
 ```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
 ln -s ~/charles-coding-skill/skills/coding-standards ~/.<工具>/skills/charles-coding
 ```
 
@@ -99,7 +132,7 @@ cd <安装目录> && git pull origin main
 
 ## 规范校验器
 
-`tools/check.sh` 把确定性规则变成会 fail 的检查，共八项：
+`tools/check.sh` 把确定性规则变成会 fail 的检查，共十项：
 
 ```bash
 bash tools/check.sh --all        # 全量扫描
@@ -116,6 +149,8 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 | 六 | 注释篇幅（**硬上限 3 行**）与句子折断 |
 | 七 | 注释黑话（隐喻与口语表达词表） |
 | 八 | 模块访问边界（单一入口，读项目根 `.import-boundaries`） |
+| 九 | 样式注释（`.css` / `.scss` 与 Vue `<style>` 块内禁止任何注释） |
+| 十 | import 排版（`import type` 不得排在值 import 之前） |
 
 两级豁免：文件级写进 `.checkignore`，行级在注释里加 `check-ignore` 标记。文档反例与测试 fixture 用它放行。
 
@@ -157,12 +192,15 @@ bash tools/check.sh --all        # 规范仓自身的规范校验
 | 注释措辞 | 动作加对象加必要条件，一句话说清；动作词全项目统一；禁止隐喻黑话；日志与用户可见文案同一套要求 |
 | 分层架构 | 后端强制 Controller 到 Service 到 Repository，禁止跨层 |
 | 单一入口 | 一项能力只暴露一个入口模块，底层实现不许被入口之外的地方直接 import；受保护关系写进 `.import-boundaries` |
+| 样式注释 | `.css` / `.scss` 文件与 Vue `<style>` 块内不写任何注释，含文件头；意图由 class 名与自定义属性命名表达 |
+| import 排版 | 顺序为第三方值 import、项目内值 import、全部 type import、常量，组间空一行；type 一律用 `import type` |
+| 元素排版 | 属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现；数组相邻元素之间空一行，对象内键值对不空行 |
 | 变更闸门 | 动手前先判定变更类型（新功能 / 需求变更 / Bug 修复 / 重构 / 依赖升级），按对应档执行文档与测试要求 |
 | Bug 修复 | 先定位根因，**先写复现测试并确认它失败**，再改实现，测试保留进 `regression/` |
 | 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，新功能编码前先写文档并评审 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
-| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界，外加提交信息扫描 |
+| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版，外加提交信息扫描 |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止任何 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干、不发起 PR |
 

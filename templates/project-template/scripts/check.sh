@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界)变成会 fail 的检查，交付前由 make verify 强制执行，不依赖 Agent 自觉
+# 规范校验器 -- 把 charles-coding 里的确定性规则(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版)变成会 fail 的检查，交付前由 make verify 强制执行，不依赖 Agent 自觉
 # 创建日期：2026-08-03
 # 修改日期：2026-09-21
 
@@ -55,6 +55,9 @@ SOURCE_EXT_REGEX='\.(java|kt|kts|go|py|js|jsx|ts|tsx|vue|sql|sh|html|css|scss|ym
 
 # 无扩展名但属于源码的文件（按文件名匹配，与 SOURCE_EXT_REGEX 并列生效）
 SOURCE_NAME_REGEX='(^|/)(Makefile|Dockerfile|Dockerfile\.[A-Za-z0-9_-]+)$'
+
+# 样式文件：不写任何注释(含文件头)，由检查九强制
+NO_COMMENT_EXT_REGEX='\.(css|scss)$'
 
 # 豁免清单：每行一个路径片段，命中的文件跳过全部检查（用于文档反例与测试 fixture）
 CHECK_IGNORE_FILE='.checkignore'
@@ -173,7 +176,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/8] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/10] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -229,12 +232,17 @@ normalize_header_content() {
 # 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
 # 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
-	echo "[2/8] 检查源码文件头注释块..."
+	echo "[2/10] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
 
 		if ! is_source_file "${file}"; then
+			continue
+		fi
+
+		# CSS/SCSS 不写任何注释,自然没有文件头,由检查九单独约束
+		if [[ "${file}" =~ ${NO_COMMENT_EXT_REGEX} ]]; then
 			continue
 		fi
 
@@ -341,7 +349,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/8] 检查项目必需文件..."
+	echo "[3/10] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -401,7 +409,7 @@ check_required_files() {
 # 检查四：命名(数据传输类命名 + 变量/函数的无意义命名)
 # 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规；tmp / obj / doIt 之类占位名一律拦截
 check_naming() {
-	echo "[4/8] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
+	echo "[4/10] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
 
 	local file
 	while IFS= read -r file; do
@@ -453,7 +461,7 @@ check_naming() {
 # 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
 # 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
 check_comment_syntax() {
-	echo "[5/8] 检查注释语法(块注释 / docstring)..."
+	echo "[5/10] 检查注释语法(块注释 / docstring)..."
 
 	local file
 	while IFS= read -r file; do
@@ -571,7 +579,7 @@ MAX_COMMENT_BODY_LINES=3
 # 标签行(@param / @return / :param 等)不计入正文,避免多参数 Javadoc 误报
 # 折断判定走 perl -CSD:中文标点是多字节,awk 在非 UTF-8 locale 下按字节比对会误命中
 check_comment_length() {
-	echo "[6/8] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
+	echo "[6/10] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
 
 	local file
 	while IFS= read -r file; do
@@ -651,7 +659,7 @@ FORBIDDEN_JARGON_PATTERN='\x{4fe1}\x{5c01}|\x{76d2}\x{5b50}|\x{585e}\x{8fdb}|\x{
 
 # 检查七：注释黑话(隐喻 / 口语表达)，词表见上方 FORBIDDEN_JARGON_PATTERN，一律改写为工程动作词
 check_comment_jargon() {
-	echo "[7/8] 检查注释黑话(隐喻 / 口语表达)..."
+	echo "[7/10] 检查注释黑话(隐喻 / 口语表达)..."
 
 	local file
 	while IFS= read -r file; do
@@ -681,7 +689,7 @@ IMPORT_BOUNDARY_FILE='.import-boundaries'
 # 检查八：模块访问边界(单一入口原则,禁止绕过入口直接引用底层实现)
 # 受保护片段里的 / 同时按 . 匹配,以覆盖 Java 的 import com.xx.dal.mapper 这类写法
 check_import_boundaries() {
-	echo "[8/8] 检查模块访问边界(单一入口)..."
+	echo "[8/10] 检查模块访问边界(单一入口)..."
 
 	if [ ! -f "${IMPORT_BOUNDARY_FILE}" ]; then
 		echo "  [SKIP] 未配置 ${IMPORT_BOUNDARY_FILE}，跳过。"
@@ -763,6 +771,75 @@ check_import_boundaries() {
 	done < "${IMPORT_BOUNDARY_FILE}"
 }
 
+# 检查九：样式里不写注释(CSS / SCSS 文件与 Vue SFC 的 style 块)
+# 样式意图由 class 名与自定义属性命名表达，设计决策写进模块文档
+check_style_comments() {
+	echo "[9/10] 检查样式注释(CSS 与 style 块不写注释)..."
+
+	local file
+	while IFS= read -r file; do
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		local hits=""
+
+		if [[ "${file}" =~ ${NO_COMMENT_EXT_REGEX} ]]; then
+			# 块注释任意位置即违规;行首 // 是 SCSS 单行注释,URL 里的 // 不在行首故不误伤
+			hits=$(grep -nE '/\*|^[[:space:]]*//' "${file}" | drop_ignored_lines)
+		elif [[ "${file}" =~ \.(vue|html)$ ]]; then
+			# 只看 style 块内部,模板与脚本的注释不受这条约束
+			hits=$(awk '
+				/<style/ { instyle = 1; next }
+				/<\/style>/ { instyle = 0; next }
+				instyle && (/\/\*/ || /^[[:space:]]*\/\//) { print NR ": " $0 }
+			' "${file}" | drop_ignored_lines)
+		else
+			continue
+		fi
+
+		if [ -n "${hits}" ]; then
+			report "${file} 样式里写了注释(CSS 与 style 块不写任何注释,含文件头):"
+			echo "${hits}" | sed 's/^/         /'
+		fi
+
+	done < <(list_files)
+}
+
+# 检查十：import 排版(type import 不得出现在值 import 之前)
+# 顺序固定为值 import -> type import -> 常量,便于一眼看清依赖来源
+check_import_order() {
+	echo "[10/10] 检查 import 排版(type 在值 import 之后)..."
+
+	local file
+	while IFS= read -r file; do
+
+		if [[ ! "${file}" =~ \.(ts|tsx|js|jsx|vue)$ ]]; then
+			continue
+		fi
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		local first_type last_value
+		first_type=$(grep -nE '^[[:space:]]*import[[:space:]]+type[[:space:]]' "${file}" | head -1 | cut -d: -f1)
+		last_value=$(grep -nE '^[[:space:]]*import[[:space:]]' "${file}" \
+			| grep -vE '^[0-9]+:[[:space:]]*import[[:space:]]+type[[:space:]]' \
+			| tail -1 | cut -d: -f1)
+
+		if [ -z "${first_type}" ] || [ -z "${last_value}" ]; then
+			continue
+		fi
+
+		if [ "${first_type}" -lt "${last_value}" ]; then
+			report "${file} import 排版错误(L${first_type} 的 type import 在 L${last_value} 的值 import 之前,type 应排在全部值 import 之后)"
+		fi
+
+	done < <(list_files)
+}
+
 echo "=== charles-coding 规范校验 ==="
 
 check_forbidden_chars
@@ -773,6 +850,8 @@ check_comment_syntax
 check_comment_length
 check_comment_jargon
 check_import_boundaries
+check_style_comments
+check_import_order
 
 echo "==============================="
 

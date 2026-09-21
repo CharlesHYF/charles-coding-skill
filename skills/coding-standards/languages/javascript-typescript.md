@@ -15,7 +15,7 @@
 ## 代码风格
 - 缩进：Tab
 - 语句结尾**必须加分号**，不依赖自动分号插入
-- 字符串统一单引号 `'`，需要插值时用模板字符串，禁止字符串拼接变量
+- 字符串统一双引号 `"`，需要插值时用模板字符串，禁止字符串拼接变量
 - 声明一律 `const`，确需重新赋值才用 `let`，**禁止 `var`**
 - 相等比较一律 `===` 与 `!==`，禁止 `==`
 - **禁止链式可选调用掩盖错误**：`a?.b?.c?.d` 超过两层说明数据结构不明确，应先校验再取值
@@ -28,6 +28,62 @@
 - 类型命名用 `PascalCase`，不加 `I` 前缀（用 `User` 不用 `IUser`）；泛型参数用有意义的名字（`TPayload`），单字母仅限 `T` 一个参数的简单场景
 - 类型定义就近放在使用它的模块内；跨模块共享的类型集中放 `types/`，按 [naming.md](../rules/naming.md) 的数据传输命名规则取名
 - 联合类型的判别字段统一叫 `type` 或 `kind`，全项目只选一个
+
+## import 排版
+> 顺序固定为：值 import -> type import -> 常量与其余代码。组间空一行，组内不空行。
+
+分四组，依次排列：
+
+1. **第三方值 import**（node_modules 里的包）
+2. **项目内值 import**（`@/` 或相对路径）
+3. **全部 type import**（先第三方，后项目内）
+4. **常量、配置与其余代码**
+
+```ts
+import { ChevronDown, ChevronLeft, ChevronRight, Clock } from "lucide";
+import { MorphIcon } from "morphicons/vue";
+
+import { getDashboardOperations } from "@/api/admin/dashboard";
+import EChart from "@/components/EChart/index.vue";
+
+import type { EChartsOption } from "echarts";
+import type {
+	DashboardActivityVO,
+	DashboardInboxItemVO,
+	DashboardOperationsRespVO,
+	DashboardProjectProgressVO,
+} from "@/types";
+
+const PERCENTAGE_MULTIPLIER = 100;
+```
+
+- **type 导入一律用 `import type`**，不与值导入混写在同一条语句里
+- **具名导入超过三个，或整行超过 printWidth 时，每个导入独占一行**并带行尾逗号
+- 组内按模块路径字母序排列
+- 静态 import 必须在文件顶部；动态 `import()` 属于运行逻辑，保留在实际加载位置
+- **禁止把 type import 混进值 import 组中间**，这是最常见的违规形态
+
+## 数组与对象排版
+- **数组字面量的相邻元素之间空一行**，元素内部的键值对不空行：
+  ```ts
+  export const RULE_STATUS_OPTIONS = [
+  	{
+  		label: "待确认",
+  		tag: "pending-confirmation",
+  		value: 1,
+  	},
+
+  	{
+  		label: "已确认",
+  		tag: "confirmed",
+  		value: 2,
+  	},
+  ] as const;
+  ```
+- 对象内部逻辑上分组时，组之间可空一行；否则不空
+- **顶层 `export` 之间空一行，函数之间空一行**
+- 换行不得丢掉 `as const`、类型断言与分号
+
 
 ## 异步
 - 统一 `async` / `await`，不混用 `.then()` 链
