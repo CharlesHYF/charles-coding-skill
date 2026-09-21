@@ -1,0 +1,31 @@
+{
+  "name": "charles-coding",
+  "version": "4.0.0",
+  "description": "Charles 的全栈编码规范与开发工作流：规范模块、变更类型闸门、规范校验器与六个场景工作流",
+  "author": {
+    "name": "Charles",
+    "email": "w1400214654@outlook.com",
+    "url": "https://github.com/CharlesHYF"
+  },
+  "homepage": "https://github.com/CharlesHYF/charles-coding-skill",
+  "repository": "https://github.com/CharlesHYF/charles-coding-skill",
+  "license": "MIT",
+  "keywords": [
+    "coding-standards",
+    "code-review",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Charles Coding",
+    "shortDescription": "全栈编码规范、变更闸门与场景工作流",
+    "longDescription": "提供 Java / Kotlin / Python / Go / TypeScript / Vue / React / Android 的编码规范，按变更类型划分交付闸门，并附带可执行的规范校验器与六个场景工作流。",
+    "developerName": "Charles",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/CharlesHYF/charles-coding-skill"
+  }
+}

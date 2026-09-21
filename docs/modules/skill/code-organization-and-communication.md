@@ -2,7 +2,7 @@
 > 模块职责：规定源码编写与组织方式、已有代码修改边界和开发交流风格
 > 负责人：GPT-5
 > 系统模块：skill
-> 关联文件：SKILL.md、reference/code-organization.md、reference/chinese-developer.md
+> 关联文件：skills/coding-standards/SKILL.md、skills/coding-standards/rules/architecture.md、skills/coding-standards/rules/collaboration.md
 
 ## 代码编写与组织规范
 ### 功能描述

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # check.sh 回归测试 -- 用固定 fixture 断言七项检查该报的都报、不该报的不报，防止规则改动静默退化
 # 创建日期：2026-08-31
-# 修改日期：2026-09-14
+# 修改日期：2026-09-21
 
 set -uo pipefail
 
 # 被测脚本：模板里的规范校验器
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-CHECK_SH="${REPO_ROOT}/reference/project-template/scripts/check.sh"
+CHECK_SH="${REPO_ROOT}/tools/check.sh"
 
 if [ ! -f "${CHECK_SH}" ]; then
 	echo "[FATAL] 找不到被测脚本: ${CHECK_SH}"
@@ -104,6 +104,80 @@ public class GoodService {
 		return null;
 	}
 }
+EOF
+
+cat > "${GOOD_DIR}/good-style.css" <<'EOF'
+/*
+ * 定义订单列表页的配色与栅格
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+:root {
+	--bg-primary: #ffffff;
+	--text-main: #1f2a44;
+}
+
+.order-list,
+.order-detail {
+	background: var(--bg-primary);
+}
+EOF
+
+cat > "${GOOD_DIR}/PageUserVO.java" <<'EOF'
+/**
+ * 用户分页查询的框架基类
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+public class PageUserVO {
+
+	/**
+	 * 按条件分页查询用户
+	 *
+	 * @param pageNo 页码
+	 * @param pageSize 每页条数
+	 * @param keyword 关键字
+	 * @return 用户分页结果
+	 */
+	public Object queryUsers(int pageNo, int pageSize, String keyword) {
+		return null;
+	}
+}
+EOF
+
+cat > "${GOOD_DIR}/countdown.ts" <<'EOF'
+/**
+ * 倒计时递减与业务术语用词的放行样例
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+export const tickDown = (start: number): number => {
+	let remaining = start;
+	remaining--;
+	return remaining;
+};
+
+// 按运单号汇总包裹重量
+export const sumParcelWeight = (weights: number[]): number => weights.reduce((a, b) => a + b, 0);
+
+// 这里保留隐喻说法作为反例演示 -- 搬运 check-ignore
+export const legacyNote = 1;
+EOF
+
+cat > "${GOOD_DIR}/deploy.yml" <<'EOF'
+# 定义生产环境的容器编排与端口映射
+# 创建日期：2026-09-21
+# 修改日期：2026-09-21
+version: "3"
+EOF
+
+cat > "${GOOD_DIR}/Makefile" <<'EOF'
+# 提供构建与测试的统一入口
+# 创建日期：2026-09-21
+# 修改日期：2026-09-21
+
+all:
+	@echo ok
 EOF
 
 cat > "${GOOD_DIR}/GoodReqVO.ts" <<'EOF'
@@ -584,6 +658,186 @@ else
 fi
 
 rm -rf "${MISS_DIR}"
+
+
+# ============================================================
+# 场景四：此前漏检的四类违规必须被拦住
+# ============================================================
+echo "=== 场景四：扩展扫描范围与文件头回溯 ==="
+GAP_DIR="$(mktemp -d)"
+make_skeleton "${GAP_DIR}"
+
+# 带 package 的 Java 缺描述行：回溯不得把 package/import 当成描述行
+cat > "${GAP_DIR}/NoDesc.java" <<'EOF'
+package com.demo;
+
+import java.util.List;
+
+/**
+ * 创建日期：2026-01-01
+ * 修改日期：2026-01-02
+ */
+public class NoDesc {
+}
+EOF
+
+# 单独的"作用："前缀标签
+cat > "${GAP_DIR}/prefix.sh" <<'EOF'
+# 作用：构建并校验项目交付产物
+# 创建日期：2026-01-01
+# 修改日期：2026-01-02
+
+echo hi
+EOF
+
+# YAML：既缺文件头也含黑话
+cat > "${GAP_DIR}/deploy.yml" <<'EOF'
+# 把配置塞进容器，喂给下游服务
+version: "3"
+EOF
+
+# Makefile：日期行用半角冒号
+cat > "${GAP_DIR}/Makefile" <<'EOF'
+# 提供构建与测试的统一入口
+# 创建日期: 2026-07-29
+# 修改日期：2026-07-29
+
+all:
+	@echo hi
+EOF
+
+run_check "${GAP_DIR}"
+expect_contains "${CHECK_OUTPUT}" "NoDesc.java 缺少文件头作用描述行" "检查二:带 package 仍能判缺描述行"
+expect_contains "${CHECK_OUTPUT}" "prefix.sh 文件头带了前缀标签" "检查二:单独的作用前缀标签"
+expect_contains "${CHECK_OUTPUT}" "deploy.yml 缺少" "检查二:YAML 纳入文件头校验"
+expect_contains "${CHECK_OUTPUT}" "deploy.yml 注释含隐喻" "检查七:YAML 注释纳入黑话校验"
+expect_contains "${CHECK_OUTPUT}" "Makefile 日期行用了半角冒号" "检查二:Makefile 纳入校验"
+
+rm -rf "${GAP_DIR}"
+
+# ============================================================
+# 场景五：豁免机制(文件级 .checkignore 与行级 check-ignore)
+# ============================================================
+echo "=== 场景五：豁免机制 ==="
+IGNORE_DIR="$(mktemp -d)"
+make_skeleton "${IGNORE_DIR}"
+
+cat > "${IGNORE_DIR}/bad-example.yml" <<'EOF'
+# 把配置塞进容器，喂给下游服务
+version: "3"
+EOF
+
+cat > "${IGNORE_DIR}/inline.sh" <<'EOF'
+# 构建并校验项目交付产物
+# 创建日期：2026-01-01
+# 修改日期：2026-01-02
+
+# 这一行故意保留隐喻作为文档反例 -- 搬运 check-ignore
+echo hi
+EOF
+
+run_check "${IGNORE_DIR}"
+expect_contains "${CHECK_OUTPUT}" "bad-example.yml" "豁免前:反例文件确实会被报出来"
+
+printf 'bad-example.yml\n' > "${IGNORE_DIR}/.checkignore"
+run_check "${IGNORE_DIR}"
+expect_not_contains "${CHECK_OUTPUT}" "bad-example.yml" "豁免后:.checkignore 命中的文件被跳过"
+expect_not_contains "${CHECK_OUTPUT}" "inline.sh 注释含隐喻" "行级 check-ignore 跳过该行"
+
+rm -rf "${IGNORE_DIR}"
+
+# ============================================================
+# 场景六：增量模式只检查本次改动
+# ============================================================
+echo "=== 场景六：增量检查 ==="
+INC_DIR="$(mktemp -d)"
+make_skeleton "${INC_DIR}"
+(
+	cd "${INC_DIR}" || exit 1
+	git init -q .
+	git config user.email test@example.com
+	git config user.name test
+	printf 'const tmp = 1;\nexport function doIt() { return tmp; }\n' > legacy.ts
+	git add -A
+	git commit -qm "存量代码"
+	git branch -M main
+	git checkout -qb agents/feature/incremental
+	cat > clean.ts <<'INNER'
+/**
+ * 计算订单总价
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+export const calculateTotal = (prices: number[]): number => prices.reduce((a, b) => a + b, 0);
+INNER
+	git add -A
+	git commit -qm "新增合规文件"
+) >/dev/null 2>&1
+
+run_check "${INC_DIR}"
+expect_contains "${CHECK_OUTPUT}" "legacy.ts" "全量模式:存量违规被报出"
+
+CHECK_OUTPUT="$(cd "${INC_DIR}" && bash "${CHECK_SH}" --changed 2>&1)"
+CHECK_EXIT=$?
+expect_not_contains "${CHECK_OUTPUT}" "legacy.ts" "增量模式:未改动的存量文件被跳过"
+
+if [ "${CHECK_EXIT}" -eq 0 ]; then
+	pass "增量模式:本次改动合规则退出码 0"
+else
+	fail "增量模式:本次改动合规但退出码为 ${CHECK_EXIT}"
+fi
+
+rm -rf "${INC_DIR}"
+
+# ============================================================
+# 场景七：模块访问边界(单一入口)
+# ============================================================
+echo "=== 场景七：模块访问边界 ==="
+BOUNDARY_DIR="$(mktemp -d)"
+make_skeleton "${BOUNDARY_DIR}"
+mkdir -p "${BOUNDARY_DIR}/src/utils" "${BOUNDARY_DIR}/src/composables" "${BOUNDARY_DIR}/src/store"
+
+cat > "${BOUNDARY_DIR}/src/utils/auth.ts" <<'EOF'
+/**
+ * 读取与刷新本地认证令牌
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+export const readToken = (): string | null => localStorage.getItem('token');
+EOF
+
+cat > "${BOUNDARY_DIR}/src/composables/useAuth.ts" <<'EOF'
+/**
+ * 对外提供认证状态与登录登出操作
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+import { readToken } from '../utils/auth';
+
+export const useAuth = () => ({ token: readToken() });
+EOF
+
+cat > "${BOUNDARY_DIR}/src/store/authStore.ts" <<'EOF'
+/**
+ * 保存全局认证状态
+ * 创建日期：2026-09-21
+ * 修改日期：2026-09-21
+ */
+import { readToken } from '../utils/auth';
+
+export const authState = { token: readToken() };
+EOF
+
+run_check "${BOUNDARY_DIR}"
+expect_not_contains "${CHECK_OUTPUT}" "绕过入口" "未配置边界时不做检查"
+
+printf 'utils/auth | composables/useAuth\n' > "${BOUNDARY_DIR}/.import-boundaries"
+run_check "${BOUNDARY_DIR}"
+expect_contains "${CHECK_OUTPUT}" "authStore.ts 绕过入口直接引用受保护模块" "检查八:拦截绕过入口的引用"
+expect_not_contains "${CHECK_OUTPUT}" "useAuth.ts 绕过入口" "检查八:白名单内的入口文件放行"
+expect_not_contains "${CHECK_OUTPUT}" "auth.ts 绕过入口直接引用" "检查八:受保护模块自身放行"
+
+rm -rf "${BOUNDARY_DIR}"
 
 # ============================================================
 # 汇总

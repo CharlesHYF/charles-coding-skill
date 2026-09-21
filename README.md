@@ -1,173 +1,188 @@
-<h1 align="center">charles-coding-skill</h1>
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-3.9.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Go%20%7C%20Vue3%20%7C%20React%20%7C%20Python%20%7C%20SQL-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
+<img src="assets/banner-light.png" alt="charles-coding" width="880">
+
+![Version](https://img.shields.io/badge/version-4.0.0-blue) ![Languages](https://img.shields.io/badge/languages-Java%20%7C%20Kotlin%20%7C%20Python%20%7C%20Go%20%7C%20TypeScript%20%7C%20Vue%20%7C%20React-informational) ![AI Tools](https://img.shields.io/badge/AI%20tools-Claude%20Code%20%7C%20Codex%20%7C%20Cursor%20%7C%20Gemini%20%7C%20Copilot-brightgreen) ![Indent](https://img.shields.io/badge/indent-Tab-orange) ![Comments](https://img.shields.io/badge/comments-%E4%B8%AD%E6%96%87-red)
 
 </div>
 
-Charles 专用全栈编码规范 Skill，适用于主流 AI 编程工具。
+Charles 专用的全栈编码规范，适用于主流 AI 编程工具。
 
-覆盖 Java / Kotlin / Go / Vue 3 / React / Python / SQL，包含：分层架构、解耦原则、代码块规范、命名约定、常量管理、格式化工具链、Docker 规范、测试要求、Git 分支与提交规范、注释规范、代码编写与组织规范和 Chinese Developer 输出风格。
+覆盖 Java / Kotlin / Python / Go / TypeScript / JavaScript / HTML / CSS / SQL / Node.js / Vue 3 / React / Android / Web 前端，包含：分层架构与解耦、命名与注释、变更类型闸门、测试要求、Git 分支与交付规范，以及一个会 fail 的规范校验器。
+
+## 组成
+
+七个 skill，一份规范本体加六个场景工作流：
+
+| skill | 用途 |
+| --- | --- |
+| `coding-standards` | 规范本体：交付红线、场景路由、规范模块索引 |
+| `new-project` | 新项目初始化：装脚手架、装闸门、验证闸门确实会 fail |
+| `legacy-project` | 老项目接入：增量检查，新代码严格、存量不阻塞 |
+| `new-feature` | 新功能与需求变更：问清需求、模块文档评审、编码、测试 |
+| `bugfix` | Bug 修复：定位根因、先写复现测试、再改实现 |
+| `refactor` | 重构：证明行为等价，禁止改断言让它通过 |
+| `review` | 代码审查：先跑校验器，再审脚本查不了的部分 |
 
 ## 安装
+
 ### Claude Code
 ```bash
-# 全局（推荐，对所有项目生效）
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.claude/skills/charles-coding
-
-# 项目级
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .claude/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.claude/plugins/charles-coding
 ```
+在 `~/.claude/settings.json` 里把它加入 marketplace，或直接把 `skills/` 下各目录软链到 `~/.claude/skills/`。
 
 ### Codex CLI
 ```bash
-# 全局
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.agents/skills/charles-coding
-
-# 项目级
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .agents/skills/charles-coding
-```
-
-### OpenCode
-```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .opencode/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.agents/plugins/charles-coding
 ```
 
 ### Cursor
 ```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/plugins/charles-coding
 ```
 
 ### Gemini CLI
 ```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .gemini/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.gemini/extensions/charles-coding
 ```
+扩展清单为仓库根的 `gemini-extension.json`，上下文文件为 `AGENTS.md`。
 
-### GitHub Copilot
+### 其它工具（OpenCode / Trae / Qoder / Rovo Dev / Copilot）
+这些工具按 skill 目录加载，把 `skills/` 下需要的目录复制或软链到对应位置：
 ```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .github/skills/charles-coding
-```
-
-### Trae
-```bash
-# 国际版
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae/skills/charles-coding
-
-# 国内版
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.trae-cn/skills/charles-coding
-```
-
-### Rovo Dev
-```bash
-# 全局
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.rovodev/skills/charles-coding
-
-# 项目级
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .rovodev/skills/charles-coding
-```
-
-### Qoder
-```bash
-# 全局
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.qoder/skills/charles-coding
-
-# 项目级
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .qoder/skills/charles-coding
-```
-
-### Pi
-```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .pi/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
+ln -s ~/charles-coding-skill/skills/coding-standards ~/.<工具>/skills/charles-coding
 ```
 
 ### Hermes Agent / OpenClaw
-无需手动安装目录，将 [SKILL.md](SKILL.md) 内容作为 system prompt 或上下文注入即可。
+无需安装目录，把 `skills/coding-standards/SKILL.md` 内容作为 system prompt 注入即可。
 
 ## 更新
 ```bash
-cd <上述安装目录> && git pull origin main
+cd <安装目录> && git pull origin main
 ```
 
 ## 目录结构
 ```
 .
-├── SKILL.md                      # Skill 主入口：全局约定 + 速查索引
-├── example.html                  # 完整前端范例（展会落地页，含网格布局/自定义下拉/Toast）
-├── tests/                        # 本仓自测：check.sh 回归测试 + 规则一致性自检（CI 强制）
-├── docs/modules/skill/           # Skill 正式模块文档
-└── reference/
-    ├── java.md                   # Java / Spring Boot
-    ├── kotlin-android.md         # Kotlin / Android
-    ├── go.md                     # Go / Gin
-    ├── vue.md                    # Vue 3 / Vite
-    ├── react.md                  # React / Next.js
-    ├── python.md                 # Python / FastAPI
-    ├── sql.md                    # SQL (PostgreSQL / MySQL / SQLite)
-    ├── comments.md               # 注释规范示例集（正反示例）
-    ├── code-organization.md      # 源码编写顺序、注释位置与已有代码修改边界
-    ├── chinese-developer.md      # 自然、直接、具体的中文开发交流规范
-    ├── module-doc-template.md    # 模块文档模板
-    ├── readme-md.md              # 文档与 Markdown 规范
-    ├── devops.md                 # DevOps 与部署安全
-    ├── testing.md                # 测试与压测
-    ├── logging.md                # 日志
-    ├── ai-ml.md                  # AI / ML
-    ├── examples/                 # 详细范例（测试用例 + 模块文档，仅参考不复制）
-    │   ├── test_cases/           # backend / frontend / daemon 三级模块测试用例范例
-    │   └── docs/modules/         # backend / frontend / daemon 三级模块文档范例
-    └── project-template/         # 新项目脚手架骨架
+├── skills/
+│   ├── coding-standards/         # 规范本体
+│   │   ├── SKILL.md              # 交付红线 + 场景路由 + 模块索引
+│   │   ├── rules/                # 通用规则，所有语言适用
+│   │   │   ├── common.md         # 缩进、行尾、禁用符号、大括号、换行、常量
+│   │   │   ├── naming.md         # 变量、函数、布尔、集合、数据传输对象
+│   │   │   ├── text.md           # 注释语法、文件头、篇幅、折行、措辞
+│   │   │   ├── architecture.md   # 分层架构、解耦、单一入口、文件内组织
+│   │   │   ├── git.md            # 提交、署名、分支、gitignore、交付整洁
+│   │   │   ├── process.md        # 变更类型闸门表、模块文档、子 Agent 契约
+│   │   │   └── collaboration.md  # 工作节奏、确认边界、中文表达
+│   │   ├── languages/            # java kotlin python go javascript-typescript html-css sql
+│   │   ├── stacks/               # vue react nodejs web android
+│   │   └── domains/              # testing logging devops ai-ml docs-markdown
+│   ├── new-project/              # 六个场景工作流
+│   ├── legacy-project/
+│   ├── new-feature/
+│   ├── bugfix/
+│   ├── refactor/
+│   └── review/
+├── tools/
+│   ├── check.sh                  # 规范校验器，八项检查，会 fail
+│   └── install-check.sh          # 老项目接入安装器
+├── templates/
+│   ├── project-template/         # 新项目脚手架
+│   ├── module-doc.md             # 模块文档模板
+│   └── examples/                 # 测试用例与模块文档范例、前端范例页
+├── tests/                        # 本仓自测（CI 强制）
+└── .claude-plugin/ .cursor-plugin/ .codex-plugin/ .agents/   # 各工具适配层
 ```
+
+## 规范校验器
+
+`tools/check.sh` 把确定性规则变成会 fail 的检查，共八项：
+
+```bash
+bash tools/check.sh --all        # 全量扫描
+bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代用）
+```
+
+| 检查 | 内容 |
+| --- | --- |
+| 一 | 禁用字符（Unicode 引号、破折号、Emoji） |
+| 二 | 源码文件头注释块（作用描述、创建日期、修改日期、全角冒号） |
+| 三 | 项目必需文件与 `docs/modules/`、`test_cases/` 目录层级 |
+| 四 | 命名（数据传输对象后缀、占位名、编号名、口语函数名） |
+| 五 | 注释语法（块注释三段式、docstring 引号） |
+| 六 | 注释篇幅（**硬上限 3 行**）与句子折断 |
+| 七 | 注释黑话（隐喻与口语表达词表） |
+| 八 | 模块访问边界（单一入口，读项目根 `.import-boundaries`） |
+
+两级豁免：文件级写进 `.checkignore`，行级在注释里加 `check-ignore` 标记。文档反例与测试 fixture 用它放行。
+
+## 交付闸门
+
+```
+push agents/**   ->  pre-push 钩子跑增量校验
+push main        ->  pre-push 钩子跑全量 make verify，不过不让推
+推到远端之后      ->  云端 CI 二次确认
+```
+
+本地 pre-push 钩子是真闸门，云端 CI 拦的是钩子被绕过或未安装的情况。钩子由 `scripts/setup.sh` 或 `tools/install-check.sh` 安装。
 
 ## 仓库自测（本仓 CI 强制）
-规范仓自己也吃狗粮：`.github/workflows/test.yml` 在 push / PR 时强制跑以下两项，任一失败即红。
+
+规范仓对自己执行同一套标准，`.github/workflows/test.yml` 在 push 与 PR 时强制跑四项：
 
 ```bash
-bash tests/run_tests.sh
+bash tests/run_tests.sh          # check.sh 回归测试，46 项断言
+bash tests/check_consistency.sh  # 多处同源规则一致性，50 项断言
+bash tests/check_structure.sh    # skill 完整性、六处版本号、Markdown 死链
+bash tools/check.sh --all        # 规范仓自身的规范校验
 ```
 
-`check.sh` 回归测试：用固定 fixture 断言七项检查该报的都报（31 项断言）、合规文件零误报，防止规则改动静默退化。
-
-```bash
-bash tests/check_consistency.sh
-```
-
-多处同源规则一致性自检：版本号（SKILL.md metadata vs README badge）、注释篇幅上限、lint 范围串、专项分册入口、检查项编号、各分册文件头模板、注释黑话词表、仓库自身禁用字符，共 31 项断言 -- 同一条规则活在 SKILL.md / README / AGENTS.md / check.sh 四处，改一处漏三处时由它兜底。
+回归测试既断言该报的都报，也断言不该报的不报（CSS 自定义属性、JS 自减、URL 双斜杠、多参数 Javadoc、框架基类命名、业务术语），误报会让闸门被绕过，和漏报一样严重。
 
 ## 核心约定（速览）
+
 | 项目 | 规范 |
-|------|------|
+| --- | --- |
 | 缩进 | Tab（Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格） |
 | 行尾 | 统一 LF |
-| 大括号 | 控制流/函数体必须用 `{}`，前后留空行 |
+| 大括号 | 控制流与函数体必须用 `{}`，前后留空行 |
 | 常量 | 禁止魔法数字，必须定义为顶部具名常量 |
-| 命名 | 见名知义，禁止 `o`/`n`/`tmp` 等无意义变量名；函数名 = 动词 + 名词，动词与注释动作词一一对应且全项目统一；禁止隐喻/口语命名（`stuff`/`doIt`）、编号凑数名（`data1`）、拼音混拼（`getYonghu`）；由 `scripts/check.sh` 拦截 |
-| 文件头 | 三行：**第一行直接写具体职责**（一到两句自然中文，**无前缀标签、句尾不加句号**），不得使用宽泛名词、罗列全部功能或记录实现与修改过程；第二三行 `创建日期：` / `修改日期：`，**冒号必须中文全角**；已知日期严格使用 `YYYY-MM-DD`，无法可靠确认的创建日期允许留空并在交付说明中列出；由 `scripts/check.sh` 拦截 |
-| 注释篇幅 | 正文默认 1-2 行，**硬上限 3 行**（`@param` 等标签行不计入）；**一条注释一行写完，禁止把一句话折断换行**（行尾逗号/顿号/分号即违规）；背景推演、方案权衡、故障复盘写进 `docs/modules/` 而非注释；由 `scripts/check.sh` 拦截 |
-| 注释语法 | **多行注释一律用块/文档注释**（Java/Kotlin/JS/TS `/** */`、Python `"""` docstring、Vue/HTML `<!-- -->`、SQL `/* */`），禁止连续多行 `//` / `#` 拼多行；单行说明才用 `//` / `#`。例外：Go 声明级注释按 Go doc 标准用 `//`；Shell/YAML/Dockerfile 无块注释语法只能用 `#`。由 `scripts/check.sh` 拦截 |
-| 注释措辞 | **动作 + 对象 + 必要条件**一句话说清；动作词全项目统一（获取/查询/校验/组装/降级 等）；**禁止隐喻黑话**（信封/盒子/塞进/压成/留给下游 等，`scripts/check.sh` 拦截）；删掉只复述代码的零信息注释；日志与用户可见文案同一套要求 |
-| 注释 | 中文；文件头只写作用不写实现；块注释/docstring 三段式（首末行独占）；Python docstring 统一双引号 `"""`，禁止单引号三引号，禁止把单行说明写成三引号字符串；说明性注释置于被说明对象上方 |
-| 代码组织 | 默认约束所有新写和修改的源码：静态 import、类型、常量、状态、生命周期和业务方法按统一阅读顺序组织；Vue 方法按页面与业务流程排列；调整已有代码时必须保持行为 |
-| 开发交流 | 默认使用自然、直接、具体的简体中文；先说结果，不重复结论和执行过程；抽象表达改写为具体职责、输入、输出和行为影响 |
-| 禁用符号 | 禁止各类 Unicode 引号/破折号变体（弯引号 / CJK 角引号 / 全角引号 / em / en dash 等），统一用半角 `""` / `--`；由 `scripts/check.sh` 拦截 |
-| 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织，每个 func 都要写测试用例 |
-| 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，编码前先写文档 |
-| 分层架构 | 所有后端项目 Controller → Service → Repository |
-| 解耦 | 非必要不耦合，禁止循环依赖，重复代码必须抽离 |
-| Docker | 强制 compose，`./volumes/` 持久化，东八区 |
-| 测试 | 交付必须附带 `test_cases/`，确保通过；`scripts/test.sh` 零测试判失败（`ALLOW_NO_TESTS=1` 逃生舱） |
-| CI | `.github/workflows/verify.yml`：push `agents/feature/**` 或 PR→main 跑 `make lint`（禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名）+ 测试 + 提交信息扫描（破折号/Emoji/AI 署名） |
-| Git 作者 | `Charles <w1400214654@outlook.com>`，禁止 AI 联合署名 |
-| Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干 |
-| .gitignore | 必须覆盖 IDE（`.idea/`）、AI 工具（`.claude/` 等）、OS 残留 |
+| 命名 | 见名知义；禁止占位名（`tmp` / `obj`）、编号名（`data1`）、拼音混拼（`getYonghu`）、隐喻口语名（`doIt`）；函数名 = 动词 + 名词，动词全项目统一 |
+| 文件头 | 三行：第一行直接写具体职责（无前缀标签、句尾不加句号），第二三行 `创建日期：` / `修改日期：`，冒号必须中文全角 |
+| 注释篇幅 | 正文默认 1-2 行，**硬上限 3 行**（标签行不计入）；一条注释一行写完，禁止把一句话折断换行 |
+| 注释语法 | 多行注释一律用块或文档注释，禁止连续多行 `//` / `#` 拼多行；Go 声明级注释按官方标准用 `//` |
+| 注释措辞 | 动作加对象加必要条件，一句话说清；动作词全项目统一；禁止隐喻黑话；日志与用户可见文案同一套要求 |
+| 分层架构 | 后端强制 Controller 到 Service 到 Repository，禁止跨层 |
+| 单一入口 | 一项能力只暴露一个入口模块，底层实现不许被入口之外的地方直接 import；受保护关系写进 `.import-boundaries` |
+| 变更闸门 | 动手前先判定变更类型（新功能 / 需求变更 / Bug 修复 / 重构 / 依赖升级），按对应档执行文档与测试要求 |
+| Bug 修复 | 先定位根因，**先写复现测试并确认它失败**，再改实现，测试保留进 `regression/` |
+| 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
+| 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，新功能编码前先写文档并评审 |
+| 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
+| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界，外加提交信息扫描 |
+| Git 作者 | `Charles <w1400214654@outlook.com>`，禁止任何 AI 联合署名 |
+| Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干、不发起 PR |
 
-详见 [SKILL.md](SKILL.md)。
+完整细则见 [skills/coding-standards/SKILL.md](skills/coding-standards/SKILL.md)。
 
-## 遵从率兜底 · SessionStart Hook
-Skill 靠 description 软触发，为兜底"老项目被忽略/不确认就改"，可在本机 `~/.claude/settings.json` 配置一个 SessionStart hook，每次会话开始注入固定提醒（非阻断）。
+## 新项目与老项目
 
-配置步骤：
-1. 新建提醒文本 `~/.claude/charles-coding-reminder.txt`，内容为三条：老项目无 AGENTS.md 先确认；新功能/新模块先写 docs/modules 文档评审再编码，小改/bugfix 豁免但需 commit 说明；交付前测试必须实跑通过。
-2. 在 `~/.claude/settings.json` 的 `hooks.SessionStart` 加一条 command hook：`cat ~/.claude/charles-coding-reminder.txt`。
+```bash
+# 新项目：复制脚手架
+cp -r templates/project-template/ <新项目路径>
+
+# 老项目：装增量校验器与 pre-push 钩子
+bash tools/install-check.sh <项目路径>
+```
+
+老项目接入后默认走增量检查，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 `skills/legacy-project/SKILL.md`。
+
+## 遵从率兜底
+
+Skill 靠 description 软触发。为兜底老项目被忽略或不确认就改的情况，可在 `~/.claude/settings.json` 配置 SessionStart hook，每次会话开始注入固定提醒：
 
 ```json
 {
@@ -179,7 +194,4 @@ Skill 靠 description 软触发，为兜底"老项目被忽略/不确认就改"�
 }
 ```
 
-新增后需新开会话或在 Claude Code 打开一次 /hooks 使其加载。
-
-## 新项目脚手架
-复制 [`reference/project-template/`](reference/project-template/) 作为新项目起点，内含 `.editorconfig` / `.gitattributes` / `.gitignore` / `Makefile` / `scripts/` / `.github/workflows/verify.yml`（CI）/ `test_cases/` 骨架 / `docs/modules/` 骨架。详细范例见 [`reference/examples/`](reference/examples/)。
+提醒文本三条：老项目无 AGENTS.md 先确认需求；新功能先写模块文档并评审再编码；交付前测试必须实跑通过。新增后需新开会话生效。

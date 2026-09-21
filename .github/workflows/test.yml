@@ -1,26 +1,84 @@
-# 本仓自测闸门 -- push 或 PR 时跑 check.sh 回归测试与多处同源规则一致性自检，规范仓自己吃自己的狗粮
+# 本仓自测闸门 -- push 或 PR 时跑回归测试、规则一致性自检、结构校验与自身规范校验，规范仓对自己执行同一套标准
 # 创建日期：2026-08-31
-# 修改日期：2026-08-31
+# 修改日期：2026-09-21
 name: test
 
 on:
   push:
     branches:
       - main
-      - 'agents/feature/**'
+      - "agents/**"
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  tests:
+    name: 回归测试与一致性
     runs-on: ubuntu-latest
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: check.sh 回归测试
         run: bash tests/run_tests.sh
 
       - name: 规则一致性自检
         run: bash tests/check_consistency.sh
+
+      - name: 目录与链接结构校验
+        run: bash tests/check_structure.sh
+
+  self-check:
+    name: 自身规范校验
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: tools/check.sh
+        run: bash tools/check.sh --all
+
+  shell-lint:
+    name: Shell 静态检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          find tools tests templates -type f \( -name '*.sh' -o -name 'pre-push' \) -print0 \
+            | xargs -0 shellcheck --severity=warning
+
+  commit-scan:
+    name: 提交信息扫描
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 扫描破折号/引号/Emoji/AI 署名
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+          else
+            range="${{ github.event.before }}..${{ github.sha }}"
+          fi
+          msgs=$(git log --format='%B' "${range}" 2>/dev/null || git log --format='%B' -1)
+          fail=0
+          if printf '%s' "${msgs}" | perl -CSD -e 'while(<>){exit 0 if /[\x{2010}-\x{2015}\x{2212}\x{2e3a}\x{2e3b}\x{ff0d}\x{2018}\x{2019}\x{201c}\x{201d}\x{300c}-\x{300f}\x{ff02}\x{ff07}\x{1F300}-\x{1FAFF}\x{1F1E6}-\x{1F1FF}\x{2600}-\x{27BF}\x{FE0F}]/} exit 1'; then
+            echo "[NG] 提交信息含被禁字符(Unicode 破折号/引号/Emoji),请改用半角。"
+            fail=1
+          fi
+          if printf '%s' "${msgs}" | grep -iEq 'co-authored-by:.*(claude|gpt|copilot|cursor|gemini|anthropic)|generated with .*(claude|copilot|cursor)|noreply@anthropic'; then
+            echo "[NG] 提交信息含 AI 联合署名/水印,须仅署名 Charles。"
+            fail=1
+          fi
+          if [ "${fail}" = "0" ]; then
+            echo "[OK] 提交信息干净。"
+          fi
+          exit "${fail}"

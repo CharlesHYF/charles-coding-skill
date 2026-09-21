@@ -1,0 +1,15 @@
+# 模块访问边界 -- 每行一条规则，由 scripts/check.sh 检查八强制执行
+# 格式：受保护模块路径片段 | 允许引用它的文件路径片段（多个用逗号分隔）
+# 作用：防止绕过唯一入口直接引用底层实现，规则说明见 charles-coding 的 rules/architecture.md
+#
+# 路径片段里的 / 会同时按 . 匹配，因此 dal/mapper 也能匹配 Java 的 import com.xx.dal.mapper
+# 受保护模块自身与白名单内的文件不会被判违规
+#
+# 前端示例：认证能力只能经由 useAuth 使用
+# utils/auth | composables/useAuth
+#
+# 前端示例：接口请求只能经由 api 层发起
+# utils/request | api/
+#
+# 后端示例：数据层只能被业务层引用，Controller 不许直接调 Mapper
+# dal/mapper | service/

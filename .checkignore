@@ -1,0 +1,4 @@
+# 每行一个路径片段，命中的文件跳过全部规范检查
+# 这些文件里故意包含违规写法：前者是文档的正反示例集，后者是回归测试的 fixture
+skills/coding-standards/rules/text.md
+tests/run_tests.sh

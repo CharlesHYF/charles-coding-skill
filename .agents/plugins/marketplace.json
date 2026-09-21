@@ -1,0 +1,19 @@
+{
+  "name": "charles-coding",
+  "interface": {
+    "displayName": "Charles Coding"
+  },
+  "plugins": [
+    {
+      "name": "charles-coding",
+      "source": {
+        "source": "url",
+        "url": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

@@ -12,8 +12,7 @@
 # OS
 Thumbs.db
 
-# 过程产物（spec / plan 禁止提交）
-docs/superpowers/
-
-# SDD 编排 scratch
-.superpowers/
+# 过程产物：spec / plan / 调研笔记禁止提交
+*.spec.md
+plan/
+scratch/

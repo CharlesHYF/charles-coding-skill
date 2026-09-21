@@ -1,0 +1,20 @@
+{
+  "name": "charles-coding",
+  "description": "Charles 的全栈编码规范 Skill 集合",
+  "owner": {
+    "name": "Charles",
+    "email": "w1400214654@outlook.com"
+  },
+  "plugins": [
+    {
+      "name": "charles-coding",
+      "description": "Charles 的全栈编码规范与开发工作流：规范模块、变更类型闸门、规范校验器与六个场景工作流",
+      "version": "4.0.0",
+      "source": "./",
+      "author": {
+        "name": "Charles",
+        "email": "w1400214654@outlook.com"
+      }
+    }
+  ]
+}

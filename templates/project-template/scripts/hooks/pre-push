@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# 推送前交付闸门 -- 推 main 跑全量 verify，推其它分支跑增量，拦住不合规的代码进入远端
+# 创建日期：2026-09-21
+# 修改日期：2026-09-21
+
+set -uo pipefail
+
+# CI 环境不跑本地钩子，避免与流水线重复执行
+if [ -n "${CI:-}" ]; then
+	exit 0
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "${REPO_ROOT}" || exit 1
+
+# 从 stdin 读取本次推送的引用，判断是否推向主干
+# 格式：<local ref> <local sha> <remote ref> <remote sha>
+PUSH_TO_MAIN=0
+
+while read -r _ _ remote_ref _; do
+
+	case "${remote_ref}" in
+		refs/heads/main | refs/heads/master)
+			PUSH_TO_MAIN=1
+			;;
+	esac
+
+done
+
+if [ "${PUSH_TO_MAIN}" = "1" ]; then
+	echo "=== 推送主干，执行全量交付闸门 ==="
+
+	if ! bash scripts/check.sh --all; then
+		echo "[NG] 规范校验未通过，推送已中止。"
+		exit 1
+	fi
+
+	if [ -f scripts/test.sh ] && ! bash scripts/test.sh; then
+		echo "[NG] 测试未通过，推送已中止。"
+		exit 1
+	fi
+else
+	echo "=== 推送非主干分支，执行增量规范校验 ==="
+
+	if ! bash scripts/check.sh --changed; then
+		echo "[NG] 本次改动存在规范违规，推送已中止。"
+		exit 1
+	fi
+fi
+
+echo "[OK] 交付闸门通过。"
+exit 0

@@ -1,0 +1,19 @@
+{
+  "name": "charles-coding",
+  "displayName": "Charles Coding",
+  "description": "Charles 的全栈编码规范与开发工作流",
+  "version": "4.0.0",
+  "author": {
+    "name": "Charles",
+    "email": "w1400214654@outlook.com"
+  },
+  "homepage": "https://github.com/CharlesHYF/charles-coding-skill",
+  "repository": "https://github.com/CharlesHYF/charles-coding-skill",
+  "license": "MIT",
+  "keywords": [
+    "coding-standards",
+    "code-review",
+    "workflow"
+  ],
+  "skills": "./skills/"
+}
