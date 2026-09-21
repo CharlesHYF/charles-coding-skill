@@ -9,7 +9,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}" || exit 1
 
 # 主 skill：版本号以它的 metadata 为准，其余配置向它对齐
-MAIN_SKILL="skills/coding-standards/SKILL.md"
+MAIN_SKILL="skills/charles-coding-standards/SKILL.md"
 
 # 必须存在的顶层目录
 REQUIRED_DIRS=(

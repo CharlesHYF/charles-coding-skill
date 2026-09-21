@@ -1,5 +1,5 @@
 ---
-name: bugfix
+name: charles-bugfix
 description: Use when fixing a bug, test failure, or unexpected behavior in Charles's projects - enforces root-cause analysis and writing a failing reproduction test before touching implementation code.
 metadata:
   version: "4.0.0"
@@ -11,8 +11,8 @@ metadata:
 > 实现与既定行为不符时使用。这一档最容易被跳过测试，所以下面的顺序是硬要求，不是建议。
 
 ## 前置阅读
-- [变更类型闸门表](../coding-standards/rules/process.md)
-- [测试规范](../coding-standards/domains/testing.md)
+- [变更类型闸门表](../charles-coding-standards/rules/process.md)
+- [测试规范](../charles-coding-standards/domains/testing.md)
 
 ## 步骤
 

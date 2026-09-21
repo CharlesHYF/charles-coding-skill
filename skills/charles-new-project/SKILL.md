@@ -1,5 +1,5 @@
 ---
-name: new-project
+name: charles-new-project
 description: Use when starting a brand-new project in Charles's environment and it needs scaffolding - copying the project template, installing the spec checker, writing the first module doc, and verifying the delivery gate works before any feature code is written.
 metadata:
   version: "4.0.0"
@@ -11,7 +11,7 @@ metadata:
 > 从零开新项目时使用。目标是在写第一行业务代码之前，把规范闸门装好并验证它真的会 fail。
 
 ## 前置阅读
-- [交付红线](../coding-standards/SKILL.md)
+- [交付红线](../charles-coding-standards/SKILL.md)
 - 目标语言对应的 `languages/` 与 `stacks/` 分册
 
 ## 步骤
@@ -40,7 +40,7 @@ bash scripts/setup.sh
 按 [模块文档模板](../../templates/module-doc.md) 写 `docs/modules/<系统模块>/<模块>.md`，评审通过后才进入编码。
 
 ### 7. 补 AGENTS.md
-脚手架里的 `AGENTS.md` 已内联硬约束清单，按项目实际补充常用命令（启动、构建、测试）与技术栈说明。**不要改成只写一句"遵循 charles-coding"**，原因见 [子 Agent 编排契约](../coding-standards/rules/process.md)。
+脚手架里的 `AGENTS.md` 已内联硬约束清单，按项目实际补充常用命令（启动、构建、测试）与技术栈说明。**不要改成只写一句"遵循 charles-coding"**，原因见 [子 Agent 编排契约](../charles-coding-standards/rules/process.md)。
 
 ## 交付闸门
 - `make verify` 全绿

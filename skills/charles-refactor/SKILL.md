@@ -1,5 +1,5 @@
 ---
-name: refactor
+name: charles-refactor
 description: Use when restructuring existing code in Charles's projects without changing its external behavior - enforces proving behavioral equivalence and forbids weakening tests to make the refactor pass.
 metadata:
   version: "4.0.0"
@@ -11,8 +11,8 @@ metadata:
 > 对外行为不变、只改内部结构时使用。包括整理代码顺序、统一注释、抽取公共模块、拆分过长函数。
 
 ## 前置阅读
-- [变更类型闸门表](../coding-standards/rules/process.md)
-- [架构与代码组织](../coding-standards/rules/architecture.md)
+- [变更类型闸门表](../charles-coding-standards/rules/process.md)
+- [架构与代码组织](../charles-coding-standards/rules/architecture.md)
 
 ## 步骤
 

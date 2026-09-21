@@ -1,5 +1,5 @@
 ---
-name: legacy-project
+name: charles-legacy-project
 description: Use when introducing Charles's coding standards into an existing codebase that was not built with them - installing the checker in incremental mode so legacy violations do not block delivery while new code is held to the full standard.
 metadata:
   version: "4.0.0"
@@ -11,8 +11,8 @@ metadata:
 > 给已有代码库接入规范时使用。核心原则：**新代码严格，存量不阻塞**。全量开检会产生几百条违规而无法交付，那等于没接入。
 
 ## 前置阅读
-- [交付红线](../coding-standards/SKILL.md)
-- [变更类型闸门表](../coding-standards/rules/process.md)
+- [交付红线](../charles-coding-standards/SKILL.md)
+- [变更类型闸门表](../charles-coding-standards/rules/process.md)
 
 ## 步骤
 

@@ -1,5 +1,5 @@
 # Charles Coding -- 模块文档模板
-> charles-coding 的模块文档规范。**先遵循 [SKILL.md](../skills/coding-standards/SKILL.md) 的"全局约定"（尤其 Markdown 规范）。**
+> charles-coding 的模块文档规范。**先遵循 [SKILL.md](../skills/charles-coding-standards/SKILL.md) 的"全局约定"（尤其 Markdown 规范）。**
 
 ## 用途
 - 编码前，每个模块必须先在 `docs/modules/` 下按**系统级模块**划分子目录写好文档并评审通过
@@ -103,6 +103,6 @@ sequenceDiagram
 - **负责人填 Agent 模型名**（生成该文档的模型，如 `Claude Opus 4.8`），不是 Charles
 - **流程图 / 时序图用 Mermaid** 表示（`flowchart` / `sequenceDiagram`），不用文字堆叠描述复杂流程
 - **参数明细：表格 + JSON 示例** 两者都要 -- 表格讲清每个字段的类型/必填/校验/含义，JSON 给一个真实请求/响应样例
-- 命名遵循 [SKILL.md](../skills/coding-standards/SKILL.md) 数据传输规范：请求 `XxxReqVO`、响应 `XxxRespVO`
-- SQL 相关遵循 [sql.md](../skills/coding-standards/languages/sql.md)：主键雪花ID、COMMENT 写业务实体名
+- 命名遵循 [SKILL.md](../skills/charles-coding-standards/SKILL.md) 数据传输规范：请求 `XxxReqVO`、响应 `XxxRespVO`
+- SQL 相关遵循 [sql.md](../skills/charles-coding-standards/languages/sql.md)：主键雪花ID、COMMENT 写业务实体名
 - 文档随功能变更**同步更新**，代码实现须与文档一致

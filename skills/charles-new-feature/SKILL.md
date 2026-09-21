@@ -1,5 +1,5 @@
 ---
-name: new-feature
+name: charles-new-feature
 description: Use when building a new feature or module in Charles's projects, or when changing the behavior of an existing one - enforces requirement clarification, the module-doc gate before coding, and test cases before delivery.
 metadata:
   version: "4.0.0"
@@ -11,8 +11,8 @@ metadata:
 > 新增对外行为，或改变已有功能的对外行为时使用。这两档共用一套流程，区别在模块文档是新写还是改写。
 
 ## 前置阅读
-- [变更类型闸门表](../coding-standards/rules/process.md)
-- [架构与代码组织](../coding-standards/rules/architecture.md)
+- [变更类型闸门表](../charles-coding-standards/rules/process.md)
+- [架构与代码组织](../charles-coding-standards/rules/architecture.md)
 - 目标语言的 `languages/` 与 `stacks/` 分册
 
 ## 步骤
@@ -32,8 +32,8 @@ metadata:
 
 ### 3. 编码
 - 按三层架构落地：Controller 只做校验与转发、Service 承载业务、Repository 只做存取
-- 文件内排列顺序、定义集中、方法顺序按 [architecture.md](../coding-standards/rules/architecture.md)
-- 命名、注释、文件头按 [naming.md](../coding-standards/rules/naming.md) 与 [text.md](../coding-standards/rules/text.md)
+- 文件内排列顺序、定义集中、方法顺序按 [architecture.md](../charles-coding-standards/rules/architecture.md)
+- 命名、注释、文件头按 [naming.md](../charles-coding-standards/rules/naming.md) 与 [text.md](../charles-coding-standards/rules/text.md)
 - 代码实现必须与模块文档一致；实现过程中发现文档有问题，回头改文档再继续
 
 ### 4. 写测试用例

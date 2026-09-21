@@ -8,15 +8,15 @@
 
 | skill | 作用 |
 | --- | --- |
-| `skills/coding-standards/` | 规范本体：场景路由、交付红线、规范模块索引 |
-| `skills/new-project/` | 新项目初始化工作流 |
-| `skills/legacy-project/` | 老项目接入工作流 |
-| `skills/new-feature/` | 新功能与需求变更工作流 |
-| `skills/bugfix/` | Bug 修复工作流 |
-| `skills/refactor/` | 重构工作流 |
-| `skills/review/` | 代码审查工作流 |
+| `skills/charles-coding-standards/` | 规范本体：场景路由、交付红线、规范模块索引 |
+| `skills/charles-new-project/` | 新项目初始化工作流 |
+| `skills/charles-legacy-project/` | 老项目接入工作流 |
+| `skills/charles-new-feature/` | 新功能与需求变更工作流 |
+| `skills/charles-bugfix/` | Bug 修复工作流 |
+| `skills/charles-refactor/` | 重构工作流 |
+| `skills/charles-review/` | 代码审查工作流 |
 
-规范细则在 `skills/coding-standards/` 下的 `rules/`（通用规则）、`languages/`（语言）、`stacks/`（技术栈）、`domains/`（领域）。
+规范细则在 `skills/charles-coding-standards/` 下的 `rules/`（通用规则）、`languages/`（语言）、`stacks/`（技术栈）、`domains/`（领域）。
 
 ## 交付红线
 
@@ -29,7 +29,7 @@
 2. 改了 `tools/check.sh` 必须同步 `templates/project-template/scripts/check.sh`，两份内容必须逐字一致（一致性测试会校验）
 3. 改了规则文本，检查 `tests/check_consistency.sh` 里对应的同源断言是否还成立
 4. 新增规则时优先考虑能否被 `tools/check.sh` 机器验证，不能验证的写进"手动约定类"并如实标注
-5. 版本号出现在六处，必须同步：`skills/coding-standards/SKILL.md`、四个 plugin 配置、`gemini-extension.json`（结构校验会比对）
+5. 版本号出现在六处，必须同步：`skills/charles-coding-standards/SKILL.md`、四个 plugin 配置、`gemini-extension.json`（结构校验会比对）
 
 ## 硬约束（本仓自身适用）
 
@@ -53,5 +53,5 @@ bash tests/check_structure.sh      # 目录结构、版本号与链接
 ## 修改边界
 
 - 规则文本与校验器是同源的：改了规则必须同步改校验器与测试，只改一边等于制造分叉
-- 不要在 `skills/coding-standards/SKILL.md` 里堆细则，它只放路由、红线和索引，细则下沉到对应模块
+- 不要在 `skills/charles-coding-standards/SKILL.md` 里堆细则，它只放路由、红线和索引，细则下沉到对应模块
 - 第三方 skill 或工具的名称不写进规范正文

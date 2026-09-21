@@ -1,5 +1,5 @@
 ---
-name: review
+name: charles-review
 description: Use when reviewing code in Charles's projects, including reviewing output produced by subagents - runs the mechanical spec checker first, then reviews business logic, so review effort goes where scripts cannot reach.
 metadata:
   version: "4.0.0"
@@ -11,8 +11,8 @@ metadata:
 > 审查自己或子 Agent 产出的代码时使用。原则：**机器能查的不用眼睛查**，人的注意力留给脚本查不了的部分。
 
 ## 前置阅读
-- [交付红线](../coding-standards/SKILL.md)
-- [变更类型闸门表](../coding-standards/rules/process.md)
+- [交付红线](../charles-coding-standards/SKILL.md)
+- [变更类型闸门表](../charles-coding-standards/rules/process.md)
 
 ## 步骤
 
@@ -23,7 +23,7 @@ make verify
 **这是第一步，不是最后一步。** 规范类问题以脚本结论为准，不逐条肉眼找。脚本红的先让对方改完再进入人工审查，否则审查意见会被淹没在格式问题里。
 
 ### 2. 判定变更类型是否正确
-对照 [闸门表](../coding-standards/rules/process.md) 确认：
+对照 [闸门表](../charles-coding-standards/rules/process.md) 确认：
 - 声称是重构，实际却改了对外行为，属于误报类型，要求拆分提交
 - 声称是 Bug 修复，却没有复现测试，打回
 - 新功能没有模块文档，打回

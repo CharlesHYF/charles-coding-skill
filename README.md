@@ -16,65 +16,56 @@ Charles 专用的全栈编码规范，适用于主流 AI 编程工具。
 
 | skill | 用途 |
 | --- | --- |
-| `coding-standards` | 规范本体：交付红线、场景路由、规范模块索引 |
-| `new-project` | 新项目初始化：装脚手架、装闸门、验证闸门确实会 fail |
-| `legacy-project` | 老项目接入：增量检查，新代码严格、存量不阻塞 |
-| `new-feature` | 新功能与需求变更：问清需求、模块文档评审、编码、测试 |
-| `bugfix` | Bug 修复：定位根因、先写复现测试、再改实现 |
-| `refactor` | 重构：证明行为等价，禁止改断言让它通过 |
-| `review` | 代码审查：先跑校验器，再审脚本查不了的部分 |
+| `charles-coding-standards` | 规范本体：交付红线、场景路由、规范模块索引 |
+| `charles-new-project` | 新项目初始化：装脚手架、装闸门、验证闸门确实会 fail |
+| `charles-legacy-project` | 老项目接入：增量检查，新代码严格、存量不阻塞 |
+| `charles-new-feature` | 新功能与需求变更：问清需求、模块文档评审、编码、测试 |
+| `charles-bugfix` | Bug 修复：定位根因、先写复现测试、再改实现 |
+| `charles-refactor` | 重构：证明行为等价，禁止改断言让它通过 |
+| `charles-review` | 代码审查：先跑校验器，再审脚本查不了的部分 |
 
 ## 安装
 
-### Claude Code
-本仓自带 `.claude-plugin/marketplace.json`，作为本地 marketplace 安装：
+七个 skill 通过软链装到各工具的 skills 目录，**改完开发仓立即生效，不需要逐处同步**。
 
 ```bash
 git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
 ```
 
-然后在 Claude Code 里执行：
+```bash
+# Claude Code（缺省目标 ~/.claude/skills）
+bash ~/charles-coding-skill/tools/install-skills.sh
+
+# 其它工具把目标 skills 目录作为参数传进去
+bash ~/charles-coding-skill/tools/install-skills.sh ~/.agents/skills    # Codex / Qoder / Trae 的跨工具标准位置
+bash ~/charles-coding-skill/tools/install-skills.sh ~/.trae/skills      # Trae 专属路径，优先级高于 .agents
+bash ~/charles-coding-skill/tools/install-skills.sh ~/.rovodev/skills   # Rovo Dev
+```
+
+脚本会先清掉 v3.x 遗留的单 skill 目录，再建七个软链；遇到同名实体目录会跳过而不覆盖。装完是这样：
+
+```
+~/.claude/skills/
+├── charles-coding-standards -> ~/charles-coding-skill/skills/charles-coding-standards
+├── charles-new-project      -> ...
+├── charles-legacy-project   -> ...
+├── charles-new-feature      -> ...
+├── charles-bugfix           -> ...
+├── charles-refactor         -> ...
+└── charles-review           -> ...
+```
+
+项目级安装把目标改成 `<项目>/.agents/skills` 或 `<项目>/.claude/skills` 即可，同名时项目级优先。
+
+### Claude Code plugin 方式（可选）
+本仓自带 `.claude-plugin/marketplace.json`，也可以按 plugin 装，调用形式变成 `/charles-coding:charles-bugfix`：
 
 ```
 /plugin marketplace add ~/charles-coding-skill
 /plugin install charles-coding@charles-coding
 ```
 
-也可以跳过 clone，直接从 GitHub 添加：`/plugin marketplace add CharlesHYF/charles-coding-skill`。更新用 `/plugin marketplace update`。
-
-### Codex CLI / Qoder
-两者都按 `.agents/skills/` 这个跨工具事实标准加载，把七个 skill 软链过去：
-
-```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
-mkdir -p ~/.agents/skills
-ln -s ~/charles-coding-skill/skills/* ~/.agents/skills/
-```
-
-项目级放 `<项目>/.agents/skills/`，同名时项目级优先。
-
-### Trae
-Trae 同时支持 `.trae/skills/` 与 `.agents/skills/`，同名时前者优先：
-
-```bash
-mkdir -p ~/.trae/skills
-ln -s ~/charles-coding-skill/skills/* ~/.trae/skills/
-```
-
-Trae 对第三方 SKILL.md 生态的识别仍在变化，如果 `.trae/skills/` 不生效，改用上面的 `.agents/skills/` 路径。
-
-### Rovo Dev CLI
-```bash
-mkdir -p ~/.rovodev/skills
-ln -s ~/charles-coding-skill/skills/* ~/.rovodev/skills/
-```
-
-项目级放 `<项目>/.rovodev/skills/`。
-
-### Cursor
-```bash
-git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/plugins/charles-coding
-```
+两种方式装一种即可，都装会出现同名 skill。
 
 ### Gemini CLI
 ```bash
@@ -83,18 +74,21 @@ git clone git@github.com:CharlesHYF/charles-coding-skill.git ~/.gemini/extension
 
 扩展清单为仓库根的 `gemini-extension.json`，上下文文件为 `AGENTS.md`。
 
-### 其它按 skill 目录加载的工具
+### Cursor
 ```bash
-ln -s ~/charles-coding-skill/skills/coding-standards ~/.<工具>/skills/charles-coding
+git clone git@github.com:CharlesHYF/charles-coding-skill.git .cursor/plugins/charles-coding
 ```
 
 ### Hermes Agent / OpenClaw
-无需安装目录，把 `skills/coding-standards/SKILL.md` 内容作为 system prompt 注入即可。
+无需安装目录，把 `skills/charles-coding-standards/SKILL.md` 内容作为 system prompt 注入即可。
 
 ## 更新
+
 ```bash
-cd <安装目录> && git pull origin main
+cd ~/charles-coding-skill && git pull origin main
 ```
+
+软链方式下 pull 完即生效，**不需要重新跑安装脚本**。只有开发仓路径变动时才需要重跑。
 
 ## 目录结构
 ```
@@ -211,7 +205,7 @@ bash tools/check.sh --all        # 规范仓自身的规范校验
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止任何 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干、不发起 PR |
 
-完整细则见 [skills/coding-standards/SKILL.md](skills/coding-standards/SKILL.md)。
+完整细则见 [skills/charles-coding-standards/SKILL.md](skills/charles-coding-standards/SKILL.md)。
 
 ## 新项目与老项目
 
@@ -223,7 +217,7 @@ cp -r templates/project-template/ <新项目路径>
 bash tools/install-check.sh <项目路径>
 ```
 
-老项目接入后默认走增量检查，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 `skills/legacy-project/SKILL.md`。
+老项目接入后默认走增量检查，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 `skills/charles-legacy-project/SKILL.md`。
 
 ## 遵从率兜底
 

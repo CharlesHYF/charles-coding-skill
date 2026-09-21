@@ -1,5 +1,5 @@
 ---
-name: coding-standards
+name: charles-coding-standards
 description: Use when writing, reviewing, refactoring, debugging, organizing, or scaffolding code in Java, Kotlin, Python, Go, TypeScript, JavaScript, HTML, CSS, SQL, Node.js, Vue 3, React/Next.js, Android, or web frontends. Applies Charles's full-stack conventions, change-type delivery gates, Chinese comment and communication rules, testing requirements, and the agents/feature/* git branch workflow.
 metadata:
   version: "4.0.0"
@@ -20,12 +20,12 @@ metadata:
 
 | 场景 | 工作流 |
 | --- | --- |
-| 新项目初始化 | [new-project](../new-project/SKILL.md) |
-| 老项目接入规范 | [legacy-project](../legacy-project/SKILL.md) |
-| 开发新功能 / 需求变更 | [new-feature](../new-feature/SKILL.md) |
-| 修复 Bug | [bugfix](../bugfix/SKILL.md) |
-| 重构 | [refactor](../refactor/SKILL.md) |
-| 代码审查 | [review](../review/SKILL.md) |
+| 新项目初始化 | [new-project](../charles-new-project/SKILL.md) |
+| 老项目接入规范 | [legacy-project](../charles-legacy-project/SKILL.md) |
+| 开发新功能 / 需求变更 | [new-feature](../charles-new-feature/SKILL.md) |
+| 修复 Bug | [bugfix](../charles-bugfix/SKILL.md) |
+| 重构 | [refactor](../charles-refactor/SKILL.md) |
+| 代码审查 | [review](../charles-review/SKILL.md) |
 
 ## 交付红线
 > 这十二条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。

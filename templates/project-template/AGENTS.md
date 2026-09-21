@@ -138,4 +138,4 @@ make dev         # 启动开发环境
 > `scripts/setup.sh` 会安装 `pre-push` 钩子：推 `main` 跑全量 `verify`，推其它分支跑增量校验。云端 CI 是二次确认，本地钩子才是拦截点。
 
 ---
-> 硬约束以本文件为准；未覆盖的细则(各语言格式化工具、测试框架、SQL/日志/DevOps 规范等)见 charles-coding Skill 的 `skills/coding-standards/` 下 `rules/`、`languages/`、`stacks/`、`domains/` 分册。
+> 硬约束以本文件为准；未覆盖的细则(各语言格式化工具、测试框架、SQL/日志/DevOps 规范等)见 charles-coding Skill 的 `skills/charles-coding-standards/` 下 `rules/`、`languages/`、`stacks/`、`domains/` 分册。

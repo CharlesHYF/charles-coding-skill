@@ -2,16 +2,16 @@
 > 模块职责：定义本仓的 plugin 目录结构、七个 skill 的边界与跨工具适配方式
 > 负责人：Charles
 > 系统模块：skill
-> 关联文件：skills/coding-standards/SKILL.md、.claude-plugin/plugin.json、tests/check_structure.sh
+> 关联文件：skills/charles-coding-standards/SKILL.md、.claude-plugin/plugin.json、tests/check_structure.sh
 
 ## 功能一：规范本体与场景工作流分离
 
 ### 功能描述
-规范内容与使用场景拆成两层。`skills/coding-standards/` 是规范本体，只放交付红线、场景路由与模块索引，细则下沉到 `rules/`、`languages/`、`stacks/`、`domains/` 四类分册。六个场景工作流各自是独立 skill，可以按 `<plugin>:<skill>` 直接调用，工作流只写步骤与闸门，需要规范细节时指向规范本体，不复制内容。
+规范内容与使用场景拆成两层。`skills/charles-coding-standards/` 是规范本体，只放交付红线、场景路由与模块索引，细则下沉到 `rules/`、`languages/`、`stacks/`、`domains/` 四类分册。六个场景工作流各自是独立 skill，可以按 `<plugin>:<skill>` 直接调用，工作流只写步骤与闸门，需要规范细节时指向规范本体，不复制内容。
 
 ### 入参要求
 - 使用者能判断当前属于哪个场景（新项目、老项目接入、新功能、Bug 修复、重构、审查）
-- 判断不了时先读 `skills/coding-standards/SKILL.md` 的场景路由表
+- 判断不了时先读 `skills/charles-coding-standards/SKILL.md` 的场景路由表
 
 ### 参数
 | 参数 | 类型 | 必填 | 说明 |
@@ -36,7 +36,7 @@
 | 参数 | 类型 | 必填 | 说明 |
 | ---- | ---- | ---- | ---- |
 | 适配层目录 | 路径 | 是 | 各工具约定的配置目录 |
-| 版本号 | 字符串 | 是 | 必须与 `skills/coding-standards/SKILL.md` 的 metadata.version 一致 |
+| 版本号 | 字符串 | 是 | 必须与 `skills/charles-coding-standards/SKILL.md` 的 metadata.version 一致 |
 
 ### 返回
 - 各工具可加载的 plugin 配置

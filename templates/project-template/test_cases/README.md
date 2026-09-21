@@ -28,7 +28,7 @@ test_cases/
 
 ## 要求
 - 每个模块的**每个功能（func）都要写测试用例**，覆盖正向、异常、边界、并发场景
-- 测试用例表格格式见 charles-coding skill 的 `skills/coding-standards/domains/testing.md`
+- 测试用例表格格式见 charles-coding skill 的 `skills/charles-coding-standards/domains/testing.md`
 - 详细范例参考 [reference/examples/test_cases/](../../examples/test_cases/)
 
 ## 占位文件

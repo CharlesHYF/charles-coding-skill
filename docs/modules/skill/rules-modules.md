@@ -2,7 +2,7 @@
 > 模块职责：定义七个规范模块各自管什么、与校验器和测试的同源关系
 > 负责人：Charles
 > 系统模块：skill
-> 关联文件：skills/coding-standards/rules/、tools/check.sh、tests/check_consistency.sh
+> 关联文件：skills/charles-coding-standards/rules/、tools/check.sh、tests/check_consistency.sh
 
 ## 功能一：模块边界
 
