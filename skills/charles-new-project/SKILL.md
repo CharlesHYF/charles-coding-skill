@@ -17,10 +17,10 @@ metadata:
 ## 步骤
 
 ### 1. 复制脚手架
-把 [`templates/project-template/`](../../templates/project-template/) 整体复制为项目起点，包含 `AGENTS.md`、`README.md`、`Makefile`、`scripts/`、`.editorconfig`、`.gitattributes`、`.gitignore`、PR 模板与 CI 配置。
+把 [`templates/project-template/`](templates/project-template/) 整体复制为项目起点，包含 `AGENTS.md`、`README.md`、`Makefile`、`scripts/`、`.editorconfig`、`.gitattributes`、`.gitignore`、PR 模板与 CI 配置。
 
 ### 2. 装规范校验器
-把 [`tools/check.sh`](../../tools/check.sh) 复制到项目的 `scripts/check.sh`，确认 `make lint` 能跑通。
+把 [`tools/check.sh`](tools/check.sh) 复制到项目的 `scripts/check.sh`，确认 `make lint` 能跑通。
 
 ### 3. 装 pre-push 钩子
 ```bash
@@ -37,7 +37,7 @@ bash scripts/setup.sh
 **故意写一个违规文件**（例如文件头缺"创建日期："），跑 `make lint` 确认它报错，再删掉。闸门装了但不生效等于没装。
 
 ### 6. 写第一个模块文档
-按 [模块文档模板](../../templates/module-doc.md) 写 `docs/modules/<系统模块>/<模块>.md`，评审通过后才进入编码。
+按 [模块文档模板](templates/module-doc.md) 写 `docs/modules/<系统模块>/<模块>.md`，评审通过后才进入编码。
 
 ### 7. 补 AGENTS.md
 脚手架里的 `AGENTS.md` 已内联硬约束清单，按项目实际补充常用命令（启动、构建、测试）与技术栈说明。**不要改成只写一句"遵循 charles-coding"**，原因见 [子 Agent 编排契约](../charles-coding-standards/rules/process.md)。

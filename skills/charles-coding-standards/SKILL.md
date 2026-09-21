@@ -86,8 +86,9 @@ metadata:
 | [docs-markdown](domains/docs-markdown.md) | README、徽章、Markdown 规范 |
 
 ## 新项目脚手架
-开新项目直接复制 [`templates/project-template/`](../../templates/project-template/)，内含 AGENTS.md（已内联硬约束）、README、Makefile、`scripts/`、`.editorconfig`、`.gitattributes`、`.gitignore`、PR 模板与 CI。
+开新项目直接复制 [`templates/project-template/`](templates/project-template/)，内含 AGENTS.md（已内联硬约束）、README、Makefile、`scripts/`、`.editorconfig`、`.gitattributes`、`.gitignore`、PR 模板与 CI。
 
-- **规范校验器** [`tools/check.sh`](../../tools/check.sh)：把确定性规则变成会 fail 的检查，由 `make verify` 强制执行
+- **规范校验器** [`tools/check.sh`](tools/check.sh)：把确定性规则变成会 fail 的检查，由 `make verify` 强制执行
+- **工具从 skill 目录调用，不要复制进项目**：skill 目录内有 `tools` 与 `templates` 软链，直接 `bash ~/.claude/skills/charles-coding-standards/tools/install-check.sh <项目路径>` 即可。复制过去会让 `check.sh` 变成散落各处的拷贝，skill 更新后不同步，同一条规则在不同项目里表现不一样。唯一的例外是 `install-check.sh` 往项目里装的那份 `scripts/check.sh`，它是交付闸门的一部分，必须随项目走
 - **交付总闸门** `make verify` = `scripts/check.sh`（规范）+ `scripts/test.sh`（测试），全绿才算完成
-- 老项目接入用 [`tools/install-check.sh`](../../tools/install-check.sh)，装完默认走增量检查，存量代码不阻塞
+- 老项目接入用 [`tools/install-check.sh`](tools/install-check.sh)，装完默认走增量检查，存量代码不阻塞

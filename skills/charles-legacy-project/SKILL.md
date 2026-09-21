@@ -39,7 +39,7 @@ bash scripts/check.sh --changed
 
 ### 4. 补必需文件
 老项目通常缺这几样，逐个补齐：
-- `AGENTS.md`：按 [模板](../../templates/project-template/AGENTS.md) 生成，内联硬约束清单
+- `AGENTS.md`：按 [模板](templates/project-template/AGENTS.md) 生成，内联硬约束清单
 - `.editorconfig` / `.gitattributes`：从脚手架复制，按项目实际语言调整缩进
 - `docs/modules/` 与 `test_cases/` 目录骨架
 

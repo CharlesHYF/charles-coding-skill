@@ -73,7 +73,7 @@
 - 常量的 OPTIONS 数组与派生 MAP 的写法见 [vue.md 的常量小节](vue.md)
 
 ## 开发体验（dev）
-- **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../../../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）
+- **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）
 - **启动自动打开浏览器**：Next.js 15+ 的 `next dev` 支持 `--open`（`"dev": "next dev --open"`）；旧版本无该 flag，可用 `concurrently` 等在 dev 脚本里并行执行 `open`/`opener` 打开地址
 - **codeInspectorPlugin**：dev 环境接入 [`code-inspector-plugin`](https://github.com/zh-lx/code-inspector)，点击页面元素直接跳到编辑器对应源码。在 `next.config` 的 webpack 钩子注册（仅开发生效）：
   ```ts

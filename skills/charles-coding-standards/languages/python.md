@@ -26,7 +26,7 @@
 
 ## 注释规范
 - docstring：模块/类/公共函数必须写（定义体内第一个语句）；三段式 -- `"""` 独占首行、正文从第二行起顶格、`"""` 独占末行，单行内容同理，禁止把摘要和 `"""` 挤在一行。
-- **docstring 统一用双引号 `"""`**，禁止单引号三引号（PEP 257）。注意：Ruff 的 D 系规则默认不开启，须在 `pyproject.toml` 显式 `extend-select = ["D300", "D213"]` 才会机器拦截（脚手架模板 [project-template/pyproject.toml](../../../templates/project-template/pyproject.toml) 已配好）；**禁止启用 D200 / D212** -- 两者要求摘要与引号收拢同行，与本规范三段式直接冲突。
+- **docstring 统一用双引号 `"""`**，禁止单引号三引号（PEP 257）。注意：Ruff 的 D 系规则默认不开启，须在 `pyproject.toml` 显式 `extend-select = ["D300", "D213"]` 才会机器拦截（脚手架模板 [project-template/pyproject.toml](../templates/project-template/pyproject.toml) 已配好）；**禁止启用 D200 / D212** -- 两者要求摘要与引号收拢同行，与本规范三段式直接冲突。
 - **单行说明一律用 `#`，禁止写成三引号字符串**：一句话的注释写 `# 说明`，不要写成三引号包一行字。那在 Python 里是一条 no-op 表达式语句，不是注释 -- 既不绑定对象、也不被 `help()` / IDE 识别，还会留在字节码里。
 - 变量/常量/字段说明：用 `#` 写在其上一行，不写下方；禁止用悬空的 `"""..."""` 当变量文档（Python 里那是 no-op 字符串、不绑定变量、也不被工具识别为 docstring）。示例：
   ```python

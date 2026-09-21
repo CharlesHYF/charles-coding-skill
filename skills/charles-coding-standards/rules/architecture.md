@@ -41,7 +41,7 @@
 - **后果**：入口层加的缓存、鉴权刷新、错误处理、状态同步对绕过的调用方全部失效。这类问题在开发期不报错，等到需要统一改行为时才暴露，且必须逐个文件排查
 - **判定标准**：一个模块被 import 的位置超出它的设计边界即为违规，**不看"能不能跑通"**。绕过入口的调用通常都能跑通，这正是它危险的地方
 - **新建模块时先定边界**：写一个底层工具模块时，同时明确"谁可以引用它"，写进 `.import-boundaries`，而不是等被滥用之后再治理
-- **机器兜底**：在项目根维护 `.import-boundaries`，由 `scripts/check.sh` 检查八强制执行。格式见 [模板](../../../templates/project-template/.import-boundaries)
+- **机器兜底**：在项目根维护 `.import-boundaries`，由 `scripts/check.sh` 检查八强制执行。格式见 [模板](../templates/project-template/.import-boundaries)
 
 
 ## 适用范围

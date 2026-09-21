@@ -77,4 +77,4 @@
   - 并发 VU（虚拟用户数，阶梯加压：如 10 → 50 → 100 → 200）
   - TPS（每秒事务数）
   - 数据传输量
-- **脚手架模板**：新项目直接参考 [`project-template/test_cases/stress/load-test.js`](../../../templates/project-template/test_cases/stress/load-test.js) 起步，按目标接口改造阈值与压测阶梯；测试用例范例见 [`examples/test_cases/`](../../../templates/examples/test_cases/)
+- **脚手架模板**：新项目直接参考 [`project-template/test_cases/stress/load-test.js`](../templates/project-template/test_cases/stress/load-test.js) 起步，按目标接口改造阈值与压测阶梯；测试用例范例见 [`examples/test_cases/`](../templates/examples/test_cases/)

@@ -61,4 +61,4 @@ HTML 与 Vue SFC 放文件最顶部：
 ```
 
 ## 参考范例
-完整可对照的范例文件见 [`templates/examples/example.html`](../../../templates/examples/example.html)。
+完整可对照的范例文件见 [`templates/examples/example.html`](../templates/examples/example.html)。

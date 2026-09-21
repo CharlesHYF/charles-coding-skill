@@ -79,7 +79,7 @@
   	grid-template-columns: 1fr;
   }
   ```
-- 完整可参考的范例文件：[`example.html`](../../../templates/examples/example.html)；测试用例范例见 [`templates/examples/test_cases/`](../../../templates/examples/test_cases/)；模块文档范例见 [`templates/examples/docs/modules/`](../../../templates/examples/docs/modules/)
+- 完整可参考的范例文件：[`example.html`](../templates/examples/example.html)；测试用例范例见 [`templates/examples/test_cases/`](../templates/examples/test_cases/)；模块文档范例见 [`templates/examples/docs/modules/`](../templates/examples/docs/modules/)
 
 
 ## 常量与魔法数字规范

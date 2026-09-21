@@ -242,7 +242,7 @@ export const AGENT_CREDENTIAL_TYPE_MAP = AGENT_CREDENTIAL_TYPE_OPTIONS.reduce(
 - 注册与按需 import 两种方式不混用：一个组件要么全局注册，要么始终局部引入
 
 ## 开发体验（dev）
-- **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../../../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）
+- **Prettier 配置**：新项目直接复制脚手架的 [project-template/.prettierrc.json](../templates/project-template/.prettierrc.json)（`useTabs` 落地 Tab 缩进、`trailingComma: "all"` 落地"键值独占一行带尾逗号"；JSON/YAML 覆写为 2 空格与 `.editorconfig` 对齐）
 - **启动自动打开浏览器**：dev 脚本加 `--open`，即 `package.json` 中 `"dev": "vite --open"`（或在 `vite.config` 设 `server: { open: true }`）
 - **codeInspectorPlugin**：dev 环境接入 [`code-inspector-plugin`](https://github.com/zh-lx/code-inspector)，点击页面元素直接跳到编辑器对应源码。在 `vite.config.ts` 注册（仅开发生效）：
   ```ts
