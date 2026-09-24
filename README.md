@@ -126,7 +126,7 @@ cd ~/charles-coding-skill && git pull origin main
 
 ## 规范校验器
 
-`tools/check.sh` 把确定性规则变成会 fail 的检查，共十二项：
+`tools/check.sh` 把确定性规则变成会 fail 的检查，共十四项：
 
 ```bash
 bash tools/check.sh --all        # 全量扫描
@@ -147,6 +147,8 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 | 十 | import 排版（`import type` 不得排在值 import 之前） |
 | 十一 | 测试代码位置（前端集中放 `frontend/tests/`，不散落在源码目录旁） |
 | 十二 | 压测脚本（`test_cases/stress/` 为空即视为未完成） |
+| 十三 | 集合写法（推导式、Stream、集合回调链、嵌套三元；Python 走语法树识别） |
+| 十四 | Python 函数类型注解（参数与返回类型都要写，没有返回值写 `-> None`） |
 
 两级豁免：文件级写进 `.checkignore`，行级在注释里加 `check-ignore` 标记。文档反例与测试 fixture 用它放行。
 
@@ -165,8 +167,8 @@ push main        ->  pre-push 钩子跑全量 make verify，不过不让推
 规范仓对自己执行同一套标准，`.github/workflows/test.yml` 在 push 与 PR 时强制跑四项：
 
 ```bash
-bash tests/run_tests.sh          # check.sh 回归测试，46 项断言
-bash tests/check_consistency.sh  # 多处同源规则一致性，50 项断言
+bash tests/run_tests.sh          # check.sh 回归测试，74 项断言
+bash tests/check_consistency.sh  # 多处同源规则一致性，83 项断言
 bash tests/check_structure.sh    # skill 完整性、六处版本号、Markdown 死链
 bash tools/check.sh --all        # 规范仓自身的规范校验
 ```
@@ -194,6 +196,8 @@ bash tools/check.sh --all        # 规范仓自身的规范校验
 | 文件头描述 | 只写核心职责，禁止用 `--` 追加功能罗列；功能会变，描述跟着过期 |
 | 测试位置 | 测试代码集中放 `tests/`（前端 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外 |
 | 压测 | 新功能必须提供压测脚本，覆盖写操作、列表分页、批量导入导出、核心读接口四类 |
+| 集合写法 | 集合的遍历、过滤、转换、汇总一律显式循环；禁止推导式、Stream、集合回调链与嵌套三元，JSX 渲染列表时单独一次 `.map` 除外 |
+| Python 注解 | 函数的参数与返回类型都要写注解，没有返回值写 `-> None` |
 | 提交粒度 | 一个任务、一个需求、一个问题对应一个 commit；重构与功能修改分开提交 |
 | 前端结构 | `types` / `store` / `constants` 一律 `index.ts` 再导出、实体放 `modules/`；`permission` 放 `src/` 下；全局组件在 `main.ts` 注册 |
 | 变更闸门 | 动手前先判定变更类型（新功能 / 需求变更 / Bug 修复 / 重构 / 依赖升级），按对应档执行文档与测试要求 |
@@ -201,7 +205,7 @@ bash tools/check.sh --all        # 规范仓自身的规范校验
 | 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，新功能编码前先写文档并评审 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
-| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测，外加提交信息扫描 |
+| CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解，外加提交信息扫描 |
 | Git 作者 | `Charles <w1400214654@outlook.com>`，禁止任何 AI 联合署名 |
 | Git 分支 | AI 提交到 `agents/feature/xxx`，不直接推主干、不发起 PR |
 

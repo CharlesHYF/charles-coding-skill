@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # 规范校验器
 # 创建日期：2026-08-03
-# 修改日期：2026-09-21
+# 修改日期：2026-09-24
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
 
 # 校验范围,与 Makefile / AGENTS.md / README 同源,改这里要同步改那三处
-LINT_SCOPE='禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测'
+LINT_SCOPE='禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解'
 
 # 违规计数：任意一项 > 0 则最终退出码非 0，供 CI / make check 拦截
 VIOLATIONS=0
@@ -179,7 +179,7 @@ list_files() {
 # 检查一：禁用字符(引号 / 破折号 / Emoji;含各类 Unicode 变体)
 # 用 perl 的 \x{} 转义书写规则，确保本脚本自身不含任何被禁字符，无需自我排除
 check_forbidden_chars() {
-	echo "[1/12] 检查禁用字符(引号 / 破折号 / Emoji)..."
+	echo "[1/14] 检查禁用字符(引号 / 破折号 / Emoji)..."
 
 	local file
 	while IFS= read -r file; do
@@ -235,7 +235,7 @@ normalize_header_content() {
 # 检查二：源码文件头注释块(作用描述行 + 创建日期 + 修改日期,冒号须为中文全角)
 # 文件头首行是纯描述、不带任何前缀标签，故以"创建日期"行为锚点，回看上一行确认描述存在
 check_file_header() {
-	echo "[2/12] 检查源码文件头注释块..."
+	echo "[2/14] 检查源码文件头注释块..."
 
 	local file
 	while IFS= read -r file; do
@@ -358,7 +358,7 @@ check_file_header() {
 
 # 检查三：项目级必需文件是否齐全
 check_required_files() {
-	echo "[3/12] 检查项目必需文件..."
+	echo "[3/14] 检查项目必需文件..."
 
 	local required
 	for required in "${REQUIRED_FILES[@]}"; do
@@ -418,7 +418,7 @@ check_required_files() {
 # 检查四：命名(数据传输类命名 + 变量/函数的无意义命名)
 # 规则：请求 XxxReqVO、响应 XxxRespVO；裸 XxxVO(非 Req/Resp)视为违规；tmp / obj / doIt 之类占位名一律拦截
 check_naming() {
-	echo "[4/12] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
+	echo "[4/14] 检查命名(XxxReqVO / XxxRespVO / 无意义命名)..."
 
 	local file
 	while IFS= read -r file; do
@@ -470,7 +470,7 @@ check_naming() {
 # 检查五：注释语法(多行注释必须用块/文档注释，禁止连续 // 或 # 拼多行)
 # 只做确定性检查，规避误报：文件头注释语法、块注释挤行、Python docstring 三段式与引号
 check_comment_syntax() {
-	echo "[5/12] 检查注释语法(块注释 / docstring)..."
+	echo "[5/14] 检查注释语法(块注释 / docstring)..."
 
 	local file
 	while IFS= read -r file; do
@@ -588,7 +588,7 @@ MAX_COMMENT_BODY_LINES=3
 # 标签行(@param / @return / :param 等)不计入正文,避免多参数 Javadoc 误报
 # 折断判定走 perl -CSD:中文标点是多字节,awk 在非 UTF-8 locale 下按字节比对会误命中
 check_comment_length() {
-	echo "[6/12] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
+	echo "[6/14] 检查注释篇幅与折行(正文不超过 ${MAX_COMMENT_BODY_LINES} 行,不许句子折断)..."
 
 	local file
 	while IFS= read -r file; do
@@ -668,7 +668,7 @@ FORBIDDEN_JARGON_PATTERN='\x{4fe1}\x{5c01}|\x{76d2}\x{5b50}|\x{585e}\x{8fdb}|\x{
 
 # 检查七：注释黑话(隐喻 / 口语表达)，词表见上方 FORBIDDEN_JARGON_PATTERN，一律改写为工程动作词
 check_comment_jargon() {
-	echo "[7/12] 检查注释黑话(隐喻 / 口语表达)..."
+	echo "[7/14] 检查注释黑话(隐喻 / 口语表达)..."
 
 	local file
 	while IFS= read -r file; do
@@ -698,7 +698,7 @@ IMPORT_BOUNDARY_FILE='.import-boundaries'
 # 检查八：模块访问边界(单一入口原则,禁止绕过入口直接引用底层实现)
 # 受保护片段里的 / 同时按 . 匹配,以覆盖 Java 的 import com.xx.dal.mapper 这类写法
 check_import_boundaries() {
-	echo "[8/12] 检查模块访问边界(单一入口)..."
+	echo "[8/14] 检查模块访问边界(单一入口)..."
 
 	if [ ! -f "${IMPORT_BOUNDARY_FILE}" ]; then
 		echo "  [SKIP] 未配置 ${IMPORT_BOUNDARY_FILE}，跳过。"
@@ -783,7 +783,7 @@ check_import_boundaries() {
 # 检查九：样式里不写注释(CSS / SCSS 文件与 Vue SFC 的 style 块)
 # 样式意图由 class 名与自定义属性命名表达，设计决策写进模块文档
 check_style_comments() {
-	echo "[9/12] 检查样式注释(CSS 与 style 块不写注释)..."
+	echo "[9/14] 检查样式注释(CSS 与 style 块不写注释)..."
 
 	local file
 	while IFS= read -r file; do
@@ -819,7 +819,7 @@ check_style_comments() {
 # 检查十：import 排版(type import 不得出现在值 import 之前)
 # 顺序固定为值 import -> type import -> 常量,便于一眼看清依赖来源
 check_import_order() {
-	echo "[10/12] 检查 import 排版(type 在值 import 之后)..."
+	echo "[10/14] 检查 import 排版(type 在值 import 之后)..."
 
 	local file
 	while IFS= read -r file; do
@@ -855,7 +855,7 @@ STRESS_SCRIPT_REGEX='\.(js|ts|jmx|lua|py)$'
 # 检查十一：测试代码位置(构建工具不强制的语言,测试一律集中到 tests/)
 # Go 与 Java/Kotlin 由构建工具强制放在特定位置,属于例外
 check_test_location() {
-	echo "[11/12] 检查测试代码位置(集中放 tests/)..."
+	echo "[11/14] 检查测试代码位置(集中放 tests/)..."
 
 	local file
 	while IFS= read -r file; do
@@ -891,7 +891,7 @@ check_test_location() {
 
 # 检查十二：压测脚本(有接口层的项目必须提供,空目录视为未完成)
 check_stress_tests() {
-	echo "[12/12] 检查压测脚本..."
+	echo "[12/14] 检查压测脚本..."
 
 	# 没有 backend/frontend 用例目录说明不是服务类项目,不强制压测
 	if [ ! -d "test_cases/backend" ] && [ ! -d "test_cases/frontend" ]; then
@@ -912,6 +912,271 @@ check_stress_tests() {
 	fi
 }
 
+# Java：Stream 入口与集合回调方法，Stream 已禁用后 .map / .filter 只剩 Optional 链这类同类写法
+JAVA_COLLECTION_REGEX='\.(stream|parallelStream)\(\)|\b(Stream|IntStream|LongStream|DoubleStream|StreamSupport|Collectors)\.|java\.util\.stream|\.(map|flatMap|filter|forEach|reduce)\('
+
+# Kotlin：只拦与 Flow 操作符不同名的写法，map / filter 等同名写法列为手动约定
+KOTLIN_COLLECTION_REGEX='\.(stream|parallelStream)\(\)|\bCollectors\.|java\.util\.stream|\.asSequence\(\)|\.(forEach|forEachIndexed)[[:space:]]*[({]'
+
+# Go：函数式集合库与自写的泛型集合辅助函数
+GO_COLLECTION_REGEX='github\.com/samber/lo|^[[:space:]]*func[[:space:]]+(Map|Filter|Reduce|FlatMap|ForEach)[[:space:]]*\['
+
+# 注释行不参与集合写法匹配
+CODE_COMMENT_LINE_REGEX='^[0-9]+:[[:space:]]*(//|\*|/\*)'
+
+# 检查十三与十四共用的 Python 语法树扫描脚本：第一个参数选模式，其余参数是待查文件
+# 每条命中输出一行"文件<TAB>L行号: 说明: 原文"，解析失败的文件在 stderr 提示后跳过
+PYTHON_AST_SCANNER=$(cat <<'PYEOF'
+from __future__ import annotations
+
+import ast
+import os
+import sys
+import warnings
+
+SCAN_MODE = sys.argv[1]
+IGNORE_MARK = os.environ.get("LINE_IGNORE_MARK", "check-ignore")
+
+COMPREHENSION_KINDS = {
+	ast.ListComp: "列表推导式",
+	ast.SetComp: "集合推导式",
+	ast.DictComp: "字典推导式",
+	ast.GeneratorExp: "生成器表达式",
+}
+
+FUNCTIONAL_BUILTINS = ("map", "filter", "reduce")
+
+BOUND_FIRST_PARAMS = ("self", "cls")
+
+
+def describe_functional_call(node: ast.Call) -> str:
+	func = node.func
+
+	if isinstance(func, ast.Name) and func.id in FUNCTIONAL_BUILTINS:
+		return func.id + "() 调用"
+
+	if isinstance(func, ast.Attribute) and func.attr == "reduce" and isinstance(func.value, ast.Name) and func.value.id == "functools":
+		return "functools.reduce() 调用"
+
+	return ""
+
+
+def has_nested_if_exp(node: ast.IfExp) -> bool:
+	for part in (node.test, node.body, node.orelse):
+		if isinstance(part, ast.IfExp):
+			return True
+
+	return False
+
+
+def scan_collection(tree: ast.AST) -> list[tuple[int, str]]:
+	hits: list[tuple[int, str]] = []
+
+	for node in ast.walk(tree):
+		kind = COMPREHENSION_KINDS.get(type(node), "")
+
+		if not kind and isinstance(node, ast.Call):
+			kind = describe_functional_call(node)
+
+		if not kind and isinstance(node, ast.NamedExpr):
+			kind = "海象运算符 :="
+
+		if not kind and isinstance(node, ast.IfExp) and has_nested_if_exp(node):
+			kind = "嵌套三元表达式"
+
+		if kind:
+			hits.append((node.lineno, kind))
+
+	return hits
+
+
+def check_function(node: ast.FunctionDef | ast.AsyncFunctionDef, in_class: bool, hits: list[tuple[int, str]]) -> None:
+	params = node.args.posonlyargs + node.args.args + node.args.kwonlyargs
+
+	if node.args.vararg is not None:
+		params.append(node.args.vararg)
+
+	if node.args.kwarg is not None:
+		params.append(node.args.kwarg)
+
+	for index, param in enumerate(params):
+
+		if in_class and index == 0 and param.arg in BOUND_FIRST_PARAMS:
+			continue
+
+		if param.annotation is None:
+			hits.append((node.lineno, f"函数 {node.name} 的参数 {param.arg} 缺少类型注解"))
+
+	if node.returns is None:
+		hits.append((node.lineno, f"函数 {node.name} 缺少返回类型"))
+
+
+def visit_annotations(node: ast.AST, in_class: bool, hits: list[tuple[int, str]]) -> None:
+	for child in ast.iter_child_nodes(node):
+
+		if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+			check_function(child, in_class, hits)
+			visit_annotations(child, False, hits)
+		elif isinstance(child, ast.ClassDef):
+			visit_annotations(child, True, hits)
+		else:
+			visit_annotations(child, in_class, hits)
+
+
+def scan_annotations(tree: ast.AST) -> list[tuple[int, str]]:
+	hits: list[tuple[int, str]] = []
+	visit_annotations(tree, False, hits)
+
+	return hits
+
+
+def main() -> None:
+	warnings.simplefilter("ignore")
+
+	for path in sys.argv[2:]:
+
+		try:
+			with open(path, encoding="utf-8", errors="replace") as source_file:
+				source = source_file.read()
+
+			tree = ast.parse(source, filename=path)
+		except (OSError, SyntaxError, ValueError) as error:
+			print(f"  [WARN] {path} 无法按当前 python3 解析，跳过语法树检查: {error}", file=sys.stderr)
+			continue
+
+		if SCAN_MODE == "collection":
+			hits = scan_collection(tree)
+		else:
+			hits = scan_annotations(tree)
+
+		lines = source.splitlines()
+		reported: set[tuple[int, str]] = set()
+
+		for lineno, detail in sorted(hits):
+			line_text = ""
+
+			if 0 < lineno <= len(lines):
+				line_text = lines[lineno - 1]
+
+			if IGNORE_MARK in line_text or (lineno, detail) in reported:
+				continue
+
+			reported.add((lineno, detail))
+			print(f"{path}\tL{lineno}: {detail}: {line_text.strip()}")
+
+
+main()
+PYEOF
+)
+
+# 用语法树扫描全部待查 .py 文件，按文件分组报告命中行
+run_python_ast_scan() {
+	local scan_mode="$1"
+	local message="$2"
+
+	local python_files=()
+	local file
+	while IFS= read -r file; do
+
+		if [[ "${file}" =~ \.py$ ]] && [ -f "${file}" ]; then
+			python_files+=("${file}")
+		fi
+
+	done < <(list_files)
+
+	if [ "${#python_files[@]}" -eq 0 ]; then
+		return
+	fi
+
+	if ! command -v python3 >/dev/null 2>&1; then
+		echo "  [SKIP] 未找到 python3，跳过 Python 部分。"
+		return
+	fi
+
+	local hits
+	hits=$(LINE_IGNORE_MARK="${LINE_IGNORE_MARK}" python3 -c "${PYTHON_AST_SCANNER}" "${scan_mode}" "${python_files[@]}")
+
+	if [ -z "${hits}" ]; then
+		return
+	fi
+
+	local hit_file
+	while IFS= read -r hit_file; do
+		report "${hit_file} ${message}:"
+		printf '%s\n' "${hits}" | awk -F'\t' -v target="${hit_file}" '$1 == target { print "         " $2 }'
+	done < <(printf '%s\n' "${hits}" | cut -f1 | sort -u)
+}
+
+# JS / TS：集合回调方法；JSX 里以 {list.map( 起头的列表渲染放行，.filter 传对象或字符串属于非数组 API 也放行
+scan_js_collection_calls() {
+	local file="$1"
+	local jsx_mode=0
+
+	if [[ "${file}" =~ \.(jsx|tsx)$ ]]; then
+		jsx_mode=1
+	fi
+
+	JSX_MODE="${jsx_mode}" perl -ne '
+		next if /^\s*(\/\/|\*|\/\*)/;
+		my $code = $_;
+		$code =~ s/^(\s*\{[\w\$.?\[\]]+)\.map\(/$1.jsxRender(/ if $ENV{JSX_MODE};
+		$code =~ s/\.filter\(\s*[\{\x27"`]/.filterByOption(/g;
+		print "$.:$_" if $code =~ /\.(map|filter|flatMap|reduce|reduceRight|forEach)\(/;
+	' "${file}" | drop_ignored_lines
+}
+
+# 检查十三：集合写法(推导式、Stream 与集合回调链一律改为显式循环)
+# Python 走语法树精确识别，其余语言按行匹配，分不清同名 API 的写法列为手动约定
+check_collection_style() {
+	echo "[13/14] 检查集合写法(推导式 / Stream / 集合回调链)..."
+
+	run_python_ast_scan "collection" "用了推导式或函数式简写(集合的遍历、过滤、转换与汇总一律改为显式 for 循环)"
+
+	local file
+	while IFS= read -r file; do
+
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
+		local hits=""
+
+		case "${file}" in
+			*.min.js)
+				continue
+				;;
+			*.java)
+				hits=$(grep -nE "${JAVA_COLLECTION_REGEX}" "${file}" | grep -vE "${CODE_COMMENT_LINE_REGEX}" | drop_ignored_lines)
+				;;
+			*.kt | *.kts)
+				hits=$(grep -nE "${KOTLIN_COLLECTION_REGEX}" "${file}" | grep -vE "${CODE_COMMENT_LINE_REGEX}" | drop_ignored_lines)
+				;;
+			*.js | *.mjs | *.cjs | *.ts | *.jsx | *.tsx | *.vue | *.html)
+				hits=$(scan_js_collection_calls "${file}")
+				;;
+			*.go | go.mod | */go.mod)
+				hits=$(grep -nE "${GO_COLLECTION_REGEX}" "${file}" | grep -vE "${CODE_COMMENT_LINE_REGEX}" | drop_ignored_lines)
+				;;
+			*)
+				continue
+				;;
+		esac
+
+		if [ -n "${hits}" ]; then
+			report "${file} 用了流式或集合回调写法(集合的遍历、过滤、转换与汇总一律改为显式 for 循环):"
+			echo "${hits}" | sed 's/^/         /'
+		fi
+
+	done < <(list_files)
+}
+
+# 检查十四：Python 函数类型注解(参数与返回类型都要写，self / cls 除外)
+check_python_annotations() {
+	echo "[14/14] 检查 Python 函数类型注解..."
+
+	run_python_ast_scan "annotation" "函数缺少类型注解(参数与返回类型都要写，没有返回值写 -> None)"
+}
+
 echo "=== charles-coding 规范校验 ==="
 echo "校验范围：${LINT_SCOPE}"
 
@@ -927,6 +1192,8 @@ check_style_comments
 check_import_order
 check_test_location
 check_stress_tests
+check_collection_style
+check_python_annotations
 
 echo "==============================="
 

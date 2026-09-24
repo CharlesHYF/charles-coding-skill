@@ -1,5 +1,5 @@
 # Charles Coding -- 通用规范
-> 缩进、行尾、禁用符号、代码块边界、展开换行与常量。**所有语言通用，含前端**（JS / TS / Vue / React / HTML / CSS）。
+> 缩进、行尾、禁用符号、代码块边界、展开换行、常量与集合处理写法。**所有语言通用，含前端**（JS / TS / Vue / React / HTML / CSS）。
 
 ## 编辑与格式
 ## 工具强制类（由 Prettier/gofmt/Ruff + editorconfig 自动保证，不靠自觉）
@@ -92,4 +92,22 @@
       return;
   }
   ```
+
+## 集合处理写法（scripts/check.sh 检查十三拦截，部分手动）
+> 集合的遍历、过滤、转换、汇总一律写显式循环。推导式、Stream 与集合回调链把多步逻辑压进一个表达式，读的人要在脑子里还原成循环才看得懂，也没法打断点、加日志。
+
+- **写法**：用 `for` 循环逐个处理；不合规的数据用 `continue` 提前跳过；清洗后的值先存进变量再判断，不在条件和结果里重复调用同一个函数
+- **查找类单次调用允许**：只为找出一个元素或判断是否存在时，可用语言自带的单次调用（JS `find` / `findIndex` / `some` / `every` / `includes`，Kotlin `any` / `all` / `first` / `find`），回调只写一个表达式。Python 的 `any()` / `all()` 要配生成器表达式，仍写循环
+- **单独作为参数的 lambda 允许**：排序的 key 与比较器、事件回调不属于集合处理，如 `sorted(orders, key=lambda order: order.created_at)`
+- **嵌套三元一律禁止**：两层以上的条件改写成 `if` / `else`
+
+| 语言 | 禁止 | 例外 | 拦截方式 |
+| --- | --- | --- | --- |
+| Python | 列表 / 字典 / 集合推导式、生成器表达式、`map()` / `filter()` / `reduce()`、海象运算符 `:=`、嵌套三元 | 无 | 检查十三（语法树） |
+| Java | Stream 全部 API（`.stream()`、`Collectors`、`IntStream` 等）、`forEach` 回调、`Optional` 的 `.map` / `.flatMap` / `.filter` 链、嵌套三元 | 无 | 检查十三；嵌套三元手动 |
+| Kotlin | `map` / `filter` / `flatMap` / `fold` / `reduce` / `groupBy` / `associate*` / `forEach`、`asSequence()` | `Flow` / `StateFlow` 的操作符 | `forEach` 与 `asSequence()` 由检查十三拦截；其余与 Flow 操作符同名，手动 |
+| JS / TS / Vue / HTML 内联脚本 | `map` / `filter` / `flatMap` / `reduce` / `reduceRight` / `forEach`、嵌套三元 | JSX 渲染列表时单独一次 `.map` | 检查十三；嵌套三元由 ESLint `no-nested-ternary` 提示 |
+| Go | 自写泛型 `Map` / `Filter` / `Reduce` 辅助函数、`samber/lo` 这类函数式集合库 | 无 | 检查十三 |
+
+各语言的正反示例见对应分册：[Python](../languages/python.md)、[Java](../languages/java.md)、[Kotlin](../languages/kotlin.md)、[JS / TS](../languages/javascript-typescript.md)、[Go](../languages/go.md)。
 

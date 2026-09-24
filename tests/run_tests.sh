@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check.sh 回归测试
 # 创建日期：2026-08-31
-# 修改日期：2026-09-21
+# 修改日期：2026-09-24
 
 set -uo pipefail
 
@@ -154,7 +154,15 @@ export const tickDown = (start: number): number => {
 };
 
 // 按运单号汇总包裹重量
-export const sumParcelWeight = (weights: number[]): number => weights.reduce((a, b) => a + b, 0);
+export const sumParcelWeight = (weights: number[]): number => {
+	let total = 0;
+
+	for (const weight of weights) {
+		total += weight;
+	}
+
+	return total;
+};
 
 // 这里保留隐喻说法作为反例演示 -- 搬运 check-ignore
 export const legacyNote = 1;
@@ -772,7 +780,15 @@ make_skeleton "${INC_DIR}"
  * 创建日期：2026-09-21
  * 修改日期：2026-09-21
  */
-export const calculateTotal = (prices: number[]): number => prices.reduce((a, b) => a + b, 0);
+export const calculateTotal = (prices: number[]): number => {
+	let total = 0;
+
+	for (const price of prices) {
+		total += price;
+	}
+
+	return total;
+};
 INNER
 	git add -A
 	git commit -qm "新增合规文件"
@@ -978,6 +994,294 @@ run_check "${DELIVERY_DIR}"
 expect_contains "${CHECK_OUTPUT}" "缺少压测目录" "检查十二:缺压测目录被拦"
 
 rm -rf "${DELIVERY_DIR}"
+
+# ============================================================
+# 场景十：集合写法与 Python 类型注解
+# ============================================================
+echo "=== 场景十：集合写法与类型注解 ==="
+LOOP_DIR="$(mktemp -d)"
+make_skeleton "${LOOP_DIR}"
+mkdir -p "${LOOP_DIR}/tests/e2e"
+
+# 违规：Python 推导式、map() 调用、海象运算符与嵌套三元
+cat > "${LOOP_DIR}/bad_comprehension.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+竞品站点标注的清洗
+创建日期：2026-09-24
+修改日期：2026-09-24
+"""
+
+
+def competitor_sites_of(sites: dict[str, str]) -> dict[str, str]:
+    """
+    清洗竞品 ASIN 到站点代码的映射
+    """
+    return {
+        asin.strip().upper(): site.strip().upper()
+        for asin, site in sites.items()
+        if asin.strip() and site.strip()
+    }
+
+
+def list_codes(sites: dict[str, str]) -> list[str]:
+    """
+    列出全部站点代码
+    """
+    return list(map(str.upper, sites.values()))
+
+
+def pick_label(sites: dict[str, str]) -> str:
+    """
+    按站点数量返回档位标签
+    """
+    if (site_count := len(sites)) == 0:
+        return "none"
+
+    return "many" if site_count > MANY_SITES else "few" if site_count > 1 else "one"
+EOF
+
+# 违规：函数缺少参数注解与返回类型，__init__ 也要写 -> None
+cat > "${LOOP_DIR}/bad_annotation.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+订单文件读取
+创建日期：2026-09-24
+修改日期：2026-09-24
+"""
+
+
+def load_orders(path):
+    """
+    读取订单文件
+    """
+    return path
+
+
+class OrderLoader:
+    """
+    订单文件读取器
+    """
+
+    def __init__(self, path: str):
+        self.path = path
+EOF
+
+# 合规：显式循环、sorted 的 key lambda、ORM 的 filter 方法与行级豁免都要放行
+cat > "${LOOP_DIR}/good_loop.py" <<'EOF'
+# -*- coding: utf-8 -*-
+"""
+订单查询与排序
+创建日期：2026-09-24
+修改日期：2026-09-24
+"""
+
+
+class OrderRepository:
+    """
+    订单数据访问
+    """
+
+    def __init__(self, session: Session) -> None:
+        self.session = session
+
+    @classmethod
+    def build(cls, session: Session) -> "OrderRepository":
+        return cls(session)
+
+    def list_paid(self, orders: list[Order]) -> list[Order]:
+        """
+        按下单时间排序已支付订单
+        """
+        paid: list[Order] = []
+
+        for order in orders:
+            if not order.paid:
+                continue
+
+            paid.append(order)
+
+        return sorted(paid, key=lambda order: order.created_at)
+
+    def query_by_id(self, order_id: int) -> Query:
+        """
+        按 ID 查询订单
+        """
+        legacy_ids = [order_id for _ in range(1)]  # check-ignore
+        return self.session.query(Order).filter(Order.id.in_(legacy_ids))
+EOF
+
+# 违规：Stream 链与 Optional 链
+cat > "${LOOP_DIR}/BadStream.java" <<'EOF'
+/**
+ * 用户名单汇总
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+public class BadStream {
+
+	public List<String> listNames(List<User> users) {
+		return users.stream()
+			.map(User::getName)
+			.collect(Collectors.toList());
+	}
+
+	public String findCity(User user) {
+		return Optional.ofNullable(user).map(User::getCity).orElse("");
+	}
+}
+EOF
+
+# 合规：显式循环，注释里提到 Stream 不算违规
+cat > "${LOOP_DIR}/GoodLoop.java" <<'EOF'
+/**
+ * 用户名单汇总
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+public class GoodLoop {
+
+	public List<String> listNames(List<User> users) {
+		List<String> names = new ArrayList<>();
+
+		for (User user : users) {
+			names.add(user.getName());
+		}
+
+		return names;
+	}
+
+	public String findCity(Optional<User> user) {
+		// 不再写 list.stream() 链式调用
+		return user.orElseThrow().getCity();
+	}
+}
+EOF
+
+# 违规：数组回调链
+cat > "${LOOP_DIR}/bad-chain.ts" <<'EOF'
+/**
+ * 计算已支付订单总额
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+export const paidAmount = (orders: Order[]): number => orders.filter((order) => order.paid).reduce((sum, order) => sum + order.amount, 0);
+EOF
+
+# 合规：JSX 渲染列表时单独一次 map、查找类单次调用
+cat > "${LOOP_DIR}/GoodList.tsx" <<'EOF'
+/**
+ * 已支付订单列表
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+export function OrderList({ orders }: OrderListProps) {
+	const paidOrders: Order[] = [];
+
+	for (const order of orders) {
+		if (order.paid) {
+			paidOrders.push(order);
+		}
+	}
+
+	const firstPaid = orders.find((order) => order.paid);
+
+	return (
+		<ul>
+			{paidOrders.map((order) => (
+				<li
+					key={order.id}
+				>
+					{order.name}
+				</li>
+			))}
+		</ul>
+	);
+}
+EOF
+
+# 合规：Playwright 的 locator.filter 传对象，不是数组方法
+cat > "${LOOP_DIR}/tests/e2e/orders.spec.ts" <<'EOF'
+/**
+ * 订单列表页端到端测试
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+export const openPaidOrder = async (page: Page): Promise<void> => {
+	await page.locator("li").filter({ hasText: "已支付" }).click();
+};
+EOF
+
+# 违规：Kotlin 集合 forEach
+cat > "${LOOP_DIR}/BadLoop.kt" <<'EOF'
+/**
+ * 订单打印
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+class BadLoop {
+    fun printOrders(orders: List<Order>) {
+        orders.forEach { println(it) }
+    }
+}
+EOF
+
+# 合规：Flow 的 map 与集合 map 同名，属于手动约定，不得误拦
+cat > "${LOOP_DIR}/OrderViewModel.kt" <<'EOF'
+/**
+ * 订单列表的界面状态
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+class OrderViewModel(repository: OrderRepository) : ViewModel() {
+    val orderCount = repository.orders.map { it.size }.stateIn(viewModelScope, SharingStarted.Lazily, 0)
+}
+EOF
+
+# 违规：Go 引入函数式集合库，自写泛型集合辅助函数
+printf 'module demo\n\nrequire github.com/samber/lo v1.39.0\n' > "${LOOP_DIR}/go.mod"
+
+cat > "${LOOP_DIR}/helpers.go" <<'EOF'
+/*
+ * 集合辅助函数
+ * 创建日期：2026-09-24
+ * 修改日期：2026-09-24
+ */
+package helpers
+
+func Map[T, U any](items []T, convert func(T) U) []U {
+	return nil
+}
+EOF
+
+run_check "${LOOP_DIR}"
+expect_contains "${CHECK_OUTPUT}" "bad_comprehension.py 用了推导式或函数式简写" "检查十三:Python 推导式被拦"
+expect_contains "${CHECK_OUTPUT}" "字典推导式" "检查十三:识别字典推导式"
+expect_contains "${CHECK_OUTPUT}" "map() 调用" "检查十三:识别 map() 调用"
+expect_contains "${CHECK_OUTPUT}" "海象运算符" "检查十三:识别海象运算符"
+expect_contains "${CHECK_OUTPUT}" "嵌套三元表达式" "检查十三:识别嵌套三元"
+expect_not_contains "${CHECK_OUTPUT}" "good_loop.py" "检查十三/十四:key lambda、ORM filter、行级豁免与 self/cls 放行"
+expect_contains "${CHECK_OUTPUT}" "BadStream.java 用了流式或集合回调写法" "检查十三:Java Stream 与 Optional 链被拦"
+expect_not_contains "${CHECK_OUTPUT}" "GoodLoop.java" "检查十三:Java 显式循环与注释放行"
+expect_contains "${CHECK_OUTPUT}" "bad-chain.ts 用了流式或集合回调写法" "检查十三:TS 数组回调链被拦"
+expect_not_contains "${CHECK_OUTPUT}" "GoodList.tsx" "检查十三:JSX 渲染列表的单次 map 与 find 放行"
+expect_not_contains "${CHECK_OUTPUT}" "orders.spec.ts" "检查十三:Playwright 的 filter 传对象放行"
+expect_contains "${CHECK_OUTPUT}" "BadLoop.kt 用了流式或集合回调写法" "检查十三:Kotlin forEach 被拦"
+expect_not_contains "${CHECK_OUTPUT}" "OrderViewModel.kt" "检查十三:Kotlin Flow 的 map 放行"
+expect_contains "${CHECK_OUTPUT}" "go.mod 用了流式或集合回调写法" "检查十三:Go 引入 samber/lo 被拦"
+expect_contains "${CHECK_OUTPUT}" "helpers.go 用了流式或集合回调写法" "检查十三:Go 自写泛型 Map 被拦"
+expect_contains "${CHECK_OUTPUT}" "bad_annotation.py 函数缺少类型注解" "检查十四:缺类型注解被拦"
+expect_contains "${CHECK_OUTPUT}" "函数 load_orders 缺少返回类型" "检查十四:识别缺返回类型"
+expect_contains "${CHECK_OUTPUT}" "函数 load_orders 的参数 path 缺少类型注解" "检查十四:识别缺参数注解"
+expect_contains "${CHECK_OUTPUT}" "函数 __init__ 缺少返回类型" "检查十四:__init__ 也要写 -> None"
+
+if [ "${CHECK_EXIT}" -ne 0 ]; then
+	pass "集合写法场景退出码非 0"
+else
+	fail "集合写法场景退出码应非 0，实际 0"
+fi
+
+rm -rf "${LOOP_DIR}"
 
 # ============================================================
 # 汇总

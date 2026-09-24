@@ -37,6 +37,10 @@ bash scripts/check.sh --changed
 ```
 只应报本次改动文件的问题。如果它报了没动过的文件，说明 base 取错了，检查当前分支与 `main` 的关系。
 
+增量检查按文件粒度：改到一个存量文件，整个文件的违规都会报出来。集合写法（检查十三）与 Python 类型注解（检查十四）在存量代码里命中最多，处理方式：
+- 命中的存量写法单独一个提交，按 [refactor](../charles-refactor/SKILL.md) 流程改写并证明行为等价，不和本次功能改动混在一起
+- 确实不能动的文件加进 `.checkignore`，并在提交信息里写明原因
+
 ### 4. 补必需文件
 老项目通常缺这几样，逐个补齐：
 - `AGENTS.md`：按 [模板](templates/project-template/AGENTS.md) 生成，内联硬约束清单

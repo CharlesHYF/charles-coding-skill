@@ -20,6 +20,32 @@
 - **数据类**：网络请求响应体、数据库传输对象一律用 `data class` 定义，字段用 `val` 不可变
 - **禁止在 data class 里写业务逻辑**：它只承载数据，计算与判断放 Service 层
 
+## 集合处理写法
+> 通用规则见 [common.md](../rules/common.md) 的"集合处理写法"。
+
+- **禁止**集合操作函数 `map` / `filter` / `flatMap` / `mapNotNull` / `fold` / `reduce` / `groupBy` / `associate*` / `sumOf` / `forEach` 与 `asSequence()`，一律改为 `for` 循环
+- **允许**：查找类单次调用 `any` / `all` / `first` / `find`，回调只写一个表达式；`sortedBy { it.createdAt }` 这类单独传入的排序 lambda
+- **例外**：`Flow` / `StateFlow` 的 `map` / `filter` / `combine` 等操作符属于异步数据流，不是集合处理，照常使用
+- **拦截方式**：`scripts/check.sh` 检查十三只拦 `forEach` / `forEachIndexed`、`asSequence()` 与 Java Stream；`map` / `filter` 等与 Flow 操作符同名，脚本分不清，属于手动约定，审查时逐处确认
+
+错误：
+```kotlin
+val names = users.filter { it.active }.map { it.name }
+```
+
+正确：
+```kotlin
+val names = mutableListOf<String>()
+
+for (user in users) {
+    if (!user.active) {
+        continue
+    }
+
+    names.add(user.name)
+}
+```
+
 ## 文件头模板
 KDoc 放在**类型声明上方**（文件物理顶部是 `package` 与 `import`）；类上有注解时，注释块放在**注解之上**。
 ```kotlin

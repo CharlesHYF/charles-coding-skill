@@ -21,6 +21,33 @@
 - **禁止链式可选调用掩盖错误**：`a?.b?.c?.d` 超过两层说明数据结构不明确，应先校验再取值
 - 对象与数组字面量每个元素独占一行并带行尾逗号（见 [common.md](../rules/common.md)）
 
+## 集合处理写法
+> 通用规则见 [common.md](../rules/common.md) 的"集合处理写法"。`scripts/check.sh` 检查十三按行匹配，覆盖 `.js` / `.ts` / `.jsx` / `.tsx` / `.vue` 与 HTML 内联脚本，注释行跳过。
+
+- **禁止**数组回调方法 `map` / `filter` / `flatMap` / `reduce` / `reduceRight` / `forEach`，一律改为 `for...of`；`Map` / `Set` / `NodeList` 同样用 `for...of` 遍历
+- **允许**：查找类单次调用 `find` / `findIndex` / `some` / `every` / `includes`，回调只写一个表达式；`sort((a, b) => ...)` 比较函数；`Promise` 的 `then` / `catch`
+- **例外**：JSX 渲染列表时单独一次 `.map`，见 [react.md](../stacks/react.md)；`.filter(` 传对象或字符串是 Playwright、Cypress 等库的方法，不拦
+- **并发请求**：先用循环组装 Promise 数组，再交给 `Promise.all`，不写 `Promise.all(ids.map(...))`
+- **嵌套三元禁止**：脚手架 [eslint.config.js](../templates/project-template/eslint.config.js) 已开 `no-nested-ternary`
+
+错误：
+```ts
+const paidAmount = orders.filter((order) => order.paid).reduce((sum, order) => sum + order.amount, 0);
+```
+
+正确：
+```ts
+let paidAmount = 0;
+
+for (const order of orders) {
+	if (!order.paid) {
+		continue;
+	}
+
+	paidAmount += order.amount;
+}
+```
+
 ## TypeScript 专项
 - **禁止 `any`**：确实无法确定类型时用 `unknown` 并在使用处收窄；第三方库缺类型时写局部 `.d.ts`，不用 `any` 糊过去
 - `tsconfig.json` 基线必须开启：`strict`、`noImplicitAny`、`strictNullChecks`、`noUnusedLocals`、`noUnusedParameters`、`noFallthroughCasesInSwitch`

@@ -28,7 +28,7 @@ metadata:
 | 代码审查 | [review](../charles-review/SKILL.md) |
 
 ## 交付红线
-> 这十二条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
+> 这十三条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
 
 1. **注释用中文**，所有源码文件带文件头三行：作用描述、`创建日期：YYYY-MM-DD`、`修改日期：YYYY-MM-DD`，冒号是全角；描述**只写核心职责，禁止用 `--` 追加功能罗列**
 2. **缩进默认 Tab**；Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格；行尾统一 LF
@@ -42,13 +42,14 @@ metadata:
 10. **动手前先判定变更类型**，按 [流程规范](rules/process.md) 的闸门表执行对应要求
 11. **样式里不写任何注释**（`.css` / `.scss` 与 Vue `<style>` 块，含文件头）；**import 顺序**为值 import 在前、`import type` 在后
 12. **元素多行书写**：属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现
+13. **集合处理一律显式循环**：禁止推导式、Stream、集合回调链与嵌套三元，JSX 渲染列表时单独一次 `.map` 除外；Python 函数的参数与返回类型都要写注解。细则见 [common](rules/common.md) 的"集合处理写法"
 
 ## 规范模块
 
 ### 通用规则（rules/）-- 所有语言适用
 | 模块 | 内容 |
 | --- | --- |
-| [common](rules/common.md) | 缩进、行尾、编码、禁用符号、大括号、展开换行、常量与魔法数字 |
+| [common](rules/common.md) | 缩进、行尾、编码、禁用符号、大括号、展开换行、常量与魔法数字、集合处理写法 |
 | [naming](rules/naming.md) | 变量、函数、布尔、集合、数据传输对象命名 |
 | [text](rules/text.md) | 注释语法、文件头模板、篇幅上限、折行、措辞与黑话词表 |
 | [architecture](rules/architecture.md) | 分层架构、解耦原则、文件内排列顺序、已有代码修改边界 |

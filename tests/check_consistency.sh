@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 多处同源规则一致性自检
 # 创建日期：2026-08-31
-# 修改日期：2026-09-21
+# 修改日期：2026-09-24
 
 set -uo pipefail
 
@@ -70,7 +70,7 @@ else
 fi
 
 # 三、lint 范围描述串：四处必须逐字一致
-LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测"
+LINT_SCOPE="禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解"
 
 expect_in_file "${CHECK_SH}" "${LINT_SCOPE}" "lint 范围串在 check.sh"
 expect_in_file "${AGENTS}" "${LINT_SCOPE}" "lint 范围串在 AGENTS.md"
@@ -124,6 +124,27 @@ expect_in_file "${AGENTS}" "禁止用 \`--\` 追加功能说明" "文件头描�
 expect_in_file "skills/charles-coding-standards/stacks/vue.md" "## 常量（constants）" "常量规范已写入 Vue 分册"
 expect_in_file "skills/charles-coding-standards/stacks/vue.md" "## 全局组件注册" "全局组件注册已写入 Vue 分册"
 expect_in_file "${COLLABORATION}" "## 分析输出格式" "分析输出格式已写入协作模块"
+
+# 四之三之五、集合处理写法与 Python 类型注解必须同时活在通用模块、语言分册、红线与项目模板里
+COLLECTION_DOCS=(
+	"skills/charles-coding-standards/rules/common.md"
+	"skills/charles-coding-standards/languages/python.md"
+	"skills/charles-coding-standards/languages/java.md"
+	"skills/charles-coding-standards/languages/kotlin.md"
+	"skills/charles-coding-standards/languages/javascript-typescript.md"
+	"skills/charles-coding-standards/languages/go.md"
+)
+
+for collection_doc in "${COLLECTION_DOCS[@]}"; do
+	expect_in_file "${collection_doc}" "## 集合处理写法" "集合处理写法已写入 ${collection_doc}"
+done
+
+expect_in_file "${SKILL}" "集合处理一律显式循环" "集合处理写法已进入交付红线"
+expect_in_file "${AGENTS}" "集合处理一律显式循环" "集合处理写法已内联进 AGENTS.md"
+expect_in_file "skills/charles-coding-standards/languages/python.md" '没有返回值写 `-> None`' "Python 类型注解已写入分册"
+expect_in_file "${AGENTS}" '没有返回值写 `-> None`' "Python 类型注解已内联进 AGENTS.md"
+expect_in_file "templates/project-template/pyproject.toml" '"PERF401"' "Ruff 反向规则已写进脚手架 ignore"
+expect_in_file "templates/project-template/eslint.config.js" '"no-nested-ternary"' "嵌套三元已写进脚手架 ESLint"
 
 # 四之三之四、规范分册的文件头不得带前缀标签(md 不进 check.sh 扫描范围,靠这条兜底)
 LABEL_HITS=$(grep -rlE '^(作用|文件作用|文件用途|文件说明)[:：]' skills/ templates/ 2>/dev/null || true)

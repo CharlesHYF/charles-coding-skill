@@ -34,6 +34,28 @@
   }
   ```
 - **命名**：组件文件夹/组件名 `PascalCase`（如 `LoginForm`）；自定义 Hook 文件与函数名一律 `useXxx` 前缀（如 `useAuth`、`useDebounce`），全局复用放 `src/hooks/`，页面私有放该路由 `_components/` 同级
+- **列表渲染只用单次 `.map`**：JSX 里 `{list.map((item) => (...))}` 是集合处理写法的唯一例外（见 [common.md](../rules/common.md) 的"集合处理写法"），回调只返回元素；过滤、排序先在组件里用 `for...of` 算出具名变量，JSX 里不串 `.filter().map()`。`scripts/check.sh` 只放行以 `{list.map(` 开头的这一行
+  ```tsx
+  const paidOrders: Order[] = [];
+
+  for (const order of orders) {
+  	if (order.paid) {
+  		paidOrders.push(order);
+  	}
+  }
+
+  return (
+  	<ul>
+  		{paidOrders.map((order) => (
+  			<li
+  				key={order.id}
+  			>
+  				{order.name}
+  			</li>
+  		))}
+  	</ul>
+  );
+  ```
 
 ## 目录结构
 - **路由页面**：Next.js App Router 强制以 `app/` 为路由目录，路由入口文件为框架约定的 `page.tsx` / `layout.tsx`（此处不改名为 `index`，遵循框架要求）

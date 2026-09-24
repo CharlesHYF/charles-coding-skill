@@ -55,8 +55,37 @@
   public class UserController {
   }
   ```
-- **判空兜底用 `Optional`**：可能为空的返回值/查询结果用 `Optional` 表达与处理（`Optional.ofNullable(...).map(...).orElse(...)` / `orElseThrow(...)`），**禁止**层层 `if (x != null)` 手写判空堆叠；对外可能返回空的方法优先声明返回 `Optional<T>`
+- **判空用 `Optional` 表达，取值不走链式调用**：对外可能返回空的方法优先声明返回 `Optional<T>`；取值只用 `orElse` / `orElseGet` / `orElseThrow`，判断用 `isPresent` / `isEmpty`；**禁止** `.map` / `.flatMap` / `.filter` 链式调用，多步转换先取出值再用普通语句处理；**禁止**层层 `if (x != null)` 手写判空堆叠
 - **对象转换用 `BeanUtil.toBean`**（Hutool）/ MapStruct 等成熟工具，在 DO ↔ VO/DTO 之间转换，**禁止**自己手写一堆 `setXxx(a.getXxx())` 的封装/拷贝代码
+
+## 集合处理写法
+> 通用规则见 [common.md](../rules/common.md) 的"集合处理写法"。`scripts/check.sh` 检查十三拦截 Stream 入口、`java.util.stream` 引用与 `.map(` / `.flatMap(` / `.filter(` / `.forEach(` / `.reduce(`；ModelMapper 这类库的同名 `.map(` 属于误报，在该行注释里加 `check-ignore` 豁免。
+
+- **禁止** Stream 全部 API：`.stream()`、`.parallelStream()`、`Stream.of`、`IntStream` / `LongStream` / `DoubleStream`、`Arrays.stream`、`Collectors`
+- **禁止** `forEach` 回调：`list.forEach(...)`、`map.forEach(...)` 一律改为增强 `for`
+- **允许**：`removeIf`、`computeIfAbsent`、`sort(Comparator.comparing(...))` 这类单次调用
+- **嵌套三元禁止**：手动约定，脚本不拦
+
+错误：
+```java
+List<String> names = users.stream()
+	.filter(user -> user.isActive())
+	.map(User::getName)
+	.collect(Collectors.toList());
+```
+
+正确：
+```java
+List<String> names = new ArrayList<>();
+
+for (User user : users) {
+	if (!user.isActive()) {
+		continue;
+	}
+
+	names.add(user.getName());
+}
+```
 
 ## 微服务架构规范
 > 中大型 / 微服务项目遵循以下 Maven 多模块与分层约定（源自实践项目，Spring Cloud Alibaba + Dubbo）。小型单体项目可只保留分层与统一响应部分。

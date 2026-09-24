@@ -82,6 +82,8 @@
 - **压测必须有**：`test_cases/stress/` 下必须有脚本，覆盖写操作、列表分页、批量导入导出、核心读接口四类，阈值写进脚本由 k6 自动判定。`scripts/check.sh` 检查十二会拦。
 - **前端 index 化**：`types` / `store` / `constants` 一律 `index.ts` 做再导出、实体放 `modules/`；`permission` 放 `src/` 下；`src/components` 下的全局组件全部在 `main.ts` 注册。
 - **单一入口**：一项能力对外只暴露一个入口模块，底层实现不许被入口之外的地方直接 import(例如认证只能经由 `composables/useAuth`，不许直接引 `utils/auth`；Controller 不许直接引 Mapper)。受保护关系写在项目根 `.import-boundaries`，`scripts/check.sh` 检查八会拦。绕过入口的调用通常也能跑通，但入口层的缓存、鉴权刷新、错误处理会对它全部失效。
+- **集合处理一律显式循环**：禁止 Python 推导式与生成器表达式、`map()` / `filter()` / `reduce()`、海象运算符；禁止 Java Stream、`forEach` 回调与 `Optional` 链；禁止 Kotlin 集合函数链(`Flow` 操作符除外)与 JS/TS 的 `map` / `filter` / `flatMap` / `reduce` / `forEach`(JSX 渲染列表时单独一次 `.map` 除外)；禁止 Go 自写泛型 `Map` / `Filter` 与 `samber/lo`；禁止嵌套三元。不合规的数据用 `continue` 提前跳过，清洗后的值先存变量再判断。查找类单次调用(`find` / `some` / `any` / `first`)与排序的 key lambda 允许。`scripts/check.sh` 检查十三会拦。
+- **Python 类型注解**：所有函数的参数与返回类型都要写(`self` / `cls` 除外)，没有返回值写 `-> None`，`__init__` 也不例外。`scripts/check.sh` 检查十四会拦。
 
 ## 6. 代码编写与组织规范
 以下规则默认适用于所有新写和修改的源码，不需要用户另行提出"整理代码"。
@@ -129,7 +131,7 @@
 ```bash
 make verify      # 交付前总闸门：增量规范校验 + 测试(全绿才算完成)
 make verify-all  # 全量闸门：全量规范校验 + 测试(推主干与 CI 用)
-make lint        # 仅规范校验，只查本次改动(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测)
+make lint        # 仅规范校验，只查本次改动(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解)
 make lint-all    # 仅规范校验，全量扫描
 make check       # 仅跑测试
 make dev         # 启动开发环境

@@ -1,6 +1,6 @@
 # Python 工具链配置模板
 # 创建日期：2026-08-31
-# 修改日期：2026-08-31
+# 修改日期：2026-09-24
 
 [project]
 name = "project-name"
@@ -16,6 +16,10 @@ line-length = 120
 # D213 -> 多行 docstring 摘要从第二行开始(对应 charles-coding 的"三段式")
 # 禁止启用 D200 / D212:两者要求摘要与引号收拢同行,与三段式直接冲突
 extend-select = ["I", "D300", "D213"]
+
+# 下列规则建议把循环改写成推导式、any()/all() 或生成器,与 charles-coding 的集合处理写法相反
+# 写进 ignore 后,即使以后按前缀整组开启 C4 / PERF / SIM / FURB / UP 也不会生效
+ignore = ["C402", "C403", "C404", "C417", "PERF401", "PERF403", "SIM110", "FURB140", "UP027"]
 
 [tool.mypy]
 strict = true

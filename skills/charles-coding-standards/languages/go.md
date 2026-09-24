@@ -40,6 +40,15 @@
   - **禁止**用 `panic` 做正常的错误处理流程；只在程序无法继续（如初始化失败）时使用
   - 每个 goroutine 内部若可能 panic，必须 `defer recover()` 兜底并记录日志，避免一个 goroutine panic 拖垮整个进程
 
+## 集合处理写法
+> 通用规则见 [common.md](../rules/common.md) 的"集合处理写法"。Go 标准库本身没有 Stream，要防的是把别的语言的写法搬进来。
+
+- 集合的遍历、过滤、转换、汇总一律 `for range`，不合规的数据用 `continue` 提前跳过
+- **禁止**自写泛型 `Map` / `Filter` / `Reduce` / `FlatMap` / `ForEach` 辅助函数
+- **禁止**引入 `samber/lo` 这类函数式集合库
+- **允许**：标准库 `slices` / `maps` 的 `Contains`、`Index`、`SortFunc` 这类单次调用
+- `scripts/check.sh` 检查十三拦截 `go.mod` 与源码里的 `github.com/samber/lo`，以及 `func Map[` 这类泛型辅助函数定义
+
 ## 注释规范（Go 是全局"块注释优先"规则的例外）
 - **声明级注释一律用 `//`，即使多行也用连续 `//`**：Go 的官方文档注释标准就是 `//`，`go doc` / pkg.go.dev / `golint` 只识别这种形式，写成 `/* */` 不被当作 doc comment。这是 [SKILL.md](../SKILL.md) "多行注释用块注释"规则的明确例外
 - **doc comment 以标识符名开头**：注释首个词必须是被注释的标识符名，如 `// GetUser 按 ID 查询用户，未命中返回 ErrUserNotFound。`

@@ -12,7 +12,7 @@
 - 数据库驱动：asyncpg（PostgreSQL）或 aiomysql（MySQL）
 - 异步：全面使用 `async/await` 处理 IO 密集型任务
 - 代码风格：PEP8 强制，使用 **Ruff** 替代 flake8 + isort + Black（缩进 4 空格，由 Ruff/editorconfig 统一）
-- 类型注解：全部函数添加类型注解，并使用 mypy 严格模式检查
+- 类型注解：全部函数的参数与返回类型都要写注解（`self` / `cls` 除外），没有返回值写 `-> None`，`__init__`、嵌套函数与测试函数也不例外；`scripts/check.sh` 检查十四拦截缺失。注解写得对不对由 mypy 严格模式检查，mypy 未接入 `make verify`，需要时手动跑 `uv run mypy src`
 
 ## 文件头部模板
 ```python
@@ -33,6 +33,41 @@
   # 末阶段号:完成后无需确认门,整条分析即收尾。
   LAST_PHASE: Phase = Phase.LISTING
   ```
+
+## 集合处理写法
+> 通用规则见 [common.md](../rules/common.md) 的"集合处理写法"。`scripts/check.sh` 检查十三用语法树识别，不会误伤 ORM 的 `query.filter()` 这类方法调用。
+
+- **禁止**：列表 / 字典 / 集合推导式、生成器表达式（含 `sum(x for x in ...)`、`any(...)`、`"".join(...)` 这类传参写法）、`map()` / `filter()` / `functools.reduce()`、海象运算符 `:=`、嵌套三元
+- **允许**：单独作为参数的 lambda，如 `sorted(orders, key=lambda order: order.created_at)`
+- **Ruff 里方向相反的规则禁止启用**：`C402` / `C403` / `C404` / `C417`（改写成推导式）、`PERF401` / `PERF403`（把循环改成推导式）、`SIM110`（把循环改成 `any()` / `all()`）、`FURB140`（改用 `itertools.starmap`）、`UP027`（改成生成器表达式）。脚手架 [pyproject.toml](../templates/project-template/pyproject.toml) 已把它们写进 `ignore`，以后按前缀整组开启 `C4` / `PERF` / `SIM` / `FURB` / `UP` 也不会生效
+
+错误：遍历、类型检查、空值过滤、清洗和构造字典挤在一个表达式里，`strip()` 在条件和结果里各调一次
+```python
+return {
+    asin.strip().upper(): site.strip().upper()
+    for asin, site in sites.items()
+    if isinstance(asin, str) and isinstance(site, str) and asin.strip() and site.strip()
+}
+```
+
+正确：不合规的数据用 `continue` 提前跳过，清洗一次存进变量再判断
+```python
+result: dict[str, str] = {}
+
+for asin, site in sites.items():
+    if not isinstance(asin, str) or not isinstance(site, str):
+        continue
+
+    asin = asin.strip().upper()
+    site = site.strip().upper()
+
+    if not asin or not site:
+        continue
+
+    result[asin] = site
+
+return result
+```
 
 ## 测试
 - 框架：pytest + pytest-asyncio

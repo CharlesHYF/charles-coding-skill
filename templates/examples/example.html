@@ -1,7 +1,7 @@
 <!--
 	展会前端示例页面
 	创建日期：2026-08-01
-	修改日期：2026-08-10
+	修改日期：2026-09-24
 	说明：本文件为完整可参考的范例，展示网格布局、自定义下拉、模态表单、Toast 提示等前端组件的实现方式。
 		   所有内容均为示例数据，无实际业务含义。
 -->
@@ -1342,19 +1342,26 @@
 		 * 渲染左侧场景菜单
 		 */
 		function renderMenu() {
-			menu.innerHTML = scenarios.map((item, index) => `
+			let menuHtml = '';
+
+			for (const [index, item] of scenarios.entries()) {
+				menuHtml += `
 				<button class="scenario-tab ${index === current ? 'active' : ''}" data-index="${index}">
 					<strong>${item.name}</strong>
 					<span>${item.short}</span>
 				</button>
-			`).join('');
-			menu.querySelectorAll('.scenario-tab').forEach(btn => {
+			`;
+			}
+
+			menu.innerHTML = menuHtml;
+
+			for (const btn of menu.querySelectorAll('.scenario-tab')) {
 				btn.addEventListener('click', () => {
 					current = Number(btn.dataset.index);
 					renderMenu();
 					renderScene();
 				});
-			});
+			}
 		}
 
 		/**
@@ -1366,9 +1373,11 @@
 			sceneDesc.textContent = item.desc;
 			sceneClient.textContent = item.client;
 			sceneCanvas.style.backgroundImage = `url("${IMAGES[item.id]}")`;
-			sceneCanvas.querySelectorAll('.hotspot').forEach(el => el.remove());
+			for (const oldHotspot of sceneCanvas.querySelectorAll('.hotspot')) {
+				oldHotspot.remove();
+			}
 
-			item.hotspots.forEach((spot, idx) => {
+			for (const [idx, spot] of item.hotspots.entries()) {
 				const btn = document.createElement('button');
 				btn.className = 'hotspot';
 				if (spot.x > 55) {
@@ -1379,7 +1388,18 @@
 				btn.setAttribute('type', 'button');
 				btn.setAttribute('aria-label', spot.title);
 				const bodyHtml = spot.body ? `<p>${spot.body}</p>` : '';
-				const pointsHtml = (spot.points && spot.points.length) ? `<ul>${spot.points.map(point => `<li>${point}</li>`).join('')}</ul>` : '';
+				let pointsHtml = '';
+
+				if (spot.points && spot.points.length) {
+					let pointItems = '';
+
+					for (const point of spot.points) {
+						pointItems += `<li>${point}</li>`;
+					}
+
+					pointsHtml = `<ul>${pointItems}</ul>`;
+				}
+
 				btn.innerHTML = `<span class="hotspot-num">${idx + 1}</span>
 					<div class="tooltip">
 						<h4>${spot.title}</h4>
@@ -1387,11 +1407,14 @@
 						${pointsHtml}
 					</div>`;
 				btn.addEventListener('click', () => {
-					sceneCanvas.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+					for (const hotspot of sceneCanvas.querySelectorAll('.hotspot')) {
+						hotspot.classList.remove('active');
+					}
+
 					btn.classList.add('active');
 				});
 				sceneCanvas.appendChild(btn);
-			});
+			}
 		}
 
 		/* ===== 预约表单弹窗 ===== */
@@ -1411,12 +1434,12 @@
 			formDialog.focus();
 		}
 
-		document.querySelectorAll('[data-open-form]').forEach(btn => {
+		for (const btn of document.querySelectorAll('[data-open-form]')) {
 			btn.addEventListener('click', openForm);
-		});
+		}
 
 		/* 入口卡按钮：滚动到场景区并切换到对应场景 */
-		document.querySelectorAll('[data-goto-scene]').forEach(btn => {
+		for (const btn of document.querySelectorAll('[data-goto-scene]')) {
 			btn.addEventListener('click', () => {
 				const targetIndex = scenarios.findIndex(item => item.id === btn.dataset.gotoScene);
 				if (targetIndex >= 0) {
@@ -1426,7 +1449,7 @@
 				}
 				document.getElementById('scenarios').scrollIntoView({ behavior: 'smooth', block: 'start' });
 			});
-		});
+		}
 
 		formClose.addEventListener('click', () => {
 			resetForm();
@@ -1459,8 +1482,21 @@
 		const productText = document.getElementById('productText');
 		const productMenu = document.getElementById('productMenu');
 
+		/**
+		 * 读取产品多选下拉里已勾选的产品
+		 */
+		function readCheckedProducts() {
+			const checked = [];
+
+			for (const input of productMenu.querySelectorAll('input:checked')) {
+				checked.push(input.value);
+			}
+
+			return checked;
+		}
+
 		function refreshProductText() {
-			const checked = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			const checked = readCheckedProducts();
 			if (checked.length) {
 				productText.textContent = checked.join(', ');
 				productToggle.classList.add('has-value');
@@ -1497,11 +1533,12 @@
 			const host = formDialog.open ? formDialog : document.body;
 			const tip = document.createElement('div');
 			tip.className = 'field-tooltip';
-			lines.forEach(line => {
+			for (const line of lines) {
 				const span = document.createElement('span');
 				span.textContent = line;
 				tip.appendChild(span);
-			});
+			}
+
 			host.appendChild(tip);
 
 			const anchorRect = anchor.getBoundingClientRect();
@@ -1519,7 +1556,7 @@
 		}
 
 		productToggle.addEventListener('mouseenter', () => {
-			const checked = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			const checked = readCheckedProducts();
 			showFieldTooltip(productToggle, checked);
 		});
 		productToggle.addEventListener('mouseleave', hideFieldTooltip);
@@ -1559,36 +1596,43 @@
 		window.addEventListener('resize', repositionOpenSelectMenus);
 		window.addEventListener('scroll', repositionOpenSelectMenus, true);
 
-		sectorMenu.querySelectorAll('.single-select-option').forEach(opt => {
+		for (const opt of sectorMenu.querySelectorAll('.single-select-option')) {
 			opt.addEventListener('click', () => {
 				sectorSelect.dataset.value = opt.dataset.value;
 				sectorText.textContent = opt.dataset.value;
 				sectorText.title = opt.dataset.value;
 				sectorToggle.classList.add('has-value');
 				sectorToggle.classList.remove('error');
-				sectorMenu.querySelectorAll('.single-select-option').forEach(o => o.classList.toggle('selected', o === opt));
+
+				for (const option of sectorMenu.querySelectorAll('.single-select-option')) {
+					option.classList.toggle('selected', option === opt);
+				}
+
 				sectorSelect.classList.remove('open');
 				sectorToggle.setAttribute('aria-expanded', 'false');
 			});
-		});
+		}
 
 		function resetSector() {
 			sectorSelect.dataset.value = '';
 			sectorText.textContent = '请选择行业';
 			sectorText.removeAttribute('title');
 			sectorToggle.classList.remove('has-value', 'error');
-			sectorMenu.querySelectorAll('.single-select-option').forEach(o => o.classList.remove('selected'));
+
+			for (const option of sectorMenu.querySelectorAll('.single-select-option')) {
+				option.classList.remove('selected');
+			}
 		}
 
 		/* 点击外部收起下拉 */
 		document.addEventListener('click', (e) => {
-			document.querySelectorAll('.multi-select.open, .single-select.open').forEach(sel => {
+			for (const sel of document.querySelectorAll('.multi-select.open, .single-select.open')) {
 				if (!sel.contains(e.target)) {
 					sel.classList.remove('open');
 					const tgl = sel.querySelector('.multi-select-toggle, .single-select-toggle');
 					if (tgl) tgl.setAttribute('aria-expanded', 'false');
 				}
-			});
+			}
 		});
 
 		/* ===== Toast 提示 ===== */
@@ -1637,7 +1681,7 @@
 				return;
 			}
 
-			const selectedProducts = [...productMenu.querySelectorAll('input:checked')].map(i => i.value);
+			const selectedProducts = readCheckedProducts();
 			if (selectedProducts.length === 0) {
 				productToggle.classList.add('error');
 				productToggle.focus();

@@ -31,6 +31,7 @@
 - 格式化：Prettier + ESLint（eslint-plugin-vue）；Prettier 设 `useTabs: true` 以符合全局 Tab 约定
 - **命名**：组件文件夹/组件名 `PascalCase`（如 `LoginForm`）；组合式函数（composables）文件与函数名一律 `useXxx` 前缀（如 `useAuth`、`useRequest`），放在 `src/composables/`（全局复用）或页面目录下（页面私有，与私有组件同级）
 - **导入路径用别名 `@/`**：一律用 `@/xxx/xxx`（`@` 指向 `src`），**禁止**用 `../../xxx` 这类多级相对路径。在 `vite.config.ts` 的 `resolve.alias` 与 `tsconfig.json` 的 `paths` 中配置 `@` → `src`
+- **集合处理写显式循环**：模板里不写 `list.filter(...)` 这类表达式，过滤放进 computed；computed 内部同样用 `for...of`，规则见 [common.md](../rules/common.md) 的"集合处理写法"。`v-for` 本身就是循环，照常使用
 
 ### `<script setup>` 内部顺序
 编写、修改或整理 Vue 代码时，先读 [code-organization.md](../rules/architecture.md)。在不改变初始化顺序、副作用和组件行为的前提下，按照以下顺序排列：
@@ -224,13 +225,11 @@ export const AGENT_CREDENTIAL_TYPE_OPTIONS = [
 	},
 ] as const;
 
-export const AGENT_CREDENTIAL_TYPE_MAP = AGENT_CREDENTIAL_TYPE_OPTIONS.reduce(
-	(acc, option) => ({
-		...acc,
-		[option.value]: option.label,
-	}),
-	{} as Record<number, string>,
-);
+export const AGENT_CREDENTIAL_TYPE_MAP: Record<number, string> = {};
+
+for (const option of AGENT_CREDENTIAL_TYPE_OPTIONS) {
+	AGENT_CREDENTIAL_TYPE_MAP[option.value] = option.label;
+}
 ```
 
 - `value` 的取值必须与数据库字段一致，改动时同步迁移脚本
