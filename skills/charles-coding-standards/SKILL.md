@@ -20,12 +20,12 @@ metadata:
 
 | 场景 | 工作流 |
 | --- | --- |
-| 新项目初始化 | [new-project](../charles-new-project/SKILL.md) |
-| 老项目接入规范 | [legacy-project](../charles-legacy-project/SKILL.md) |
-| 开发新功能 / 需求变更 | [new-feature](../charles-new-feature/SKILL.md) |
-| 修复 Bug | [bugfix](../charles-bugfix/SKILL.md) |
-| 重构 | [refactor](../charles-refactor/SKILL.md) |
-| 代码审查 | [review](../charles-review/SKILL.md) |
+| 新项目初始化 | [new-project](../charles-coding-new-project/SKILL.md) |
+| 老项目接入规范 | [legacy-project](../charles-coding-legacy-project/SKILL.md) |
+| 开发新功能 / 需求变更 | [new-feature](../charles-coding-new-feature/SKILL.md) |
+| 修复 Bug | [bugfix](../charles-coding-bugfix/SKILL.md) |
+| 重构 | [refactor](../charles-coding-refactor/SKILL.md) |
+| 代码审查 | [review](../charles-coding-review/SKILL.md) |
 
 ## 交付红线
 > 这十三条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。

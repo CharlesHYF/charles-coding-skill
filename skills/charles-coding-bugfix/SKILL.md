@@ -1,5 +1,5 @@
 ---
-name: charles-bugfix
+name: charles-coding-bugfix
 description: Use when fixing a bug, test failure, or unexpected behavior in Charles's projects - enforces root-cause analysis and writing a failing reproduction test before touching implementation code.
 metadata:
   version: "4.0.0"

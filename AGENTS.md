@@ -9,12 +9,12 @@
 | skill | 作用 |
 | --- | --- |
 | `skills/charles-coding-standards/` | 规范本体：场景路由、交付红线、规范模块索引 |
-| `skills/charles-new-project/` | 新项目初始化工作流 |
-| `skills/charles-legacy-project/` | 老项目接入工作流 |
-| `skills/charles-new-feature/` | 新功能与需求变更工作流 |
-| `skills/charles-bugfix/` | Bug 修复工作流 |
-| `skills/charles-refactor/` | 重构工作流 |
-| `skills/charles-review/` | 代码审查工作流 |
+| `skills/charles-coding-new-project/` | 新项目初始化工作流 |
+| `skills/charles-coding-legacy-project/` | 老项目接入工作流 |
+| `skills/charles-coding-new-feature/` | 新功能与需求变更工作流 |
+| `skills/charles-coding-bugfix/` | Bug 修复工作流 |
+| `skills/charles-coding-refactor/` | 重构工作流 |
+| `skills/charles-coding-review/` | 代码审查工作流 |
 
 规范细则在 `skills/charles-coding-standards/` 下的 `rules/`（通用规则）、`languages/`（语言）、`stacks/`（技术栈）、`domains/`（领域）。
 

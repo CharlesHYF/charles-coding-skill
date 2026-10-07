@@ -17,12 +17,12 @@ Charles 专用的全栈编码规范，适用于主流 AI 编程工具。
 | skill | 用途 |
 | --- | --- |
 | `charles-coding-standards` | 规范本体：交付红线、场景路由、规范模块索引 |
-| `charles-new-project` | 新项目初始化：装脚手架、装闸门、验证闸门确实会 fail |
-| `charles-legacy-project` | 老项目接入：增量检查，新代码严格、存量不阻塞 |
-| `charles-new-feature` | 新功能与需求变更：问清需求、模块文档评审、编码、测试 |
-| `charles-bugfix` | Bug 修复：定位根因、先写复现测试、再改实现 |
-| `charles-refactor` | 重构：证明行为等价，禁止改断言让它通过 |
-| `charles-review` | 代码审查：先跑校验器，再审脚本查不了的部分 |
+| `charles-coding-new-project` | 新项目初始化：装脚手架、装闸门、验证闸门确实会 fail |
+| `charles-coding-legacy-project` | 老项目接入：增量检查，新代码严格、存量不阻塞 |
+| `charles-coding-new-feature` | 新功能与需求变更：问清需求、模块文档评审、编码、测试 |
+| `charles-coding-bugfix` | Bug 修复：定位根因、先写复现测试、再改实现 |
+| `charles-coding-refactor` | 重构：证明行为等价，禁止改断言让它通过 |
+| `charles-coding-review` | 代码审查：先跑校验器，再审脚本查不了的部分 |
 
 ## 安装
 
@@ -42,23 +42,23 @@ bash ~/charles-coding-skill/tools/install-skills.sh ~/.trae/skills      # Trae �
 bash ~/charles-coding-skill/tools/install-skills.sh ~/.rovodev/skills   # Rovo Dev
 ```
 
-脚本会先清掉 v3.x 遗留的单 skill 目录，再建七个软链；遇到同名实体目录会跳过而不覆盖。装完是这样：
+脚本会先清掉 v3.x 遗留的单 skill 目录和指向本仓的失效软链（skill 改名后留下的旧名），再建七个软链；遇到同名实体目录会跳过而不覆盖。v4.0.0 之后六个工作流 skill 从 `charles-xxx` 改名为 `charles-coding-xxx`，升级后重跑一次脚本即可清掉旧名。装完是这样：
 
 ```
 ~/.claude/skills/
 ├── charles-coding-standards -> ~/charles-coding-skill/skills/charles-coding-standards
-├── charles-new-project      -> ...
-├── charles-legacy-project   -> ...
-├── charles-new-feature      -> ...
-├── charles-bugfix           -> ...
-├── charles-refactor         -> ...
-└── charles-review           -> ...
+├── charles-coding-new-project      -> ...
+├── charles-coding-legacy-project   -> ...
+├── charles-coding-new-feature      -> ...
+├── charles-coding-bugfix           -> ...
+├── charles-coding-refactor         -> ...
+└── charles-coding-review           -> ...
 ```
 
 项目级安装把目标改成 `<项目>/.agents/skills` 或 `<项目>/.claude/skills` 即可，同名时项目级优先。
 
 ### Claude Code plugin 方式（可选）
-本仓自带 `.claude-plugin/marketplace.json`，也可以按 plugin 装，调用形式变成 `/charles-coding:charles-bugfix`：
+本仓自带 `.claude-plugin/marketplace.json`，也可以按 plugin 装，调用形式变成 `/charles-coding:charles-coding-bugfix`：
 
 ```
 /plugin marketplace add ~/charles-coding-skill
@@ -221,7 +221,7 @@ cp -r templates/project-template/ <新项目路径>
 bash tools/install-check.sh <项目路径>
 ```
 
-老项目接入后默认走增量检查，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 `skills/charles-legacy-project/SKILL.md`。
+老项目接入后默认走增量检查，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 `skills/charles-coding-legacy-project/SKILL.md`。
 
 ## 遵从率兜底
 

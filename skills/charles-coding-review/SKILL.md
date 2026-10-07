@@ -1,5 +1,5 @@
 ---
-name: charles-review
+name: charles-coding-review
 description: Use when reviewing code in Charles's projects, including reviewing output produced by subagents - runs the mechanical spec checker first, then reviews business logic, so review effort goes where scripts cannot reach.
 metadata:
   version: "4.0.0"

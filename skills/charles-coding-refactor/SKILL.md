@@ -1,5 +1,5 @@
 ---
-name: charles-refactor
+name: charles-coding-refactor
 description: Use when restructuring existing code in Charles's projects without changing its external behavior - enforces proving behavioral equivalence and forbids weakening tests to make the refactor pass.
 metadata:
   version: "4.0.0"

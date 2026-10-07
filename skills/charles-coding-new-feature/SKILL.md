@@ -1,5 +1,5 @@
 ---
-name: charles-new-feature
+name: charles-coding-new-feature
 description: Use when building a new feature or module in Charles's projects, or when changing the behavior of an existing one - enforces requirement clarification, the module-doc gate before coding, and test cases before delivery.
 metadata:
   version: "4.0.0"

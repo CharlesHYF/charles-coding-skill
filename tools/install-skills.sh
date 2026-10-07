@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 把七个 skill 软链到指定工具的 skills 目录，改完开发仓即刻生效，不再需要逐处拷贝同步
 # 创建日期：2026-09-21
-# 修改日期：2026-09-21
+# 修改日期：2026-10-07
 
 set -uo pipefail
 
@@ -26,6 +26,21 @@ if [ -e "${TARGET}/${LEGACY_DIR_NAME}" ] && [ -f "${TARGET}/${LEGACY_DIR_NAME}/S
 	rm -rf "${TARGET:?}/${LEGACY_DIR_NAME:?}"
 	echo "  [CLEAN] 已移除 v3.x 单 skill 目录 ${LEGACY_DIR_NAME}"
 fi
+
+# 清理失效软链：指向本仓 skills 目录但目标已不存在(skill 改名或删除后留下)，只删软链不动实体目录
+for stale_path in "${TARGET}"/*; do
+
+	if [ ! -L "${stale_path}" ] || [ -e "${stale_path}" ]; then
+		continue
+	fi
+
+	case "$(readlink "${stale_path}")" in
+		"${REPO_ROOT}"/skills/*)
+			rm -f "${stale_path}"
+			echo "  [CLEAN] 已移除失效软链 $(basename "${stale_path}")"
+			;;
+	esac
+done
 
 LINKED=0
 
