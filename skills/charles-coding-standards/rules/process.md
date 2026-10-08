@@ -2,7 +2,7 @@
 <!--
 开发流程规范
 创建日期：2026-09-21
-修改日期：2026-09-21
+修改日期：2026-10-08
 -->
 > 动手写代码前先判定本次属于哪一类变更，再按对应闸门执行。判定不了就按更严格的一档执行。
 
@@ -54,6 +54,18 @@
 - 记录升级前后版本号与变更原因
 - 跑冒烟测试确认主流程可用
 - 涉及安全补丁时在 commit 说明里注明 CVE 或来源
+
+## 编码前检查 CI
+> 没有 CI 时 pre-push 钩子被绕过就没有第二道拦截。这一条要和用户对话，属于手动约定，`check.sh` 不拦。
+
+1. **先查配置文件**：项目里存在以下任一项即视为已有 CI，直接开始编码，不询问
+   - `.github/workflows/`、`.gitea/workflows/`、`.forgejo/workflows/` 下的 `*.yml` / `*.yaml`
+   - `.gitlab-ci.yml`、`Jenkinsfile`、`.circleci/config.yml`、`azure-pipelines.yml`、`bitbucket-pipelines.yml`、`.drone.yml`、`.woodpecker.yml` 或 `.woodpecker/`、`.travis.yml`
+2. **再查已记录的决定**：项目根 `AGENTS.md` 里有 `CI：不需要` 这一行，说明用户已经答复过，直接开始编码，不再询问
+3. **两项都没有才询问**：问用户这个项目是否需要 CI，一个项目只问一次
+   - 需要：GitHub 项目以 `templates/project-template/.github/workflows/verify.yml` 为起点，其他平台按同样的检查步骤改写；CI 配置建好后第 1 步就能识别，不必另外记录
+   - 不需要：立刻在 `AGENTS.md` 写一行 `CI：不需要（确认日期：YYYY-MM-DD）`，项目没有 `AGENTS.md` 时先按模板创建。不写下来，下一个会话还会重复询问
+   - 用户暂时不答复：不记录，本次会话内不再追问，先继续编码
 
 
 ## AGENTS.md（项目级 AI 指令）

@@ -39,7 +39,7 @@ metadata:
 7. **注释块正文不超过 3 行**，一条注释一行写完，不把一句话折断换行
 8. **AI 代码只提交到 `agents/feature/*`**，禁止任何 AI 联合署名，禁止直接推主干或发起 PR；**一个任务对应一个 commit**
 9. **交付前 `make verify` 全绿**（规范校验 + 测试），未实跑不得声称通过；测试代码集中放 `tests/`，新功能必须带压测脚本
-10. **动手前先判定变更类型**，按 [流程规范](rules/process.md) 的闸门表执行对应要求
+10. **动手前先判定变更类型**，按 [流程规范](rules/process.md) 的闸门表执行对应要求；项目没有 CI 且 `AGENTS.md` 未记录过决定时，先问用户是否需要 CI，一个项目只问一次
 11. **样式里不写任何注释**（`.css` / `.scss` 与 Vue `<style>` 块，含文件头）；**import 顺序**为值 import 在前、`import type` 在后
 12. **元素多行书写**：属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现
 13. **集合处理一律显式循环**：禁止推导式、Stream、集合回调链与嵌套三元，JSX 渲染列表时单独一次 `.map` 除外；Python 函数的参数与返回类型都要写注解。细则见 [common](rules/common.md) 的"集合处理写法"
@@ -54,7 +54,7 @@ metadata:
 | [text](rules/text.md) | 注释语法、文件头模板、篇幅上限、折行、措辞与黑话词表 |
 | [architecture](rules/architecture.md) | 分层架构、解耦原则、文件内排列顺序、已有代码修改边界 |
 | [git](rules/git.md) | 提交信息、署名、分支权限、.gitignore、交付整洁 |
-| [process](rules/process.md) | 变更类型闸门表、模块文档、AGENTS.md、子 Agent 契约 |
+| [process](rules/process.md) | 变更类型闸门表、编码前检查 CI、模块文档、AGENTS.md、子 Agent 契约 |
 | [collaboration](rules/collaboration.md) | 工作节奏、确认边界、中文表达方式 |
 
 ### 语言（languages/）

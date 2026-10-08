@@ -16,7 +16,7 @@
 | text | 注释语法、文件头、篇幅、折行、措辞 | 文档结构（属 domains/docs-markdown） |
 | architecture | 分层、解耦、单一入口、文件内排列顺序 | 目录结构（属各技术栈分册） |
 | git | 提交粒度、提交信息、署名、分支、gitignore、交付整洁 | CI 配置（属脚手架模板） |
-| process | 变更类型闸门、模块文档、AGENTS.md、子 Agent 契约 | 具体测试写法（属 domains/testing） |
+| process | 变更类型闸门、编码前检查 CI、模块文档、AGENTS.md、子 Agent 契约 | 具体测试写法（属 domains/testing） |
 | collaboration | 工作节奏、分析输出格式、确认边界、中文表达 | 代码本身的任何规则 |
 
 ### 入参要求

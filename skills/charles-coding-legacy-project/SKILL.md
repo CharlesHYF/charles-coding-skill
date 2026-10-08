@@ -46,6 +46,7 @@ bash scripts/check.sh --changed
 - `AGENTS.md`：按 [模板](templates/project-template/AGENTS.md) 生成，内联硬约束清单
 - `.editorconfig` / `.gitattributes`：从脚手架复制，按项目实际语言调整缩进
 - `docs/modules/` 与 `test_cases/` 目录骨架
+- CI：项目没有 CI 配置时问用户是否需要，按 [编码前检查 CI](../charles-coding-standards/rules/process.md) 处理，答复记进 `AGENTS.md`
 
 ### 5. 给存量违规排优先级
 不要一次性全改。按这个顺序分批处理，每批一个独立提交：
