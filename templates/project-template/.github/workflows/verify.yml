@@ -1,6 +1,6 @@
 # CI 交付闸门
 # 创建日期：2026-08-10
-# 修改日期：2026-09-21
+# 修改日期：2026-10-08
 name: verify
 
 # 本地 pre-push 钩子是真闸门，云端这层拦的是钩子被绕过或未安装的情况
@@ -66,7 +66,7 @@ jobs:
             fail=1
           fi
           if printf '%s' "${msgs}" | grep -iEq 'co-authored-by:.*(claude|gpt|copilot|cursor|gemini|anthropic)|generated with .*(claude|copilot|cursor)|noreply@anthropic'; then
-            echo "[NG] 提交信息含 AI 联合署名/水印,须仅署名 Charles。"
+            echo "[NG] 提交信息含 AI 联合署名/水印,须仅署名提交者本人。"
             fail=1
           fi
           if [ "${fail}" = "0" ]; then

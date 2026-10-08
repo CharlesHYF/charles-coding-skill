@@ -137,4 +137,4 @@ for (User user : users) {
 3. 实现 Service 层业务逻辑
 4. 实现 Controller 层，参数校验、异常捕获交给全局处理器
 5. 编写单元测试（覆盖 Mapper、Service、Controller 关键路径，参见全局覆盖率策略）
-6. 自测通过后，**AI 将代码 commit 到 `agents/feature/xxx` 分支**，由 Charles 审查后合并或发起 PR
+6. 自测通过后，**AI 将代码 commit 到 `agents/feature/xxx` 分支**，由使用者本人审查后合并或发起 PR

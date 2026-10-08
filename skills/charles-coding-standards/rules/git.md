@@ -4,9 +4,9 @@
 ## Git 规范
 | 项目       | 规范                                      |
 | ---------- | ----------------------------------------- |
-| 作者       | Charles <w1400214654@outlook.com>         |
+| 作者       | 仓库使用者本人的 git 身份，以 `git config user.name` / `user.email` 为准 |
 | 提交信息   | 符合社区常规（建议 Conventional Commits） |
-| 署名归属   | 仅署名 Charles，**禁止**任何 AI 联合署名  |
+| 署名归属   | 仅署名使用者本人，**禁止**任何 AI 联合署名 |
 
 ## 提交粒度
 > **一个任务、一个需求、一个问题，对应一个 commit。**
@@ -27,22 +27,22 @@
 - 脚手架模板 `../../../templates/project-template/.gitignore` 已包含上述常见项，新项目直接复制为起点，再按语言/框架追加
 
 ## 禁止 AI 署名（commit/push 时必须遵守）
-> **目的**：避免 GitHub 上出现 `claude` / Agent 作为提交者或 contributor（如 "CharlesHYF and claude" 的联合署名）。
+> **目的**：避免 GitHub 上出现 `claude` / Agent 作为提交者或 contributor（如 "someone and claude" 的联合署名）。
 
 - **禁止** 在提交信息中添加任何 AI 联合署名 trailer，包括但不限于：
   - `Co-Authored-By: Claude <noreply@anthropic.com>`
   - `Co-Authored-By: <任何 AI / Agent / Bot>`
   - 末尾的 `Generated with ...` 之类的 AI 生成声明
-- **禁止** 把 author / committer 设为 Agent 或 AI 身份；author 与 committer 必须始终为 `Charles <w1400214654@outlook.com>`
-- 提交前确认 `git config user.name` = `Charles`、`user.email` = `w1400214654@outlook.com`；必要时用 `git commit --author="Charles <w1400214654@outlook.com>"` 显式指定
+- **禁止** 把 author / committer 设为 Agent 或 AI 身份；author 与 committer 必须始终是使用者本人在本机配置的 git 身份
+- 提交前确认 `git config user.name` 与 `user.email` 已配置且是使用者本人；未配置时停下来请使用者配置，**禁止**自行编造或改写成其他人的身份
 - 提交信息正文只描述"做了什么、为什么"，不出现任何 AI / 工具相关的署名或水印
 
 ## Git 分支与 AI 协作权限
-- **主分支**：`main`（或其他主干分支），仅由 Charles 本人合并或发起 Pull Request
+- **主分支**：`main`（或其他主干分支），仅由使用者本人合并或发起 Pull Request
 - **AI 工作区**：所有 AI 生成的代码必须提交到 `agents/feature/xxx` 分支，**禁止**直接提交到主干或发起 PR
 - **工作流**：
   1. AI 在 `agents/feature/xxx` 分支上开发并 commit
-  2. Charles 审查代码后，手动合并到 `main` 或通过 PR 合入
+  2. 使用者本人审查代码后，手动合并到 `main` 或通过 PR 合入
   3. AI 不参与代码审查和合并操作
 
 ## 交付整洁规范

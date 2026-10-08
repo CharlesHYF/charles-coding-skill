@@ -38,7 +38,7 @@
 - 禁用 Unicode 弯引号、破折号、Emoji，统一半角与 `--`
 - 注释块正文不超过 3 行，一条注释一行写完
 - 文档里需要展示违规写法时，该文件必须进 `.checkignore`，或在该行加 `check-ignore` 标记
-- 提交到 `agents/feature/*` 分支，**禁止任何 AI 联合署名**，author 与 committer 必须是 `Charles <w1400214654@outlook.com>`
+- 提交到 `agents/feature/*` 分支，**禁止任何 AI 联合署名**，author 与 committer 必须是提交者本人的 git 身份
 
 ## 常用命令
 
