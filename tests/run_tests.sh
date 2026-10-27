@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check.sh 回归测试
 # 创建日期：2026-08-31
-# 修改日期：2026-09-24
+# 修改日期：2026-10-27
 
 set -uo pipefail
 
@@ -242,11 +242,10 @@ def get_order(order_id: int) -> None:
 EOF
 
 cat > "${GOOD_DIR}/good_service.go" <<'EOF'
-/*
- * 订单服务
- * 创建日期：2026-08-31
- * 修改日期：2026-08-31
- */
+// 订单服务
+// 创建日期：2026-08-31
+// 修改日期：2026-08-31
+
 package service
 
 // GetOrder 按 ID 查询订单，未命中返回 ErrOrderNotFound。
@@ -255,6 +254,16 @@ package service
 func GetOrder(id int64) error {
 	return nil
 }
+EOF
+
+# 存量 Go 文件的 /* */ 文件头放行，不要求迁移
+cat > "${GOOD_DIR}/legacy_service.go" <<'EOF'
+/*
+ * 存量订单服务
+ * 创建日期：2026-08-31
+ * 修改日期：2026-08-31
+ */
+package service
 EOF
 
 cat > "${GOOD_DIR}/GoodPage.vue" <<'EOF'
@@ -472,11 +481,10 @@ public class LongDoc {
 EOF
 
 cat > "${BAD_DIR}/longrun.go" <<'EOF'
-/*
- * 连续单行注释超长的文件
- * 创建日期：2026-08-31
- * 修改日期：2026-08-31
- */
+// 连续单行注释超长的文件
+// 创建日期：2026-08-31
+// 修改日期：2026-08-31
+
 package service
 
 // Recover 把滞留任务标记失败。
@@ -485,6 +493,13 @@ package service
 // 所以这里要给出明确原因。
 func Recover() {
 }
+EOF
+
+cat > "${BAD_DIR}/glued_header.go" <<'EOF'
+// 文件头紧贴 package 的文件
+// 创建日期：2026-08-31
+// 修改日期：2026-08-31
+package service
 EOF
 
 cat > "${BAD_DIR}/longdoc.py" <<'EOF'
@@ -627,6 +642,7 @@ expect_contains "${CHECK_OUTPUT}" "BadDate.java 创建日期格式错误" "检�
 expect_contains "${CHECK_OUTPUT}" "BadDate.java 修改日期格式错误" "检查二:修改日期格式"
 expect_contains "${CHECK_OUTPUT}" "SlashHeader.ts 文件头用了 // 单行注释" "检查五:C系文件头用单行注释"
 expect_contains "${CHECK_OUTPUT}" "InlineBlock.java 块注释挤在一行" "检查五:块注释挤行"
+expect_contains "${CHECK_OUTPUT}" "glued_header.go 文件头紧贴 package 声明" "检查五:Go 文件头紧贴 package"
 expect_contains "${CHECK_OUTPUT}" "hash_header.py 文件头用了 # 单行注释" "检查五:Python文件头用井号"
 expect_contains "${CHECK_OUTPUT}" "inline_doc.py docstring 未三段式" "检查五:docstring挤行"
 expect_contains "${CHECK_OUTPUT}" "single_quote.py 用了单引号三引号" "检查五:单引号三引号"

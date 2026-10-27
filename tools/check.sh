@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 规范校验器
 # 创建日期：2026-08-03
-# 修改日期：2026-09-24
+# 修改日期：2026-10-27
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
@@ -479,15 +479,26 @@ check_comment_syntax() {
 			continue
 		fi
 
-		# 一、C 系语言(含 Go/Vue/CSS)：文件头不得用 // 起头，必须用块注释
-		# Go 的声明级注释用 // 是标准写法，但文件头仍须 /* */,故一并纳入(只匹配含"创建日期"的行)
-		if [[ "${file}" =~ \.(java|kt|kts|go|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
+		# 一、C 系语言(含 Vue/CSS)：文件头不得用 // 起头，必须用块注释(只匹配含"创建日期"的行)
+		# Go 不在此列：文件头按 Go 约定用 //,存量的 /* */ 文件头同样放行
+		if [[ "${file}" =~ \.(java|kt|kts|js|jsx|ts|tsx|vue|css|scss)$ ]]; then
 			local slash_header
 			slash_header=$(head -n "${HEADER_SCAN_LINES}" "${file}" | grep -nE '^[[:space:]]*//.*创建日期：' || true)
 
 			if [ -n "${slash_header}" ]; then
-				report "${file} 文件头用了 // 单行注释(须改为块注释三段式；Go 用 /* */,其余用 /** */):"
+				report "${file} 文件头用了 // 单行注释(须改为块注释三段式 /** */):"
 				echo "${slash_header}" | sed 's/^/         /'
+			fi
+		fi
+
+		# Go 的 // 文件头须与 package 之间空一行，紧贴 package 会被 go doc 当作包文档
+		if [[ "${file}" =~ \.go$ ]]; then
+			local glued_header
+			glued_header=$(head -n "${HEADER_SCAN_LINES}" "${file}" | awk '/^[[:space:]]*\/\/.*修改日期：/ { line = NR; next } line && NR == line + 1 && /^package[[:space:]]/ { print line ": " $0 } { line = 0 }')
+
+			if [ -n "${glued_header}" ]; then
+				report "${file} 文件头紧贴 package 声明(须空一行，否则会被 go doc 当作包文档):"
+				echo "${glued_header}" | sed 's/^/         L/'
 			fi
 		fi
 
