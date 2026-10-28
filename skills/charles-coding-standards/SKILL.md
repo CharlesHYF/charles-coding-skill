@@ -28,7 +28,7 @@ metadata:
 | 代码审查 | [review](../charles-coding-review/SKILL.md) |
 
 ## 交付红线
-> 这十三条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
+> 这十四条必须记住，其余查模块。违反其中确定性规则的，`scripts/check.sh` 会直接 fail。
 
 1. **注释用中文**，所有源码文件带文件头三行：作用描述、`创建日期：YYYY-MM-DD`、`修改日期：YYYY-MM-DD`，冒号是全角；描述**只写核心职责，禁止用 `--` 追加功能罗列**
 2. **缩进默认 Tab**；Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格；行尾统一 LF
@@ -43,6 +43,7 @@ metadata:
 11. **样式里不写任何注释**（`.css` / `.scss` 与 Vue `<style>` 块，含文件头）；**import 顺序**为值 import 在前、`import type` 在后
 12. **元素多行书写**：属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现
 13. **集合处理一律显式循环**：禁止推导式、Stream、集合回调链与嵌套三元，JSX 渲染列表时单独一次 `.map` 除外；Python 函数的参数与返回类型都要写注解。细则见 [common](rules/common.md) 的"集合处理写法"
+14. 完成任务或子任务时按 [reporting](rules/reporting.md) 汇报，状态词只用固定的 10 个
 
 ## 规范模块
 
@@ -56,6 +57,7 @@ metadata:
 | [git](rules/git.md) | 提交信息、署名、分支权限、.gitignore、交付整洁 |
 | [process](rules/process.md) | 变更类型闸门表、编码前检查 CI、模块文档、AGENTS.md、子 Agent 契约 |
 | [collaboration](rules/collaboration.md) | 工作节奏、确认边界、中文表达方式 |
+| [reporting](rules/reporting.md) | 状态词、进度与结果汇报模板、分析三段式、证据与不确定性表达 |
 
 ### 语言（languages/）
 | 分册 | 主栈 | 格式化 / Lint | 测试 |

@@ -16,9 +16,20 @@ CHECK_SH="tools/check.sh"
 CHECK_SH_TEMPLATE="templates/project-template/scripts/check.sh"
 ARCHITECTURE="skills/charles-coding-standards/rules/architecture.md"
 COLLABORATION="skills/charles-coding-standards/rules/collaboration.md"
+REPORTING="skills/charles-coding-standards/rules/reporting.md"
 TEXT="skills/charles-coding-standards/rules/text.md"
 PROCESS="skills/charles-coding-standards/rules/process.md"
 VUE="skills/charles-coding-standards/stacks/vue.md"
+
+REPORTING_STATUS_WORDS=("已完成" "部分完成" "未开始" "进行中" "已验证" "未验证" "失败" "跳过" "阻塞" "未确认")
+REPORTING_WORKFLOWS=(
+	"skills/charles-coding-new-project/SKILL.md"
+	"skills/charles-coding-legacy-project/SKILL.md"
+	"skills/charles-coding-new-feature/SKILL.md"
+	"skills/charles-coding-bugfix/SKILL.md"
+	"skills/charles-coding-refactor/SKILL.md"
+	"skills/charles-coding-review/SKILL.md"
+)
 
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -87,6 +98,18 @@ expect_in_file "${COLLABORATION}" "keep-coding-instructions: true" "Output Style
 expect_in_file "${COLLABORATION}" "一等公民" "开发交流分册包含抽象表达改写"
 expect_in_file "${VUE}" '### `<script setup>` 内部顺序' "Vue 分册包含脚本排列顺序"
 
+# 四之一、汇报状态词与入口必须同时活在规则、模板和工作流里
+for status_word in "${REPORTING_STATUS_WORDS[@]}"; do
+	expect_in_file "${REPORTING}" "${status_word}" "汇报状态词 ${status_word} 已写入 reporting.md"
+	expect_in_file "${AGENTS}" "${status_word}" "汇报状态词 ${status_word} 已内联进 AGENTS.md"
+done
+
+expect_in_file "${SKILL}" "rules/reporting.md" "汇报模块已接入 SKILL.md"
+
+for workflow_skill in "${REPORTING_WORKFLOWS[@]}"; do
+	expect_in_file "${workflow_skill}" "rules/reporting.md" "结果汇报模板已接入 ${workflow_skill}"
+done
+
 # 四之二、变更类型闸门必须同时活在流程模块与项目模板里(子 agent 只认它直接读到的文件)
 GATE_ROWS=("新模块 / 新功能" "需求变更" "Bug 修复" "重构" "依赖升级")
 
@@ -134,7 +157,8 @@ expect_in_file "${TEXT}" "禁止用 \`--\` 追加功能说明" "文件头描述�
 expect_in_file "${AGENTS}" "禁止用 \`--\` 追加功能说明" "文件头描述粒度已内联进 AGENTS.md"
 expect_in_file "skills/charles-coding-standards/stacks/vue.md" "## 常量（constants）" "常量规范已写入 Vue 分册"
 expect_in_file "skills/charles-coding-standards/stacks/vue.md" "## 全局组件注册" "全局组件注册已写入 Vue 分册"
-expect_in_file "${COLLABORATION}" "## 分析输出格式" "分析输出格式已写入协作模块"
+expect_in_file "${REPORTING}" "## 分析输出格式" "分析输出格式已归入汇报模块"
+expect_in_file "${COLLABORATION}" "reporting.md" "协作模块已引用汇报模块"
 
 # 四之三之五、集合处理写法与 Python 类型注解必须同时活在通用模块、语言分册、红线与项目模板里
 COLLECTION_DOCS=(
@@ -209,6 +233,7 @@ HEADER_FILES=(
 	"${TEXT}"
 	"${ARCHITECTURE}"
 	"${COLLABORATION}"
+	"${REPORTING}"
 )
 
 for header_file in "${HEADER_FILES[@]}"; do

@@ -47,3 +47,4 @@ bash scripts/setup.sh
 - `docs/modules/` 下至少一个两级模块文档
 - `test_cases/` 下至少一个两级用例文档
 - `git config core.hooksPath` 已指向 `scripts/hooks`
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

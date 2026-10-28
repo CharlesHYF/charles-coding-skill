@@ -61,3 +61,4 @@ bash scripts/check.sh --changed
 - `make verify`（增量）全绿
 - 基线违规数已记录在 `docs/` 下，有明确的分批收敛计划
 - 新增代码不产生任何新违规
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

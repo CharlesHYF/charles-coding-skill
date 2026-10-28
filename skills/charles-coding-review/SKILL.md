@@ -53,3 +53,6 @@ make verify
 1. 先跑 `make verify`，返工循环由脚本自动触发
 2. 重点检查它是否读了 `AGENTS.md` 与模块文档（看实现与文档是否对得上）
 3. 检查它有没有超出任务边界改了不该改的文件
+
+## 交付闸门
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

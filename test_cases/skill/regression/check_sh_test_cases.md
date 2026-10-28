@@ -1,7 +1,7 @@
 <!--
 	规范校验器 check.sh 的回归测试用例，覆盖八项检查的拦截与放行行为
 	创建日期：2026-09-21
-	修改日期：2026-10-27
+	修改日期：2026-10-28
 -->
 # 规范校验器（tools/check.sh）-- 回归测试用例
 
@@ -66,3 +66,14 @@
 | TC-CHK-205 | P0 | 行级豁免 | 注释行带 check-ignore | 该行含黑话 | 该行不报违规 | 已跳过 | 通过 |
 | TC-CHK-206 | P1 | 未配置边界 | 无 .import-boundaries | 存在跨模块引用 | 检查八跳过，不误报 | 已跳过 | 通过 |
 | TC-CHK-207 | P1 | 违规退出码 | 存在任一违规 | 任意模式 | 退出码非 0 | 退出码 1 | 通过 |
+
+## 功能四：汇报规则同源
+
+> 执行方式：`bash tests/check_consistency.sh`。这些断言只检查文档同源，不判断实际回复是否符合汇报规则。
+
+| 测试编号 | 优先级 | 测试用例 | 输入内容 | 预计结果 | 实际结果 | 是否通过 |
+| --- | --- | --- | --- | --- | --- | --- |
+| TC-CHK-301 | P0 | 状态词双源完整 | reporting.md 与模板 AGENTS.md | 两份文档均包含全部 10 个固定状态词 | 已验证：20 项状态词断言通过 | 通过 |
+| TC-CHK-302 | P0 | 主 skill 汇报入口 | standards/SKILL.md | 包含 rules/reporting.md | 已验证：主 skill 入口断言通过 | 通过 |
+| TC-CHK-303 | P0 | 六个工作流汇报入口 | 六个非 standards 工作流的 SKILL.md | 每份文档均包含 rules/reporting.md | 已验证：6 项工作流入口断言通过 | 通过 |
+| TC-CHK-304 | P0 | 分析格式定义归位 | reporting.md 与 collaboration.md | reporting.md 包含分析输出格式定义，collaboration.md 引用 reporting.md | 已验证：定义与引用的 2 项断言通过 | 通过 |

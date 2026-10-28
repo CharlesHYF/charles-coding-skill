@@ -46,3 +46,4 @@ metadata:
 - 模块文档不需要改动（行为不变即文档不变）
 - `make verify` 全绿
 - commit 说明标明"重构，无行为变更"
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

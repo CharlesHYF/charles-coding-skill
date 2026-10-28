@@ -51,3 +51,4 @@ metadata:
 - 模块全量测试通过
 - `make verify` 全绿
 - commit 说明写清根因与修复方式，不只写"修复 bug"
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

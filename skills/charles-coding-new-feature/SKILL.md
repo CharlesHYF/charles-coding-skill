@@ -51,3 +51,4 @@ make verify
 - 用例文档齐备且实跑通过
 - `make verify` 全绿
 - 提交在 `agents/feature/*` 分支，无 AI 署名
+- 按 [结果汇报模板](../charles-coding-standards/rules/reporting.md) 交付

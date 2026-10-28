@@ -253,6 +253,7 @@ fork 后按需修改。规则按关注点拆在不同模块里，每条规则只
 | 分支、提交、署名 | `rules/git.md` |
 | 变更闸门、模块文档、CI 检查 | `rules/process.md` |
 | 工作节奏与交流方式 | `rules/collaboration.md` |
+| 状态词、进度与结果汇报模板 | `rules/reporting.md` |
 | 某门语言或框架 | `languages/`、`stacks/` 下对应分册 |
 
 部分规则同时出现在规则模块、项目模板 `AGENTS.md` 和校验器里，改了其中一处要同步其余几处，`tests/check_consistency.sh` 会检查。机器可判定的规则还要同步修改 `tools/check.sh` 和 `templates/project-template/scripts/check.sh`（两份必须一致）。
@@ -271,7 +272,8 @@ fork 后按需修改。规则按关注点拆在不同模块里，每条规则只
 │   │   │   ├── architecture.md       # 分层架构、解耦、单一入口、文件内组织
 │   │   │   ├── git.md                # 提交、署名、分支、gitignore、交付整洁
 │   │   │   ├── process.md            # 变更类型闸门、CI 检查、模块文档、子 Agent 契约
-│   │   │   └── collaboration.md      # 工作节奏、确认边界、中文表达
+│   │   │   ├── collaboration.md      # 工作节奏、确认边界、中文表达
+│   │   │   └── reporting.md          # 状态词、进度与结果汇报模板、分析三段式
 │   │   ├── languages/                # java kotlin python go javascript-typescript html-css sql
 │   │   ├── stacks/                   # vue react nodejs web android
 │   │   └── domains/                  # testing logging devops ai-ml docs-markdown
@@ -307,6 +309,10 @@ bash tests/check_consistency.sh  # 多处同源规则的一致性
 bash tests/check_structure.sh    # skill 完整性、版本号一致、Markdown 死链
 bash tools/check.sh --all        # 本仓自身的规范校验
 ```
+
+## 参考
+
+状态词与汇报模板改编自 dualface/ste-zh（MIT）及 ASD-STE100 写作原则。
 
 ## 许可证
 
