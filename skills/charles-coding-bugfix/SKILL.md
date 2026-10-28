@@ -1,6 +1,6 @@
 ---
 name: charles-coding-bugfix
-description: Use when fixing a bug, test failure, or unexpected behavior in Charles's projects - enforces root-cause analysis and writing a failing reproduction test before touching implementation code.
+description: Use when fixing a bug, test failure, or unexpected behavior in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - enforces root-cause analysis and writing a failing reproduction test before touching implementation code.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>
@@ -38,7 +38,7 @@ metadata:
 跑该模块全量测试，确认没有引入新问题。
 
 ### 5. 保留测试
-复现测试放 `test_cases/<系统模块>/regression/`，**不允许修完就删**。它的作用是防止同一个 Bug 再次出现。
+复现测试代码放 `tests/`，用例说明写进 `test_cases/<模块>/regression/`，**不允许修完就删**。它的作用是防止同一个 Bug 再次出现。
 
 ### 6. 检查文档
 如果修复过程中发现模块文档描述的行为本身就是错的，回头改文档，并在 commit 说明里写明。

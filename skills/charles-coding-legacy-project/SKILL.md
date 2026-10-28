@@ -1,6 +1,6 @@
 ---
 name: charles-coding-legacy-project
-description: Use when introducing Charles's coding standards into an existing codebase that was not built with them - installing the checker in incremental mode so legacy violations do not block delivery while new code is held to the full standard.
+description: Use when integrating an existing codebase with the checker in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - installs incremental checks so legacy violations do not block delivery while new code is held to the full standard.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>

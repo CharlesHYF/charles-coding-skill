@@ -1,6 +1,6 @@
 ---
 name: charles-coding-refactor
-description: Use when restructuring existing code in Charles's projects without changing its external behavior - enforces proving behavioral equivalence and forbids weakening tests to make the refactor pass.
+description: Use when restructuring existing code without changing its external behavior in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - enforces proving behavioral equivalence and forbids weakening tests to make the refactor pass.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>

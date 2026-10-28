@@ -45,7 +45,7 @@
 ## 功能三：结构自检
 
 ### 功能描述
-`tests/check_structure.sh` 校验三件事：每个 skill 目录都有 SKILL.md 且声明的 name 与目录名一致、六处版本号一致、全部 Markdown 内部链接可达。重构或新增 skill 后必须跑通。
+`tests/check_structure.sh` 校验三件事：每个 skill 目录都有 SKILL.md 且声明的 name 与目录名一致、十二处版本号一致（七个 skill 的 metadata.version、四个 plugin 配置与 Gemini 配置）、全部 Markdown 内部链接可达。重构或新增 skill 后必须跑通。
 
 ### 入参要求
 - 在仓库根执行

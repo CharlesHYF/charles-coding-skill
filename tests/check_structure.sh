@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # 结构自检
 # 创建日期：2026-09-21
-# 修改日期：2026-09-21
+# 修改日期：2026-10-28
 
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}" || exit 1
 
-# 主 skill：版本号以它的 metadata 为准，其余配置向它对齐
+# 主 skill：版本号以它的 metadata 为准，其余 skill 与配置向它对齐
 MAIN_SKILL="skills/charles-coding-standards/SKILL.md"
 
 # 必须存在的顶层目录
@@ -97,12 +97,53 @@ for skill_dir in skills/*/; do
 	done
 done
 
-# 三、版本号：主 skill 的 metadata 与五处配置必须一致
-MAIN_VERSION=$(grep -m1 '^[[:space:]]*version:' "${MAIN_SKILL}" | awk '{print $2}' | tr -d '"')
+# 三、版本号：七个 skill 的 metadata.version 与五处配置必须一致
+# 只读取前置信息中 metadata 的直接子字段，忽略正文与其他层级的版本号
+read_metadata_version() {
+	awk '
+		NR == 1 { if ($0 !~ /^---[[:space:]]*$/) exit; next }
+		/^---[[:space:]]*$/ { exit }
+		/^metadata:[[:space:]]*(#.*)?$/ { in_metadata = 1; next }
+		in_metadata && /^[^[:space:]#]/ { in_metadata = 0 }
+		!in_metadata || /^[[:space:]]*($|#)/ { next }
+		{
+			match($0, /[^ \t]/)
+			indent = RSTART - 1
+
+			if (!metadata_indent || indent < metadata_indent) {
+				metadata_indent = indent
+				version = ""
+			}
+
+			if (indent == metadata_indent && $0 ~ /^[ \t]+version:[ \t]*/) {
+				version = $0
+				sub(/^[ \t]+version:[ \t]*/, "", version)
+				sub(/[ \t]+#.*/, "", version)
+				sub(/[ \t]+$/, "", version)
+				gsub(/^["\047]|["\047]$/, "", version)
+			}
+		}
+		END { print version }
+	' "$1"
+}
+
+MAIN_VERSION=$(read_metadata_version "${MAIN_SKILL}")
 
 if [ -z "${MAIN_VERSION}" ]; then
-	fail "${MAIN_SKILL} 未声明版本号"
+	fail "${MAIN_SKILL} 未声明 metadata.version"
 else
+
+	for skill_file in skills/*/SKILL.md; do
+		skill_version=$(read_metadata_version "${skill_file}")
+
+		if [ -z "${skill_version}" ]; then
+			fail "${skill_file} 未声明 metadata.version"
+		elif [ "${skill_version}" = "${MAIN_VERSION}" ]; then
+			pass "版本号一致 ${MAIN_VERSION}: ${skill_file}"
+		else
+			fail "版本号漂移: ${skill_file}=${skill_version}，应为 ${MAIN_VERSION}"
+		fi
+	done
 
 	for version_file in "${VERSION_FILES[@]}"; do
 

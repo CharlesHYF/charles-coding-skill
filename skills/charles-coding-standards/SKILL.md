@@ -1,6 +1,6 @@
 ---
 name: charles-coding-standards
-description: Use when writing, reviewing, refactoring, debugging, organizing, or scaffolding code in Java, Kotlin, Python, Go, TypeScript, JavaScript, HTML, CSS, SQL, Node.js, Vue 3, React/Next.js, Android, or web frontends. Applies Charles's full-stack conventions, change-type delivery gates, Chinese comment and communication rules, testing requirements, and the agents/feature/* git branch workflow.
+description: Use when writing, reviewing, refactoring, debugging, organizing, or scaffolding code in Java, Kotlin, Python, Go, TypeScript, JavaScript, HTML, CSS, SQL, Node.js, Vue 3, React/Next.js, Android, or web frontends in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks. Applies full-stack conventions, change-type delivery gates, Chinese comment and communication rules, testing requirements, and the agents/feature/* git branch workflow.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>
@@ -11,7 +11,7 @@ metadata:
 > Charles 的全栈编码规范。本文件只放**场景路由、交付红线和模块索引**；细则全部在 `rules/` `languages/` `stacks/` `domains/` 下，按需打开。
 
 ## 何时使用
-- 在 Charles 的任意后端 / 前端 / 安卓 / 数据库 / 微服务 / CLI / 数据处理 / AI·ML 项目中写代码或做代码审查
+- 在 `AGENTS.md` 声明采用 charles-coding 规范的项目中写代码或做代码审查，或用户明确要求使用时
 - 需要遵循统一的注释、命名、格式化、测试、Git 分支与交付规范
 - 开新项目需要脚手架，或给老项目接入规范
 
@@ -35,10 +35,10 @@ metadata:
 3. **禁用 Unicode 弯引号、破折号、Emoji**，统一用 ASCII 直引号与半角双连字符 `--`
 4. **禁止魔法数字**，有语义的数字一律定义为具名常量
 5. **命名见名知义**，禁止占位名（`tmp` / `obj` / `data1`）、拼音、隐喻黑话
-6. **后端强制三层架构**：Controller -> Service -> Repository，禁止跨层调用
+6. **对外提供 HTTP/RPC 接口且有持久化的服务强制三层架构**：Controller -> Service -> Repository，禁止跨层调用；CLI、定时任务、数据处理脚本豁免
 7. **注释块正文不超过 3 行**，一条注释一行写完，不把一句话折断换行
-8. **AI 代码只提交到 `agents/feature/*`**，禁止任何 AI 联合署名，禁止直接推主干或发起 PR；**一个任务对应一个 commit**
-9. **交付前 `make verify` 全绿**（规范校验 + 测试），未实跑不得声称通过；测试代码集中放 `tests/`，新功能必须带压测脚本
+8. **AI 代码只提交到 `agents/feature/*`**，禁止任何 AI 联合署名，禁止直接推主干；默认不发起 PR；用户明确要求或项目 `AGENTS.md` 另有约定时以其为准；**一个任务交付时整理为一个 commit**
+9. **交付前 `make verify` 全绿**（规范校验 + 测试），未实跑不得声称通过；测试代码集中放 `tests/`；新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由
 10. **动手前先判定变更类型**，按 [流程规范](rules/process.md) 的闸门表执行对应要求；项目没有 CI 且 `AGENTS.md` 未记录过决定时，先问用户是否需要 CI，一个项目只问一次
 11. **样式里不写任何注释**（`.css` / `.scss` 与 Vue `<style>` 块，含文件头）；**import 顺序**为值 import 在前、`import type` 在后
 12. **元素多行书写**：属性各占一行、文本单独占一行、同级元素之间空一行；只有组件自闭合，原生 HTML 标签成对出现
@@ -90,6 +90,6 @@ metadata:
 开新项目直接复制 [`templates/project-template/`](templates/project-template/)，内含 AGENTS.md（已内联硬约束）、README、Makefile、`scripts/`、`.editorconfig`、`.gitattributes`、`.gitignore`、PR 模板与 CI。
 
 - **规范校验器** [`tools/check.sh`](tools/check.sh)：把确定性规则变成会 fail 的检查，由 `make verify` 强制执行
-- **工具从 skill 目录调用，不要复制进项目**：skill 目录内有 `tools` 与 `templates` 软链，直接 `bash ~/.claude/skills/charles-coding-standards/tools/install-check.sh <项目路径>` 即可。复制过去会让 `check.sh` 变成散落各处的拷贝，skill 更新后不同步，同一条规则在不同项目里表现不一样。唯一的例外是 `install-check.sh` 往项目里装的那份 `scripts/check.sh`，它是交付闸门的一部分，必须随项目走
+- **工具从 skill 目录调用，不要复制进项目**：skill 目录内有 `tools` 与 `templates` 软链，使用本 `SKILL.md` 所在目录下的 `tools/install-check.sh`，执行前先解析为绝对路径，再用 `bash <安装脚本绝对路径> <项目路径>` 调用。复制过去会让 `check.sh` 变成散落各处的拷贝，skill 更新后不同步，同一条规则在不同项目里表现不一样。唯一的例外是 `install-check.sh` 往项目里装的那份 `scripts/check.sh`，它是交付闸门的一部分，必须随项目走
 - **交付总闸门** `make verify` = `scripts/check.sh`（规范）+ `scripts/test.sh`（测试），全绿才算完成
 - 老项目接入用 [`tools/install-check.sh`](tools/install-check.sh)，装完默认走增量检查，存量代码不阻塞

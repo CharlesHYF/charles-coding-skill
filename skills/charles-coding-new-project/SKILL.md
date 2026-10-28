@@ -1,6 +1,6 @@
 ---
 name: charles-coding-new-project
-description: Use when starting a brand-new project in Charles's environment and it needs scaffolding - copying the project template, installing the spec checker, writing the first module doc, and verifying the delivery gate works before any feature code is written.
+description: Use when scaffolding a new codebase in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - copies the project template, installs the spec checker, writes the first module doc, and verifies the delivery gate works before any feature code is written.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>

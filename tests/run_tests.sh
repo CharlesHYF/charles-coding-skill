@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check.sh 回归测试
 # 创建日期：2026-08-31
-# 修改日期：2026-10-27
+# 修改日期：2026-10-28
 
 set -uo pipefail
 
@@ -1010,6 +1010,25 @@ run_check "${DELIVERY_DIR}"
 expect_contains "${CHECK_OUTPUT}" "缺少压测目录" "检查十二:缺压测目录被拦"
 
 rm -rf "${DELIVERY_DIR}"
+
+# 未提供压测脚本时,只有 README 明确记录不适用才放行
+STRESS_EXEMPT_DIR="$(mktemp -d)"
+make_skeleton "${STRESS_EXEMPT_DIR}"
+rm "${STRESS_EXEMPT_DIR}/test_cases/stress/load-test.js"
+printf '# 压测说明\n压测：待补充\n' > "${STRESS_EXEMPT_DIR}/test_cases/stress/README.md"
+run_check "${STRESS_EXEMPT_DIR}"
+expect_contains "${CHECK_OUTPUT}" "test_cases/stress/ 下没有压测脚本" "检查十二:普通 README 不能替代压测脚本"
+
+printf '# 压测说明\n压测：不适用\n理由：本次仅调整文案,未新增或改动对外接口、写操作、批量导入导出。\n' > "${STRESS_EXEMPT_DIR}/test_cases/stress/README.md"
+run_check "${STRESS_EXEMPT_DIR}"
+
+if [ "${CHECK_EXIT}" -eq 0 ]; then
+	pass "检查十二:README 记录压测不适用及理由后放行"
+else
+	fail "检查十二:README 记录压测不适用及理由后仍被拦(退出码 ${CHECK_EXIT})"
+fi
+
+rm -rf "${STRESS_EXEMPT_DIR}"
 
 # ============================================================
 # 场景十：集合写法与 Python 类型注解

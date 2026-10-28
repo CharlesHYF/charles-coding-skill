@@ -29,7 +29,7 @@
 2. 改了 `tools/check.sh` 必须同步 `templates/project-template/scripts/check.sh`，两份内容必须逐字一致（一致性测试会校验）
 3. 改了规则文本，检查 `tests/check_consistency.sh` 里对应的同源断言是否还成立
 4. 新增规则时优先考虑能否被 `tools/check.sh` 机器验证，不能验证的写进"手动约定类"并如实标注
-5. 版本号出现在六处，必须同步：`skills/charles-coding-standards/SKILL.md`、四个 plugin 配置、`gemini-extension.json`（结构校验会比对）
+5. 版本号出现在十二处，必须同步：七个 `skills/*/SKILL.md` 的 `metadata.version`、四个 plugin 配置、`gemini-extension.json`（以主 skill 版本为准，结构校验会比对）
 
 ## 硬约束（本仓自身适用）
 

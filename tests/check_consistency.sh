@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 多处同源规则一致性自检
 # 创建日期：2026-08-31
-# 修改日期：2026-09-24
+# 修改日期：2026-10-28
 
 set -uo pipefail
 
@@ -114,9 +114,20 @@ expect_in_file "skills/charles-coding-standards/rules/common.md" "## 元素与�
 # 四之三之三、本轮规则必须同时活在分册与项目模板里
 expect_in_file "skills/charles-coding-standards/domains/testing.md" "## 测试代码位置" "测试代码位置已写入测试分册"
 expect_in_file "${AGENTS}" "测试代码集中放" "测试代码位置已内联进 AGENTS.md"
-expect_in_file "skills/charles-coding-standards/domains/testing.md" "必测的四类接口" "压测四类覆盖已写入测试分册"
-expect_in_file "${AGENTS}" "压测必须有" "压测要求已内联进 AGENTS.md"
-expect_in_file "${PROCESS}" "压测脚本" "压测已进入变更闸门表"
+STRESS_DOCS=(
+	"skills/charles-coding-standards/domains/testing.md"
+	"${AGENTS}"
+	"${PROCESS}"
+	"${SKILL}"
+	"${README}"
+)
+
+for stress_doc in "${STRESS_DOCS[@]}"; do
+	expect_in_file "${stress_doc}" "新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本" "压测适用范围已写入 ${stress_doc}"
+	expect_in_file "${stress_doc}" "test_cases/stress/README.md" "压测豁免说明位置已写入 ${stress_doc}"
+	expect_in_file "${stress_doc}" "压测：不适用" "压测不适用声明已写入 ${stress_doc}"
+done
+
 expect_in_file "skills/charles-coding-standards/rules/git.md" "## 提交粒度" "提交粒度已写入 Git 模块"
 expect_in_file "${AGENTS}" "提交粒度" "提交粒度已内联进 AGENTS.md"
 expect_in_file "${TEXT}" "禁止用 \`--\` 追加功能说明" "文件头描述粒度已写入文本模块"

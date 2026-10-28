@@ -1,6 +1,6 @@
 ---
 name: charles-coding-new-feature
-description: Use when building a new feature or module in Charles's projects, or when changing the behavior of an existing one - enforces requirement clarification, the module-doc gate before coding, and test cases before delivery.
+description: Use when building a new feature or module, or changing the behavior of an existing one, in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - enforces requirement clarification, the module-doc gate before coding, and test cases before delivery.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>
@@ -31,7 +31,7 @@ metadata:
 **文档评审通过后再进入编码。** 这一步是闸门，不是建议。
 
 ### 3. 编码
-- 按三层架构落地：Controller 只做校验与转发、Service 承载业务、Repository 只做存取
+- 对外提供 HTTP/RPC 接口且有持久化的服务按三层架构落地：Controller 只做校验与转发、Service 承载业务、Repository 只做存取；CLI、定时任务、数据处理脚本豁免
 - 文件内排列顺序、定义集中、方法顺序按 [architecture.md](../charles-coding-standards/rules/architecture.md)
 - 命名、注释、文件头按 [naming.md](../charles-coding-standards/rules/naming.md) 与 [text.md](../charles-coding-standards/rules/text.md)
 - 代码实现必须与模块文档一致；实现过程中发现文档有问题，回头改文档再继续

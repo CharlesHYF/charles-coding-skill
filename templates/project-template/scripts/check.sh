@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 规范校验器
 # 创建日期：2026-08-03
-# 修改日期：2026-10-27
+# 修改日期：2026-10-28
 
 # 说明：故意不用 set -e。grep/perl 无匹配时返回非 0 属正常，需手动累计错误而非中断。
 set -uo pipefail
@@ -900,7 +900,7 @@ check_test_location() {
 	done < <(list_files)
 }
 
-# 检查十二：压测脚本(有接口层的项目必须提供,空目录视为未完成)
+# 检查十二：压测脚本或不适用声明(适用范围与理由由人工确认)
 check_stress_tests() {
 	echo "[12/14] 检查压测脚本..."
 
@@ -911,7 +911,12 @@ check_stress_tests() {
 	fi
 
 	if [ ! -d "test_cases/stress" ]; then
-		report "缺少压测目录：test_cases/stress/(有接口层的项目必须提供压测脚本)"
+		report "缺少压测目录：test_cases/stress/(需提供压测脚本,不适用时在 README.md 写明声明及理由)"
+		return
+	fi
+
+	if [ -f "test_cases/stress/README.md" ] && grep -qF -- "压测：不适用" "test_cases/stress/README.md"; then
+		echo "  [SKIP] test_cases/stress/README.md 已声明压测：不适用。"
 		return
 	fi
 
@@ -919,7 +924,7 @@ check_stress_tests() {
 	script_count=$(find test_cases/stress -type f | grep -cE "${STRESS_SCRIPT_REGEX}" || true)
 
 	if [ "${script_count}" -eq 0 ]; then
-		report "test_cases/stress/ 下没有压测脚本(必测四类接口:写操作、分页查询、批量导入导出、核心读接口)"
+		report "test_cases/stress/ 下没有压测脚本(需提供脚本,或在 README.md 写明压测：不适用及理由)"
 	fi
 }
 

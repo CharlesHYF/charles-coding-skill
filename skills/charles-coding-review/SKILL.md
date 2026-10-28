@@ -1,6 +1,6 @@
 ---
 name: charles-coding-review
-description: Use when reviewing code in Charles's projects, including reviewing output produced by subagents - runs the mechanical spec checker first, then reviews business logic, so review effort goes where scripts cannot reach.
+description: Use when reviewing code, including output produced by subagents, in projects that adopt the charles-coding standards (declared in AGENTS.md) or when the user asks - runs the mechanical spec checker first, then reviews business logic, so review effort goes where scripts cannot reach.
 metadata:
   version: "4.0.0"
   author: Charles <w1400214654@outlook.com>

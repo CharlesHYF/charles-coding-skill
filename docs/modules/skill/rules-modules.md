@@ -70,7 +70,7 @@
 | 九 样式注释 | languages/html-css 的样式禁注释 |
 | 十 import 排版 | languages/javascript-typescript 的 import 顺序 |
 | 十一 测试代码位置 | domains/testing 的测试集中放置 |
-| 十二 压测脚本 | domains/testing 的压测强制与四类覆盖 |
+| 十二 压测脚本 | domains/testing 的压测分级、适用场景覆盖与不适用声明 |
 | 十三 集合写法 | common 的集合处理写法（Kotlin 的 map / filter 等与 Flow 同名，属手动约定） |
 | 十四 Python 类型注解 | languages/python 的类型注解 |
 

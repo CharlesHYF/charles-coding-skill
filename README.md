@@ -18,7 +18,7 @@
 - 缩进默认 Tab（Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格）
 - 集合处理一律写显式循环，禁止推导式、Stream 与集合回调链
 - AI 只提交到 `agents/feature/*` 分支，由人工审查后合并
-- 新功能编码前必须先写模块文档并评审，交付时必须带压测脚本
+- 新功能编码前必须先写模块文档并评审；新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由
 
 需要调整时，fork 后修改对应的规则模块，见 [自定义](#自定义)。
 
@@ -39,6 +39,8 @@
 ## 安装
 
 先把仓库克隆到本地：
+
+skill 依赖软链，Windows 需开启 git 的 `core.symlinks`。
 
 ```bash
 git clone https://github.com/CharlesHYF/charles-coding-skill.git ~/charles-coding-skill
@@ -152,7 +154,7 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 | 九 | 样式注释（`.css` / `.scss` 与 Vue `<style>` 块内禁止任何注释） |
 | 十 | import 排版（`import type` 不得排在值 import 之前） |
 | 十一 | 测试代码位置（前端集中放 `frontend/tests/`，不散落在源码目录旁） |
-| 十二 | 压测脚本（`test_cases/stress/` 为空即视为未完成） |
+| 十二 | 压测脚本（`test_cases/stress/` 下有脚本，或 `README.md` 写明 '压测：不适用' 及理由） |
 | 十三 | 集合写法（推导式、Stream、集合回调链、嵌套三元；Python 走语法树识别） |
 | 十四 | Python 函数类型注解（参数与返回类型都要写，没有返回值写 `-> None`） |
 
@@ -172,8 +174,8 @@ push main        ->  pre-push 钩子跑全量 make verify，不通过不允许�
 
 规范对 AI 的提交行为有四条要求，细则见 [rules/git.md](skills/charles-coding-standards/rules/git.md)。
 
-1. **分支**：AI 只能提交到 `agents/feature/<描述>` 分支，禁止直接推 `main`，也不发起 PR。合并由人工审查后完成。分支名不按变更类型细分，变更类型只决定要过哪些闸门。
-2. **提交粒度**：一个任务、一个需求、一个问题对应一个 commit。重构与功能修改分开提交；纯格式化的批量改动单独提交，并把提交哈希登记进 `.git-blame-ignore-revs`。提交信息建议用 Conventional Commits。
+1. **分支**：AI 只能提交到 `agents/feature/<描述>` 分支，禁止直接推 `main`；默认不发起 PR；用户明确要求或项目 `AGENTS.md` 另有约定时以其为准。合并由人工审查后完成。分支名不按变更类型细分，变更类型只决定要过哪些闸门。
+2. **提交粒度**：一个任务交付时整理为一个 commit。重构与功能修改分开提交；纯格式化的批量改动单独提交，并把提交哈希登记进 `.git-blame-ignore-revs`。提交信息建议用 Conventional Commits。
 3. **作者身份**：author 与 committer 必须是使用者本人在本机配置的 git 身份（`git config user.name` / `user.email`）。AI 不得把自己设为作者，也不得替换成别人的身份；本机未配置时 AI 会停下来请你配置。
 4. **禁止 AI 署名**：提交信息里不得出现 `Co-Authored-By: Claude ...` 等 AI 联合署名 trailer，也不得出现 `Generated with ...` 这类生成声明。目的是让仓库的提交者与 contributor 列表里只有真人。
 
@@ -193,7 +195,7 @@ push main        ->  pre-push 钩子跑全量 make verify，不通过不允许�
 | 注释篇幅 | 正文默认 1-2 行，**硬上限 3 行**（标签行不计入）；一条注释一行写完，禁止把一句话折断换行 |
 | 注释语法 | 多行注释一律用块或文档注释，禁止连续多行 `//` / `#` 拼多行；Go 声明级注释按官方标准用 `//` |
 | 注释措辞 | 动作加对象加必要条件，一句话说清；动作词全项目统一；禁止隐喻黑话；日志与用户可见文案同一套要求 |
-| 分层架构 | 后端强制 Controller 到 Service 到 Repository，禁止跨层 |
+| 分层架构 | 对外提供 HTTP/RPC 接口且有持久化的服务强制三层架构，Controller 到 Service 到 Repository，禁止跨层；CLI、定时任务、数据处理脚本豁免 |
 | 单一入口 | 一项能力只暴露一个入口模块，底层实现不许被入口之外的地方直接 import；受保护关系写进 `.import-boundaries` |
 | 样式注释 | `.css` / `.scss` 文件与 Vue `<style>` 块内不写任何注释，含文件头；意图由 class 名与自定义属性命名表达 |
 | import 排版 | 顺序为第三方值 import、项目内值 import、全部 type import、常量，组间空一行；type 一律用 `import type` |
@@ -204,11 +206,11 @@ push main        ->  pre-push 钩子跑全量 make verify，不通过不允许�
 | 变更闸门 | 动手前先判定变更类型（新功能 / 需求变更 / Bug 修复 / 重构 / 依赖升级），按对应档执行文档与测试要求 |
 | CI 检查 | 编码前确认项目有 CI；没有时问一次是否需要，答复记进 `AGENTS.md` |
 | 模块文档 | `docs/modules/<系统模块>/<模块名>.md` 两级组织，新功能编码前先写文档并评审 |
-| Bug 修复 | 先定位根因，**先写复现测试并确认它失败**，再改实现，测试保留进 `regression/` |
+| Bug 修复 | 先定位根因，**先写复现测试并确认它失败**，再改实现；复现测试代码放 `tests/`，用例说明写进 `test_cases/<模块>/regression/` |
 | 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
 | 测试位置 | 测试代码集中放 `tests/`（前端 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外 |
-| 压测 | 新功能必须提供压测脚本，覆盖写操作、列表分页、批量导入导出、核心读接口四类 |
+| 压测 | 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由 |
 | CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解，外加提交信息扫描 |
 | Git | 见 [Git 提交约定](#git-提交约定) |
 

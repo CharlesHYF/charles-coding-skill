@@ -2,7 +2,7 @@
 <!--
 开发流程规范
 创建日期：2026-09-21
-修改日期：2026-10-08
+修改日期：2026-10-28
 -->
 > 动手写代码前先判定本次属于哪一类变更，再按对应闸门执行。判定不了就按更严格的一档执行。
 
@@ -23,7 +23,7 @@
 - **模块文档闸门**：必写 `docs/modules/<系统模块>/<模块名>.md`（两级组织，如 `docs/modules/backend/orders.md`），每个功能至少包含功能描述、入参要求、参数、返回等小节；文档本身遵循 [Markdown 规范](../domains/docs-markdown.md)，结构见 [模块文档模板](../templates/module-doc.md)
 - 文档评审通过后再进入编码，代码实现须与文档一致
 - 交付前补齐 `test_cases/<系统模块>/<类型>/x.md` 并实跑
-- **必须提供压测脚本**放 `test_cases/stress/`，覆盖四类接口：写操作、列表与分页查询、批量与导入导出、被其它模块依赖的核心读接口。阈值写进脚本由 k6 自动判定，细则见 [testing.md](../domains/testing.md)
+- 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本，放 `test_cases/stress/`；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由。阈值写进脚本由 k6 自动判定，细则见 [testing.md](../domains/testing.md)
 - **测试代码集中放 `tests/`**（前端为 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外
 
 ### 需求变更
@@ -39,7 +39,7 @@
 2. **先写一个能稳定复现该 Bug 的测试**，运行并确认它失败
 3. 再改实现代码，直到该测试通过
 4. 跑该模块全量测试，确认没有引入回归
-5. 复现测试保留进仓库，放 `test_cases/<系统模块>/regression/`，不允许修完就删
+5. 复现测试代码放 `tests/`，用例说明写进 `test_cases/<模块>/regression/`，保留进仓库，不允许修完就删
 
 - 如果修复过程中发现模块文档描述的行为本身就是错的，回头改文档，并在 commit 说明里写明
 - 只改一两行的显性笔误（拼写、常量值写反）可跳过第 2 步，但要在 commit 说明里注明原因
@@ -71,7 +71,7 @@
 ## AGENTS.md（项目级 AI 指令）
 - **每个项目根目录必须包含 `AGENTS.md`**（复数，跨工具事实标准，Claude Code / Codex / Cursor 等均优先读取），作为 AI 工具进入项目时首先读取的指令文件
 - **AGENTS.md 必须自足**：把命名、文件头、禁用字符、分层、模块文档闸门等**硬约束原文内联进去**，而非只写一句"请遵循 charles-coding Skill"。原因见下方"子 Agent 编排契约" -- 子 agent 是隔离上下文，只认它直接读到的文件，指针式引用会在转述中丢失
-- 内容至少包含：交付红线（`make verify` 全绿）、内联硬约束清单、代码编写与组织规则、已有代码修改边界、开发交流要求、`agents/feature/*` 分支策略（禁止直接推 `main` 或发起 PR）、常用命令（启动/构建/测试）
+- 内容至少包含：交付红线（`make verify` 全绿）、内联硬约束清单、代码编写与组织规则、已有代码修改边界、开发交流要求、`agents/feature/*` 分支策略（禁止直接推 `main`；默认不发起 PR；用户明确要求或项目 `AGENTS.md` 另有约定时以其为准）、常用命令（启动/构建/测试）
 - 完整模板见 [../../../templates/project-template/AGENTS.md](../templates/project-template/AGENTS.md)
 
 ## 子 Agent 编排契约
