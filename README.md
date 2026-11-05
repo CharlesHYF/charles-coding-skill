@@ -18,7 +18,7 @@
 - 缩进默认 Tab（Python / Kotlin 4 空格，SQL / YAML / JSON 2 空格）
 - 集合处理一律写显式循环，禁止推导式、Stream 与集合回调链
 - AI 只提交到 `agents/feature/*` 分支，由人工审查后合并
-- 新功能编码前必须先写模块文档并评审；新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由
+- 新功能编码前必须先写模块文档并评审；新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本和压测报告（`test_cases/stress/report.md`）；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由
 
 需要调整时，fork 后修改对应的规则模块，见 [自定义](#自定义)。
 
@@ -48,45 +48,30 @@ git clone https://github.com/CharlesHYF/charles-coding-skill.git ~/charles-codin
 
 ### Claude Code / Codex / Qoder / Trae / Rovo Dev
 
-安装脚本把七个 skill 以软链形式装进目标工具的 skills 目录，不传参数时装到 Claude Code：
+进入仓库后执行，自动检测已存在的 Agent 并复制安装七个 skill；同名 skill 会被替换：
 
 ```bash
-bash ~/charles-coding-skill/tools/install-skills.sh
+cd ~/charles-coding-skill
+make sync
 ```
 
-其他工具把目标 skills 目录作为参数传入：
+修改仓库内容后再次运行 `make sync` 即可更新。
+
+仓库常用命令：
 
 ```bash
-bash ~/charles-coding-skill/tools/install-skills.sh ~/.agents/skills    # Codex / Qoder / Trae 的跨工具标准位置
-bash ~/charles-coding-skill/tools/install-skills.sh ~/.trae/skills      # Trae 专属路径，优先级高于 .agents
-bash ~/charles-coding-skill/tools/install-skills.sh ~/.rovodev/skills   # Rovo Dev
+make author Charles w1400214654@outlook.com
+make commit "提交说明"
+make push
+make publish-release v1.0.0
+make rebase main
 ```
 
-遇到同名的实体目录时脚本会跳过，不会覆盖。装完的目录如下：
+发布命令需要已登录的 GitHub CLI，触发远程 main 上的 `release.yml`；验证通过后覆盖同名发布分支和标签。
 
-```
-~/.claude/skills/
-├── charles-coding-standards        -> ~/charles-coding-skill/skills/charles-coding-standards
-├── charles-coding-new-project      -> ...
-├── charles-coding-legacy-project   -> ...
-├── charles-coding-new-feature      -> ...
-├── charles-coding-bugfix           -> ...
-├── charles-coding-refactor         -> ...
-└── charles-coding-review           -> ...
-```
+### 如何调用 skill
 
-只想在某个项目里启用时，把目标改成 `<项目>/.agents/skills` 或 `<项目>/.claude/skills`。项目级与用户级同名时，项目级优先。
-
-### Claude Code plugin 方式
-
-仓库自带 `.claude-plugin/marketplace.json`，也可以按 plugin 安装，调用形式变为 `/charles-coding:charles-coding-bugfix`：
-
-```
-/plugin marketplace add ~/charles-coding-skill
-/plugin install charles-coding@charles-coding
-```
-
-软链方式和 plugin 方式只装一种，两种都装会出现同名 skill。
+在 Claude Code 中，运行 `make sync` 安装后，可以直接输入 `/charles-coding-bugfix` 调用，无需安装插件。名称是 `bugfix`，不是 `bug-fix`。在 Codex 中可输入 `$charles-coding-bugfix`，也可以直接在对话中说明使用该 skill。
 
 ### Gemini CLI
 
@@ -96,12 +81,6 @@ git clone https://github.com/CharlesHYF/charles-coding-skill.git ~/.gemini/exten
 
 扩展清单是仓库根目录的 `gemini-extension.json`，上下文文件是 `AGENTS.md`。
 
-### Cursor
-
-```bash
-git clone https://github.com/CharlesHYF/charles-coding-skill.git .cursor/plugins/charles-coding
-```
-
 ### 其他工具
 
 不支持 skill 目录的工具，把 `skills/charles-coding-standards/SKILL.md` 的内容作为 system prompt 注入即可。
@@ -109,10 +88,12 @@ git clone https://github.com/CharlesHYF/charles-coding-skill.git .cursor/plugins
 ## 更新
 
 ```bash
-cd ~/charles-coding-skill && git pull origin main
+cd ~/charles-coding-skill
+git pull origin main
+make sync
 ```
 
-软链方式下 pull 完立即生效，不需要重新运行安装脚本。只有仓库路径变化时才需要重新安装。
+`make sync` 使用复制方式安装，拉取更新后需要再次运行才能更新已安装的 skill。
 
 ## 使用
 
@@ -127,6 +108,10 @@ cp -r ~/charles-coding-skill/templates/project-template/ <新项目路径>
 # 老项目：安装增量校验器与 pre-push 钩子
 bash ~/charles-coding-skill/tools/install-check.sh <项目路径>
 ```
+
+脚手架的 Makefile 按通用、Git、容器和部署备份分组，运行 `make` 查看命令。`make verify` 执行增量规范校验和测试，`make verify-all` 执行全量规范校验和测试。容器、数据库备份和发布工作流需按项目配置后使用。
+
+备份默认放在 `~/Documents/<项目名>/` 下，支持 `VERSION=v1.3.0` 与自定义路径；安装包默认只预览，使用 `CONFIRM=1` 才执行。具体命令及数据保护范围见 [项目模板 README](templates/project-template/README.md#常用命令)。
 
 老项目接入后默认只检查本次改动，存量违规不阻塞交付，新增代码按完整标准执行。详细步骤见 [charles-coding-legacy-project](skills/charles-coding-legacy-project/SKILL.md)。
 
@@ -154,7 +139,7 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 | 九 | 样式注释（`.css` / `.scss` 与 Vue `<style>` 块内禁止任何注释） |
 | 十 | import 排版（`import type` 不得排在值 import 之前） |
 | 十一 | 测试代码位置（前端集中放 `frontend/tests/`，不散落在源码目录旁） |
-| 十二 | 压测脚本（`test_cases/stress/` 下有脚本，或 `README.md` 写明 '压测：不适用' 及理由） |
+| 十二 | 压测脚本和报告（`test_cases/stress/` 下有脚本及非空 `report.md`，或 `README.md` 写明 '压测：不适用' 及理由） |
 | 十三 | 集合写法（推导式、Stream、集合回调链、嵌套三元；Python 走语法树识别） |
 | 十四 | Python 函数类型注解（参数与返回类型都要写，没有返回值写 `-> None`） |
 
@@ -164,7 +149,7 @@ bash tools/check.sh --changed    # 只查本次改动（老项目与日常迭代
 
 ```
 push agents/**   ->  pre-push 钩子跑增量校验
-push main        ->  pre-push 钩子跑全量 make verify，不通过不允许推送
+push main        ->  pre-push 钩子跑全量规范校验和项目测试，不通过不允许推送
 推到远端之后      ->  云端 CI 再检查一次
 ```
 
@@ -210,7 +195,7 @@ push main        ->  pre-push 钩子跑全量 make verify，不通过不允许�
 | 重构 | 必须证明行为等价，禁止修改断言、删用例、放宽阈值让它通过 |
 | 测试目录 | `test_cases/<系统模块>/<测试类型>/` 两级组织 |
 | 测试位置 | 测试代码集中放 `tests/`（前端 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外 |
-| 压测 | 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由 |
+| 压测 | 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本和压测报告（`test_cases/stress/report.md`）；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由 |
 | CI | push main 与 PR 走全量，push `agents/**` 走增量；校验范围为禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解，外加提交信息扫描 |
 | Git | 见 [Git 提交约定](#git-提交约定) |
 
@@ -286,15 +271,13 @@ fork 后按需修改。规则按关注点拆在不同模块里，每条规则只
 ├── tools/
 │   ├── check.sh                      # 规范校验器，十四项检查
 │   ├── install-check.sh              # 老项目接入：装校验器与 pre-push 钩子
-│   └── install-skills.sh             # 把七个 skill 软链到工具的 skills 目录
+│   └── git-commands.sh               # Make 命令实现
 ├── templates/
 │   ├── project-template/             # 新项目脚手架，含 AGENTS.md、Makefile、CI
 │   ├── module-doc.md                 # 模块文档模板
 │   └── examples/                     # 测试用例与模块文档范例、前端范例页
-├── docs/modules/                     # 本仓自身的模块文档
 ├── test_cases/                       # 本仓自身的测试用例文档
 ├── tests/                            # 本仓自测脚本（CI 强制）
-├── .claude-plugin/ .codex-plugin/ .cursor-plugin/ .agents/   # 各工具的 plugin 清单
 ├── gemini-extension.json             # Gemini CLI 扩展清单
 └── AGENTS.md                         # 修改本仓时 AI 读取的指令
 ```

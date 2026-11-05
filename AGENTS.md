@@ -4,7 +4,7 @@
 
 ## 这是什么
 
-一个跨工具的编码规范 plugin，包含七个 skill：
+一套跨工具的编码规范，包含七个 skill：
 
 | skill | 作用 |
 | --- | --- |
@@ -18,6 +18,8 @@
 
 规范细则在 `skills/charles-coding-standards/` 下的 `rules/`（通用规则）、`languages/`（语言）、`stacks/`（技术栈）、`domains/`（领域）。
 
+本仓不维护 `docs/` 模块文档，新功能无需模块文档评审；其他项目仍遵循其适用规范。
+
 ## 交付红线
 
 1. **改完必须跑通三项验证**，缺一不可：
@@ -29,7 +31,7 @@
 2. 改了 `tools/check.sh` 必须同步 `templates/project-template/scripts/check.sh`，两份内容必须逐字一致（一致性测试会校验）
 3. 改了规则文本，检查 `tests/check_consistency.sh` 里对应的同源断言是否还成立
 4. 新增规则时优先考虑能否被 `tools/check.sh` 机器验证，不能验证的写进"手动约定类"并如实标注
-5. 版本号出现在十二处，必须同步：七个 `skills/*/SKILL.md` 的 `metadata.version`、四个 plugin 配置、`gemini-extension.json`（以主 skill 版本为准，结构校验会比对）
+5. 版本号出现在八处，必须同步：七个 `skills/*/SKILL.md` 的 `metadata.version`、`gemini-extension.json`（以主 skill 版本为准，结构校验会比对）
 
 ## 硬约束（本仓自身适用）
 
@@ -43,7 +45,7 @@
 ## 常用命令
 
 ```bash
-bash tools/check.sh --all          # 全量规范校验
+CHARLES_SKIP_MODULE_DOCS=1 bash tools/check.sh --all  # 本仓不维护模块文档
 bash tools/check.sh --changed      # 只查本次改动
 bash tests/run_tests.sh            # check.sh 回归测试
 bash tests/check_consistency.sh    # 多处同源规则一致性

@@ -69,6 +69,7 @@ make_skeleton() {
 	echo "* text eol=lf" > "${dir}/.gitattributes"
 	echo "# demo 模块" > "${dir}/docs/modules/backend/demo.md"
 	echo "# demo 用例" > "${dir}/test_cases/backend/unit/demo.md"
+	echo '# 压测报告' > "${dir}/test_cases/stress/report.md"
 	printf '/**\n * 接口压力测试脚本\n * 创建日期：2026-09-21\n * 修改日期：2026-09-21\n */\nexport default function () {}\n' > "${dir}/test_cases/stress/load-test.js"
 }
 
@@ -1003,6 +1004,14 @@ run_check "${DELIVERY_DIR}"
 expect_contains "${CHECK_OUTPUT}" "LoginPage.vue 文件头描述用 -- 追加了功能说明" "检查二:描述行 -- 追加说明被拦"
 expect_contains "${CHECK_OUTPUT}" "format.test.ts 测试代码散落在源码目录" "检查十一:散落的测试文件被拦"
 expect_not_contains "${CHECK_OUTPUT}" "parse.test.ts 测试代码散落" "检查十一:集中在 tests/ 的测试放行"
+
+# 压测脚本存在时要求非空报告
+rm "${DELIVERY_DIR}/test_cases/stress/report.md"
+run_check "${DELIVERY_DIR}"
+expect_contains "${CHECK_OUTPUT}" "缺少非空压测报告" "检查十二:缺少报告被拦"
+printf '# 压测报告\n结果：通过\n' > "${DELIVERY_DIR}/test_cases/stress/report.md"
+run_check "${DELIVERY_DIR}"
+expect_not_contains "${CHECK_OUTPUT}" "缺少非空压测报告" "检查十二:非空报告放行"
 
 # 压测目录被清空后必须报缺失
 rm -rf "${DELIVERY_DIR}/test_cases/stress"

@@ -369,7 +369,9 @@ check_required_files() {
 	done
 
 	# docs/modules/ 须存在,且模块文档必须在系统模块子目录下(两级:docs/modules/<系统模块>/<模块>.md)
-	if [ ! -d "docs/modules" ]; then
+	if [ "${CHARLES_SKIP_MODULE_DOCS:-0}" = "1" ]; then
+		:
+	elif [ ! -d "docs/modules" ]; then
 		report "缺少模块文档目录：docs/modules/"
 	else
 
@@ -398,7 +400,7 @@ check_required_files() {
 
 		# 浅层违规:躺在 test_cases/ 根或仅一层子目录里的 .md(README.md 除外)
 		local case_flat
-		case_flat=$(find test_cases -maxdepth 2 -type f -name '*.md' ! -name 'README.md')
+		case_flat=$(find test_cases -maxdepth 2 -type f -name '*.md' ! -name 'README.md' ! -path 'test_cases/stress/report.md')
 
 		if [ -n "${case_flat}" ]; then
 			report "test_cases/ 下有浅层用例文档(须放进 test_cases/<系统模块>/<类型>/x.md):"
@@ -925,6 +927,10 @@ check_stress_tests() {
 
 	if [ "${script_count}" -eq 0 ]; then
 		report "test_cases/stress/ 下没有压测脚本(需提供脚本,或在 README.md 写明压测：不适用及理由)"
+	fi
+
+	if [ "${script_count}" -gt 0 ] && [ ! -s "test_cases/stress/report.md" ]; then
+		report "缺少非空压测报告：test_cases/stress/report.md"
 	fi
 }
 

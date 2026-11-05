@@ -1,0 +1,41 @@
+# 验证并发布主分支
+# 创建日期：2026-11-05
+# 修改日期：2026-11-05
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 发布版本
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: 验证版本
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+      - name: 运行验证
+        run: |
+          bash tests/run_tests.sh
+          bash tests/test_git_commands.sh
+          bash tests/check_consistency.sh
+          bash tests/check_structure.sh
+          CHARLES_SKIP_MODULE_DOCS=1 bash tools/check.sh --all
+      - name: 发布分支和标签
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git push --force origin "HEAD:refs/heads/release/$VERSION" "HEAD:refs/tags/$VERSION"

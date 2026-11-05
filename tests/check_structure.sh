@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 结构自检
 # 创建日期：2026-09-21
-# 修改日期：2026-10-28
+# 修改日期：2026-11-05
 
 set -uo pipefail
 
@@ -22,10 +22,6 @@ REQUIRED_DIRS=(
 
 # 声明了版本号、必须与主 skill 一致的配置文件
 VERSION_FILES=(
-	".claude-plugin/plugin.json"
-	".claude-plugin/marketplace.json"
-	".cursor-plugin/plugin.json"
-	".codex-plugin/plugin.json"
 	"gemini-extension.json"
 )
 

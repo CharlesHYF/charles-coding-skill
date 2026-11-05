@@ -51,7 +51,7 @@ k6 run --env TARGET_URL=http://localhost:8080/api/endpoint load-test.js
 
 ## 结果回填
 
-测试完成后，k6 会输出完整的指标摘要。将如下关键数据记录到测试用例表：
+测试完成后，k6 会输出完整的指标摘要。将实际环境、测试场景和以下数据记录到 `test_cases/stress/report.md`；报告模板见 skill 中的 `templates/examples/stress-report-template.md`：
 
 - 最终通过/失败的请求数和错误率
 - P95 和 P99 延迟

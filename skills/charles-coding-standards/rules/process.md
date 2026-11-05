@@ -23,7 +23,7 @@
 - **模块文档闸门**：必写 `docs/modules/<系统模块>/<模块名>.md`（两级组织，如 `docs/modules/backend/orders.md`），每个功能至少包含功能描述、入参要求、参数、返回等小节；文档本身遵循 [Markdown 规范](../domains/docs-markdown.md)，结构见 [模块文档模板](../templates/module-doc.md)
 - 文档评审通过后再进入编码，代码实现须与文档一致
 - 交付前补齐 `test_cases/<系统模块>/<类型>/x.md` 并实跑
-- 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本，放 `test_cases/stress/`；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由。阈值写进脚本由 k6 自动判定，细则见 [testing.md](../domains/testing.md)
+- 新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本和压测报告，脚本放 `test_cases/stress/`，报告放 `test_cases/stress/report.md`；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由。阈值写进脚本由 k6 自动判定，细则见 [testing.md](../domains/testing.md)
 - **测试代码集中放 `tests/`**（前端为 `frontend/tests/`），Go 与 Java / Kotlin 因构建工具强制而例外
 
 ### 需求变更

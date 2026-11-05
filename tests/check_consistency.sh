@@ -146,7 +146,8 @@ STRESS_DOCS=(
 )
 
 for stress_doc in "${STRESS_DOCS[@]}"; do
-	expect_in_file "${stress_doc}" "新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本" "压测适用范围已写入 ${stress_doc}"
+	expect_in_file "${stress_doc}" "新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本和压测报告" "压测适用范围已写入 ${stress_doc}"
+	expect_in_file "${stress_doc}" "test_cases/stress/report.md" "压测报告位置已写入 ${stress_doc}"
 	expect_in_file "${stress_doc}" "test_cases/stress/README.md" "压测豁免说明位置已写入 ${stress_doc}"
 	expect_in_file "${stress_doc}" "压测：不适用" "压测不适用声明已写入 ${stress_doc}"
 done

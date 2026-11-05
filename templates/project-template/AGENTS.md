@@ -79,7 +79,7 @@
 - **import 排版**：顺序固定为第三方值 import、项目内值 import、全部 type import、常量与其余代码，组间空一行；type 一律用 `import type`，**禁止把 type import 混进值 import 中间**。`scripts/check.sh` 检查十会拦。
 - **元素多行书写**：模板里所有元素属性各占一行、文本单独占一行、结束的 `>` 或 `/>` 单独占一行，同一父元素下相邻子元素之间空一行；只有组件自闭合，`div`、`span`、`iframe`、`button` 等原生标签永远成对出现。TS/JS 里同一数组的相邻元素之间空一行，对象内部键值对不空行。排版只改格式，不动顺序、命名、属性与业务逻辑。
 - **测试代码集中放 `tests/`**：前端放 `frontend/tests/`，Python 与 Node 放 `tests/`，禁止 `src/utils/foo.test.ts` 这种就近放置。例外只有 Go(`xxx_test.go` 必须同目录)与 Java/Kotlin(构建工具固定读 `src/test`)。`scripts/check.sh` 检查十一会拦。
-- **压测分级**：新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本，放 `test_cases/stress/`；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由。阈值写进脚本由 k6 自动判定。`scripts/check.sh` 检查十二会拦。
+- **压测分级**：新增或改动对外接口、写操作、批量导入导出时必须提供压测脚本和压测报告，脚本放 `test_cases/stress/`，报告放 `test_cases/stress/report.md`；其余情况在 `test_cases/stress/README.md` 写明 '压测：不适用' 及理由。阈值写进脚本由 k6 自动判定。`scripts/check.sh` 检查十二会拦。
 - **前端 index 化**：`types` / `store` / `constants` 一律 `index.ts` 做再导出、实体放 `modules/`；`permission` 放 `src/` 下；`src/components` 下的全局组件全部在 `main.ts` 注册。
 - **单一入口**：一项能力对外只暴露一个入口模块，底层实现不许被入口之外的地方直接 import(例如认证只能经由 `composables/useAuth`，不许直接引 `utils/auth`；Controller 不许直接引 Mapper)。受保护关系写在项目根 `.import-boundaries`，`scripts/check.sh` 检查八会拦。绕过入口的调用通常也能跑通，但入口层的缓存、鉴权刷新、错误处理会对它全部失效。
 - **集合处理一律显式循环**：禁止 Python 推导式与生成器表达式、`map()` / `filter()` / `reduce()`、海象运算符；禁止 Java Stream、`forEach` 回调与 `Optional` 链；禁止 Kotlin 集合函数链(`Flow` 操作符除外)与 JS/TS 的 `map` / `filter` / `flatMap` / `reduce` / `forEach`(JSX 渲染列表时单独一次 `.map` 除外)；禁止 Go 自写泛型 `Map` / `Filter` 与 `samber/lo`；禁止嵌套三元。不合规的数据用 `continue` 提前跳过，清洗后的值先存变量再判断。查找类单次调用(`find` / `some` / `any` / `first`)与排序的 key lambda 允许。`scripts/check.sh` 检查十三会拦。
@@ -108,6 +108,39 @@
 - 结果汇报与进度使用下方模板；审视规范、代码审查、方案讨论在有两个以上问题或需要用户决定时，使用 "问题描述 / 存在的隐患 / 解决方案" 三段式编号列表，每个问题占一个编号；日常问答使用自然段。
 - 不展示工具名、执行器标签、内部状态和推理过程。
 - 需求清晰、修改可逆且没有真实产品取舍时直接执行；产品、架构、兼容性、破坏性操作或权限扩张仍须确认。
+- 执行任务前，需要按照下面的格式进行答复：
+
+  ```json
+  任务列表如下：
+  
+  开发中：
+  - xxxx：xxxxx
+  - xxxx：xxxx
+  
+  待开发：
+  - xxx：xxx
+  - xxx：xxxxx
+  
+  已完成：
+  - xxx：xxx
+  ```
+- 排查问题的答复时，需要按照下面的格式进行答复：
+
+  ```json
+  一句话总结.... 具体如下：
+  
+  ---------------------------------------
+  
+  问题描述：xxxxx
+  存在的隐患：xxxxxx
+  解决方案：xxxxx
+  
+  ---------------------------------------
+  
+  问题描述：xxxxx
+  存在的隐患：xxxxxx
+  解决方案：xxxxx
+  ```
 
 ### 7.1 固定状态词
 工作或检查状态只用以下 10 个词，每个状态必须对应明确范围，不得用 "已" 加其他动词替代。
@@ -195,7 +228,7 @@ make verify-all  # 全量闸门：全量规范校验 + 测试(推主干与 CI �
 make lint        # 仅规范校验，只查本次改动(禁用字符/文件头/注释语法/注释篇幅/注释黑话/必需文件/命名/模块边界/样式注释/import 排版/测试位置/压测/集合写法/类型注解)
 make lint-all    # 仅规范校验，全量扫描
 make check       # 仅跑测试
-make dev         # 启动开发环境
+make docker-dev  # 启动开发容器
 ```
 
 > `scripts/setup.sh` 会安装 `pre-push` 钩子：推 `main` 跑全量 `verify`，推其它分支跑增量校验。云端 CI 是二次确认，本地钩子才是拦截点。

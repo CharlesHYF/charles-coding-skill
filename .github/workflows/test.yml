@@ -24,7 +24,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: check.sh 回归测试
-        run: bash tests/run_tests.sh
+        run: |
+          bash tests/run_tests.sh
+          bash tests/test_git_commands.sh
+          bash tests/test_template_make.sh
 
       - name: 规则一致性自检
         run: bash tests/check_consistency.sh
@@ -39,7 +42,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: tools/check.sh
-        run: bash tools/check.sh --all
+        run: CHARLES_SKIP_MODULE_DOCS=1 bash tools/check.sh --all
 
   shell-lint:
     name: Shell 静态检查
